@@ -1,0 +1,61 @@
+# Kickoff
+
+27.4, 19.30-21.45
+
+- Work division
+    - @Julian: client
+    - @Adi: server
+    - @Hrisi: GenAI
+- Finding a project subject
+    - Brainstorm
+        - ~~Reservation system~~
+        - infrastructure visualization
+        - **E-Mail client** -> actual GenAI use case
+            - GenAI
+                - summarizing
+                - categorizing
+                - write answers
+                - write new E-Mails
+            - Problem? Already exists
+        - E-Mail AI in any existing E-Mail client
+        - **Nachhilfe matcher** -> Tutoring matching system 
+            - user stories -> use cases
+                - "I want to earn some sidemoney" -> show monetary aspects
+                - "I like teaching" -> Get connected with people needing help
+                - "I like contributing" -> upload summaries/async tutorials
+                - "I want to be more active in the student community"
+
+                - "I need help with DWT, but I could offer help in THEO" -> swapping
+
+                - "I started the semester a bit late and look for a tutor" -> Get connected with people offering help
+                - "I am looking for someone to help me with DWT for the next semester" -> Get connected with people offering help
+                - "I need to have at least a 1.7 in GDB" -> Get connected with people offering help
+                - "I need to have at least a 1.7 in GDB, but on a tight budget" -> budget-friendly options (filter by salary; async tutorialy; swapping)
+                - "I want to know who is the best tutor" -> rating system for tutors
+                - "I don't speak German, but need help in DWT" -> language specific help
+            - Brainstorming further feature ideas
+                - Capacity of tutors
+                - Location (campus, online, ...)
+            - Problem: GenAI
+                - Recommender (which tutor to take) -> not good, as only limited amount of tutors, which one could just look through themselfs and *Gen*AI is not so useful for this
+                - basically ChatGPT, but with easy integration to ask a tutor specific open topics/messages -> sounds like an artificial use case
+                - AI-generated personal catch-up plan -> ChatGPT can do this as well
+                - Tutor session preparation assistant -> student communicates normally with AI for the normal working on the lecture. All the questions between the last and current meeting are summarized for the tutor to help him prepare for the lesson -> probably not so useful, as students use other AI than the one we provide + will the student ask enough questions to an AI between the (potentially weekly) sessions + in the first sessions, there is no data yet
+    - Define goals/non-goals -> postpone for next meeting
+    - *Make sure GenAI is a real business use-case*
+- Architecture -> postpone for next meeting
+- Folder Structure -> rough idea to think about till next time
+- Backlog ideas -> postpone for next meeting
+- Talk about UML -> postpone for next meeting
+- Next steps project setup -> postpone for next meeting
+- Find next meeting date: 29.4 21.00
+- Find meeting with tutor: 8.5. after Lecture
+- Todos until next meeting
+    - Write Tutor @Julian
+        - e-Mail client fine, even though it already exsits
+        - Nachhilfe matcher nice, but no real GenAI use case -> do you have any ideas
+        - Microservices -> networked or services within one spring boot application
+        - Makefile
+        - meeting date
+    - Commit notes @Julian
+    - Have a look at Mono Repo folder structure and best practices @Adi, @Hrisi
