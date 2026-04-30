@@ -1,0 +1,27 @@
+openapi: 3.0.0
+info:
+  title: Module2 API
+  version: 0.0.0
+tags: []
+paths:
+  /module2:
+    get:
+      operationId: test
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+components: {}
+servers:
+  - url: https://module2.example.com
+    description: Module2 API
+    variables: {}

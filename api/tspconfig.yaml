@@ -1,0 +1,6 @@
+emit:
+  - "@typespec/openapi3"
+
+linter:
+  extends:
+    - "@typespec/http/all"
