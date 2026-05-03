@@ -1,0 +1,27 @@
+openapi: 3.0.0
+info:
+  title: Courses API
+  version: v1
+tags: []
+paths:
+  /v1/test:
+    get:
+      operationId: test
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+components: {}
+servers:
+  - url: https://courses.example.com
+    description: Courses API
+    variables: {}

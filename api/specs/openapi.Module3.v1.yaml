@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
-  title: Courses API
-  version: 0.0.0
+  title: Module3 API
+  version: v1
 tags: []
 paths:
-  /test:
+  /v1/test:
     get:
       operationId: test
       parameters: []
@@ -22,6 +22,6 @@ paths:
                   - message
 components: {}
 servers:
-  - url: https://courses.example.com
-    description: Courses API
+  - url: https://module3.example.com
+    description: Module3 API
     variables: {}

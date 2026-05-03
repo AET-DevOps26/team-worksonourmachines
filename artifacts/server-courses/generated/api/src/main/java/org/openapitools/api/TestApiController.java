@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T00:14:43.326855446+02:00[Europe/Berlin]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-03T20:59:11.101412618+02:00[Europe/Berlin]", comments = "Generator version: 7.22.0")
 @Controller
 @RequestMapping("${openapi.courses.base-path:}")
 public class TestApiController implements TestApi {

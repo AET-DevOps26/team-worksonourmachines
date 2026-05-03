@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
   title: Courses API
-  version: 0.0.0
+  version: v1
 servers:
 - description: Courses API
   url: https://courses.example.com
 paths:
-  /test:
+  /v1/test:
     get:
       operationId: test
       parameters: []
