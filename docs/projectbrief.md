@@ -1,7 +1,5 @@
 # Project Brief
 
-<!-- todo resolve tbd in projectbrief -->
-
 The web-app **TUtorMatch** is a tutor-student matching platform for TUM courses, where learners can quickly find the best tutor 
 for their goals and budget. It combines smart matching with practical filters like cost, language, location, and tutor capacity 
 with knowledge about the most common struggles of the students in each module for students best learning experience.
@@ -15,7 +13,8 @@ The current options for finding tutoring at TUM are fragmented: students search 
 - **Discovery and matching**: Search and filter tutors by course/module, price, language, location (e.g. campus vs online), and available capacity.
 - **Trust and fit**: Ratings and structured signals so students can compare tutors for a given module.
 - **Content awareness**: For each module, big content topics are presented with information about them and which ones are especially hard/easy to guide tutors and students where to put the most ressources.
-- tbd: exchange help
+
+Additionally refer to [GenAI](#genai).
 
 ## Intended Users
 
@@ -28,7 +27,7 @@ The current options for finding tutoring at TUM are fragmented: students search 
 Use cases, which highlight the use of GenAI as part of our main features:
 
 1. **Late start, exam pressure**: A student is behind in *Diskrete Strukturen* before the exam. They enter their module, exam date, and weekly budget. The app suggests tutors matching language and location, and GenAI proposes a **short catch-up plan** (topics ordered by impact) with optional slots linked to those tutors’ capacity.
-2. **Structured semester planning**: A student wants a well-organized approach to their semester with tutoring support at the right moments but isn’t sure how to set this up. They input their modules, exam dates, target grades, and budget. GenAI generates a **cost-optimized semester plan**: this includes when to schedule sessions with tutors (and for which topics), suggestions to mix live and async learning (to save both tutor capacity and student budget), and a timeline aligning study intensity to module difficulty and exam schedule. The plan connects to specific tutors’ availability within the system, making it actionable and budget-friendly.
+2. **Structured semester planning**: A student wants a well-organized approach to their semester with tutoring support at the right moments but isn’t sure how to set this up. They input their modules, exam dates, target grades, and budget. GenAI generates a **cost-optimized semester plan**: this includes when to schedule sessions with tutors (and for which topics), suggestions to mix live and async learning (to save both tutor capacity and student budget), and a timeline aligning study intensity to module difficulty and exam schedule. The plan connects to specific tutors’ availability and the content-awareness within the system, making it actionable and budget-friendly.
 
 ## Example scenarios
 
@@ -42,19 +41,20 @@ Use cases, which highlight the use of GenAI as part of our main features:
 
 These goals should be reached over the project. They are defined as milestones, that will be put into the GitHub Project.
 
-1. **Foundation**: Monorepo or agreed repo layout, local setup, shared API contracts, and baseline CI so client, server, and GenAI can integrate against stable interfaces.
+1. **Foundation**: Monorepo or agreed repo layout, local setup, shared API contracts, basic logging, and baseline CI so client, server, and GenAI can integrate against stable interfaces.
 2. **Identity and access**: End-to-end authentication and authorization (e.g. Keycloak) wired into the web client and backend services, with roles that distinguish students, tutors, and admins as needed for the first release.
 3. **Core marketplace**: Tutor profiles, module/topic coverage, capacity, pricing signals, and student-side **discovery** (search, filters for language, location, budget) backed by the server and Postgres logical separation.
 4. **Trust and module context**: Ratings or comparable signals for tutors, plus **content awareness** for modules (topics and difficulty hints) so discovery is not only “who” but “where to focus.”
-5. **GenAI in product**: At least one shipped flow where GenAI output is grounded in **live platform data** (e.g. catch-up plan or cost-aware semester plan tied to selected modules, dates, budget, and tutor availability)—not a standalone chat page.
+5. **GenAI in product**: Have GenAI being integrated into the app and produce result from the **live platform data** (e.g. catch-up plan or cost-aware semester plan tied to selected modules, dates, budget, and tutor availability).
 6. **Release-ready**: Documentation for setup and architecture, basic observability, and a coherent demo path that exercises student → find tutor → plan/book.
 
 ## Non-Goals
 
-The following non-goals define what will not be part of the project to define the scope from the beginning.
+The following non-goals define what will not be part of the project to define the scope from the beginning. Those aspects were discussed and might be valuable in the future to extend the platform, but will not be implemented during the course.
 
 - Payments will not be processed via the platform
 - A full university timetable optimizer (“when to attend which lecture”)
+- We won't implement help exchange (tutor in one subject then student in another with the same partner) for the MVP
 
 ## Responsibilities
 
@@ -63,18 +63,20 @@ The project is organized into three main module areas, each with a Product Owner
 Product Owners (POs) for modules:
 
 - Client: _Julian Wilke_
-    - web client (React Router)
-    - user-facing reverse proxy
+    - Web client (React Router)
 - Server: _Amritanshu Sikdar_
-    - three services using Spring Boot
-    - one Postgres DB split logically for each service
+    - At least three services using Spring Boot
+    - One Postgres DB split logically for each service
 - GenAI: _Hristina Ivanova_
+    - Python service
 
 There are also shared/common services, coordinated by a primary responsible person for (initial) structure/operation, but these are mainly used and touched by all team members.
 
+- user-facing reverse proxy _Julian Wilke_
 - API specs: _Julian Wilke_
 - Local setup: _Julian Wilke_
-- Keycloak: tbd
-- Docs: tbd
-- Observability: tbd
-- tbd
+- Monorepo tooling: _Julian Wilke_
+- Keycloak: _Amritanshu Sikdar_
+- Docs: _Hristina Ivanova_
+- Observability: _Amritanshu Sikdar_
+- tbd after architecture decisions (CI/CD, Kubernetes)
