@@ -1,0 +1,32 @@
+openapi: 3.0.0
+info:
+  title: Communication API
+  version: v1
+servers:
+- description: Communication API
+  url: https://communication.example.local
+paths:
+  /v1/test:
+    get:
+      operationId: test
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/test_200_response"
+          description: The request has succeeded.
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    test_200_response:
+      example:
+        message: message
+      properties:
+        message:
+          type: string
+      required:
+      - message
+      type: object

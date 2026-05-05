@@ -1,6 +1,6 @@
 import "@typespec/http";
 import "@typespec/openapi3";
 import "@typespec/versioning";
-import "./services/courses.tsp";
-import "./services/module2.tsp";
-import "./services/module3.tsp";
+import "./services/communication.tsp";
+import "./services/marketplace.tsp";
+import "./services/student.tsp";

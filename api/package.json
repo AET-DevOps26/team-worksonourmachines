@@ -6,16 +6,16 @@
     "specs:generate": "rm -rf specs/ && tsp compile . --output-dir output/ && mv output/@typespec/openapi3 specs/ && rm -rf output/",
 
     "api:generate": "pnpm run api-client:generate && pnpm run api-server:generate",
-    "api-client:generate": "pnpm run api-client-courses:generate && pnpm run api-client-module2:generate && pnpm run api-client-module3:generate",
-    "api-server:generate": "pnpm run api-server-courses:generate && pnpm run api-server-module2:generate && pnpm run api-server-module3:generate",
+    "api-client:generate": "pnpm run api-client-communication:generate && pnpm run api-client-marketplace:generate && pnpm run api-client-student:generate",
+    "api-server:generate": "pnpm run api-server-communication:generate && pnpm run api-server-marketplace:generate && pnpm run api-server-student:generate",
 
-    "api-client-courses:generate": "openapi-generator-cli generate -i specs/openapi.Courses.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-courses/generated",
-    "api-client-module2:generate": "openapi-generator-cli generate -i specs/openapi.Module2.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-module2/generated",
-    "api-client-module3:generate": "openapi-generator-cli generate -i specs/openapi.Module3.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-module3/generated",
+    "api-client-communication:generate": "openapi-generator-cli generate -i specs/openapi.Communication.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-communication/generated",
+    "api-client-marketplace:generate": "openapi-generator-cli generate -i specs/openapi.Marketplace.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-marketplace/generated",
+    "api-client-student:generate": "openapi-generator-cli generate -i specs/openapi.Student.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-student/generated",
 
-    "api-server-courses:generate": "openapi-generator-cli generate -i specs/openapi.Courses.v1.yaml -g spring -o ../artifacts/server-courses/generated/api",
-    "api-server-module2:generate": "openapi-generator-cli generate -i specs/openapi.Module2.v1.yaml -g spring -o ../artifacts/server-module2/generated/api",
-    "api-server-module3:generate": "openapi-generator-cli generate -i specs/openapi.Module3.v1.yaml -g spring -o ../artifacts/server-module3/generated/api",
+    "api-server-communication:generate": "openapi-generator-cli generate -i specs/openapi.Communication.v1.yaml -g spring -o ../artifacts/server-communication/generated/api",
+    "api-server-marketplace:generate": "openapi-generator-cli generate -i specs/openapi.Marketplace.v1.yaml -g spring -o ../artifacts/server-marketplace/generated/api",
+    "api-server-student:generate": "openapi-generator-cli generate -i specs/openapi.Student.v1.yaml -g spring -o ../artifacts/server-student/generated/api",
 
     "generate": "pnpm run specs:generate && pnpm run api:generate",
     "format": "tsp format **/*.tsp",
