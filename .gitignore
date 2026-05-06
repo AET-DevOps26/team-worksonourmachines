@@ -1,2 +1,14 @@
 node_modules/
 api/output/
+.gradle/
+.idea/
+.vscode/
+.venv/
+.env
+.pnpm-store/
+.vite/
+__pycache__/
+build/
+dist/
+target/
+.DS_Store

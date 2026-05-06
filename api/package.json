@@ -1,20 +1,34 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API project for generating OpenAPI specifications and code for multiple services",
   "scripts": {
     "specs:generate": "rm -rf specs/ && tsp compile . --output-dir output/ && mv output/@typespec/openapi3 specs/ && rm -rf output/",
-    "api-courses:generate": "openapi-generator-cli generate -i specs/openapi.Courses.yaml -g spring -o ../artifacts/server-courses/generated/api"
+
+    "api:generate": "pnpm run api-client:generate && pnpm run api-server:generate",
+    "api-client:generate": "pnpm run api-client-communication:generate && pnpm run api-client-marketplace:generate && pnpm run api-client-student:generate",
+    "api-server:generate": "pnpm run api-server-communication:generate && pnpm run api-server-marketplace:generate && pnpm run api-server-student:generate",
+
+    "api-client-communication:generate": "openapi-generator-cli generate -i specs/openapi.Communication.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-communication/generated",
+    "api-client-marketplace:generate": "openapi-generator-cli generate -i specs/openapi.Marketplace.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-marketplace/generated",
+    "api-client-student:generate": "openapi-generator-cli generate -i specs/openapi.Student.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-student/generated",
+
+    "api-server-communication:generate": "openapi-generator-cli generate -i specs/openapi.Communication.v1.yaml -g spring -o ../artifacts/server-communication/generated/api",
+    "api-server-marketplace:generate": "openapi-generator-cli generate -i specs/openapi.Marketplace.v1.yaml -g spring -o ../artifacts/server-marketplace/generated/api",
+    "api-server-student:generate": "openapi-generator-cli generate -i specs/openapi.Student.v1.yaml -g spring -o ../artifacts/server-student/generated/api",
+
+    "generate": "pnpm run specs:generate && pnpm run api:generate",
+    "format": "tsp format **/*.tsp",
+    "lint": "tsp format --check **/*.tsp"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "worksounourmachine",
   "packageManager": "pnpm@10.18.0",
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^2.32.0",
     "@typespec/compiler": "^1.11.0",
     "@typespec/http": "^1.11.0",
-    "@typespec/openapi3": "^1.11.0"
+    "@typespec/openapi3": "^1.11.0",
+    "@typespec/versioning": "^0.81.0"
   }
 }

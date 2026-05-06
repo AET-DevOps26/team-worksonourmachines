@@ -19,7 +19,10 @@ importers:
         version: 1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))
       '@typespec/openapi3':
         specifier: ^1.11.0
-        version: 1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))(@typespec/openapi@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))))
+        version: 1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))(@typespec/openapi@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))))(@typespec/versioning@0.81.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))
+      '@typespec/versioning':
+        specifier: ^0.81.0
+        version: 0.81.0(@typespec/compiler@1.11.0(@types/node@20.19.39))
 
 packages:
 
@@ -351,6 +354,12 @@ packages:
     peerDependencies:
       '@typespec/compiler': ^1.11.0
       '@typespec/http': ^1.11.0
+
+  '@typespec/versioning@0.81.0':
+    resolution: {integrity: sha512-5bha4t64xA85zLY8VGm/6jNd2kwPHzjPq/dlCUjtgGfGXv2R6Ow/YIukqhqZnwnIgNAIlZ7nguekRMRx+2oO2w==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.11.0
 
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
@@ -1420,7 +1429,7 @@ snapshots:
     dependencies:
       '@typespec/compiler': 1.11.0(@types/node@20.19.39)
 
-  '@typespec/openapi3@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))(@typespec/openapi@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))))':
+  '@typespec/openapi3@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))(@typespec/openapi@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))))(@typespec/versioning@0.81.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))':
     dependencies:
       '@scalar/json-magic': 0.11.7
       '@scalar/openapi-parser': 0.24.17
@@ -1430,11 +1439,17 @@ snapshots:
       '@typespec/http': 1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))
       '@typespec/openapi': 1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))
       yaml: 2.8.3
+    optionalDependencies:
+      '@typespec/versioning': 0.81.0(@typespec/compiler@1.11.0(@types/node@20.19.39))
 
   '@typespec/openapi@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))(@typespec/http@1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39)))':
     dependencies:
       '@typespec/compiler': 1.11.0(@types/node@20.19.39)
       '@typespec/http': 1.11.0(@typespec/compiler@1.11.0(@types/node@20.19.39))
+
+  '@typespec/versioning@0.81.0(@typespec/compiler@1.11.0(@types/node@20.19.39))':
+    dependencies:
+      '@typespec/compiler': 1.11.0(@types/node@20.19.39)
 
   agent-base@7.1.4: {}
 

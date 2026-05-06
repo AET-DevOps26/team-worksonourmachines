@@ -1,0 +1,90 @@
+{
+    "folders": [
+        {
+            "name": "api",
+            "path": "./api"
+        },
+        {
+            "name": "client-web",
+            "path": "./artifacts/client-web"
+        },
+        {
+            "name": "root",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "biome.requireConfiguration": true,
+        "editor.formatOnSave": true,
+        "editor.quickSuggestions": {
+            "strings": "on"
+        },
+        "explorer.fileNesting.enabled": true,
+        "explorer.fileNesting.patterns": {
+            "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.js.map",
+            "*.tsx": "${capture}.js, ${capture}.d.ts, ${capture}.js.map"
+        },
+        "files.associations": {
+            ".env.dist": "properties"
+        },
+        "search.exclude": {
+            "**/.git": true,
+            "**/.gradle": true,
+            "**/.pnpm-store": true,
+            "**/.venv": true,
+            "**/.vite": true,
+            "**/__pycache__": true,
+            "**/build": true,
+            "**/dist": true,
+            "**/node_modules": true,
+            "**/target": true
+        },
+        "tailwindCSS.classFunctions": ["cn"],
+        "typescript.preferences.importModuleSpecifier": "non-relative",
+        "typescript.preferences.includePackageJsonAutoImports": "on",
+        "typescript.tsdk": "./api/node_modules/typescript/lib",
+        "typescript.tsserver.maxTsServerMemory": 8192,
+        "[css]": {
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[javascript]": {
+            "editor.codeActionsOnSave": {
+                "source.fixAll.biome": "always",
+                "source.organizeImports.biome": "always"
+            },
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[javascriptreact]": {
+            "editor.codeActionsOnSave": {
+                "source.fixAll.biome": "always",
+                "source.organizeImports.biome": "always"
+            },
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[json]": {
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[jsonc]": {
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[typescript]": {
+            "editor.codeActionsOnSave": {
+                "source.fixAll.biome": "always",
+                "source.organizeImports.biome": "always"
+            },
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[typescriptreact]": {
+            "editor.codeActionsOnSave": {
+                "source.fixAll.biome": "always",
+                "source.organizeImports.biome": "always"
+            },
+            "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[typespec]": {
+            "editor.detectIndentation": false,
+            "editor.insertSpaces": true,
+            "editor.tabSize": 2
+        }
+    }
+}
