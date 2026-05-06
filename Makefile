@@ -1,4 +1,5 @@
 API_DIR := api
+CLIENT_WEB_DIR := artifacts/client-web
 
 .DEFAULT_GOAL := help
 
@@ -15,6 +16,10 @@ api-pnpm: ## Run any pnpm command in api/ — e.g. make api-pnpm run specs:gener
 api-generate: ## Generate the api code
 	pnpm --dir $(API_DIR) run generate
 
+.PHONY: client-web-pnpm
+client-web-pnpm: ## Run any pnpm command in client-web/ — e.g. make client-web-pnpm run dev
+	pnpm --dir $(CLIENT_WEB_DIR) $(filter-out $@,$(MAKECMDGOALS))
+
 .PHONY: init
 init: ## Initialize the project
 	${MAKE} setup-env
@@ -27,10 +32,12 @@ setup-env: ## Setup the environment variables; This will overwrite the existing 
 .PHONY: format
 format: ## Format the code
 	pnpm --dir $(API_DIR) run format
+	pnpm --dir $(CLIENT_WEB_DIR) run format
 
 .PHONY: lint
 lint: ## Lint the code
 	pnpm --dir $(API_DIR) run lint
+	pnpm --dir $(CLIENT_WEB_DIR) run lint
 
 .PHONY: setup-git-hooks
 setup-git-hooks: ## Symlinks hooks from /git/hooks into .git/hooks to enable git hooks; You only need to run this if new hooks are added

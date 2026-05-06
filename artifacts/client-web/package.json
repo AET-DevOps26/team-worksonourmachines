@@ -1,0 +1,41 @@
+{
+    "name": "client-web",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "format": "biome format --write",
+        "lint": "biome check --diagnostic-level=warn",
+        "dev": "react-router dev",
+        "build": "react-router build",
+        "typegen": "react-router typegen",
+        "start": "react-router-serve ./build/server/index.js"
+    },
+    "keywords": [],
+    "author": "worksounourmachine",
+    "packageManager": "pnpm@10.18.0",
+    "dependencies": {
+        "@react-router/node": "^7.0.0",
+        "@react-router/serve": "^7.0.0",
+        "@tailwindcss/vite": "^4.2.2",
+        "arktype": "^2.2.0",
+        "isbot": "^5.1.32",
+        "react": "^19.2.5",
+        "react-dom": "^19.2.5",
+        "react-router": "^7.0.0",
+        "tailwindcss": "^4.2.2",
+        "winston": "^3.18.3"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.4.14",
+        "@react-router/dev": "^7.0.0",
+        "@total-typescript/ts-reset": "^0.6.1",
+        "@types/node": "^22.19.1",
+        "@types/react": "^19.2.0",
+        "@types/react-dom": "^19.2.0",
+        "@vitejs/plugin-react": "^4.3.4",
+        "typescript": "^5.9.3",
+        "vite": "^6.0.0",
+        "vite-tsconfig-paths": "^5.1.4"
+    }
+}
