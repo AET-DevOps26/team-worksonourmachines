@@ -1,0 +1,89 @@
+{
+    "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true,
+        "root": "../../",
+        "defaultBranch": "main"
+    },
+    "files": {
+        "ignoreUnknown": false,
+        "includes": ["**", "!**/generated"]
+    },
+    "formatter": {
+        "enabled": true,
+        "indentWidth": 4,
+        "indentStyle": "space",
+        "lineWidth": 120
+    },
+    "assist": {
+        "enabled": true,
+        "actions": {
+            "source": {
+                "organizeImports": "on",
+                "useSortedAttributes": "on",
+                "useSortedKeys": "on"
+            }
+        },
+        "includes": ["**"]
+    },
+    "linter": {
+        "enabled": true,
+        "domains": {
+            "react": "all"
+        },
+        "rules": {
+            "recommended": true,
+            "complexity": {
+                "useLiteralKeys": "off", // conflict with TS
+                "noForEach": "off"
+            },
+            "style": {
+                "noNonNullAssertion": "info",
+                "useComponentExportOnlyModules": {
+                    "level": "warn",
+                    "options": {
+                        "allowExportNames": ["loader", "action", "meta", "links", "scripts"]
+                    }
+                }
+            },
+            "security": {
+                "noDangerouslySetInnerHtml": "off"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": "info"
+            },
+            "a11y": {
+                "useKeyWithClickEvents": "off",
+                "noSvgWithoutTitle": "off"
+            },
+            "performance": {
+                "noAccumulatingSpread": "off"
+            }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single"
+        }
+    },
+    "css": {
+        "parser": {
+            "tailwindDirectives": true
+        }
+    },
+    "overrides": [
+        {
+            "assist": {
+                "actions": {
+                    "source": {
+                        "useSortedAttributes": "off",
+                        "useSortedKeys": "off"
+                    }
+                }
+            },
+            "includes": ["biome.jsonc", "**/tsconfig.json", "**/package.json"]
+        }
+    ]
+}
