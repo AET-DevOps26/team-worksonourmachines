@@ -4,8 +4,9 @@ Repository for team WorksOnOurMachines
 
 ## Deliverables for the DevOps Course
 
-- The document defining the problem statement can be found as [projectbrief](/docs/projectbrief.md).
-- The uml diagrams reside in the [docs/uml folder](/docs/uml/).
+- The document defining the problem statement can be found as [projectbrief](./docs/projectbrief.md).
+- The high-level system overview can be found in the [system-overview.md](./docs/system-overview.md) file.
+- The uml diagrams reside in the [docs/uml folder](./docs/uml/).
 
 ## Local development
 
