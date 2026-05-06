@@ -1,4 +1,4 @@
-import type { Middleware } from '~/.server/api/server-courses/generated';
+import type { Middleware } from '~/.server/api/server-communication/generated';
 import { HttpStatusCode } from '~/.server/lib/http';
 
 export type ErrorType =

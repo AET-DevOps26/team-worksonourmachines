@@ -1,4 +1,4 @@
 export { ErrorResponse, type ErrorType, FetchError } from './error';
-export { coursesApi } from './server-courses';
-export { module2Api } from './server-module2';
-export { module3Api } from './server-module3';
+export { communicationApi } from './server-communication';
+export { marketplaceApi } from './server-marketplace';
+export { studentApi } from './server-student';

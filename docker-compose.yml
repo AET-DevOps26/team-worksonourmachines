@@ -14,7 +14,9 @@ services:
     environment:
       LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:json}
       LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:info}
-      SERVER_COURSES_API_URL: tbd
+      SERVER_COMMUNICATION_API_URL: tbd
+      SERVER_MARKETPLACE_API_URL: tbd
+      SERVER_STUDENT_API_URL: tbd
 
 volumes:
   client_web_node_modules:

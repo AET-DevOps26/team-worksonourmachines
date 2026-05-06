@@ -4,9 +4,9 @@ const Env = type({
     LOG_FORMAT: "'pretty' | 'json'",
     LOG_LEVEL: "'debug' | 'info' | 'warn' | 'error'",
     NODE_ENV: "'development' | 'production'",
-    SERVER_COURSES_API_URL: 'string',
-    SERVER_MODULE2_API_URL: 'string',
-    SERVER_MODULE3_API_URL: 'string',
+    SERVER_COMMUNICATION_API_URL: 'string',
+    SERVER_MARKETPLACE_API_URL: 'string',
+    SERVER_STUDENT_API_URL: 'string',
 });
 
 type Env = typeof Env.infer;
