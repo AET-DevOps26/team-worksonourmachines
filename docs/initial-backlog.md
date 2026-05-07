@@ -111,6 +111,5 @@ _Note: This is just an initial version of the backlog. Later on we plan to creat
 - Define the final demo path. Example: student creates goal > discovers tutor > generates plan > communicates.
 - Seed demo data for students, tutors, approvals, modules, topics, tutor coverage, ratings, plans, and messages.
 - Add smoke tests for the complete demo path.
-- Add regression tests for discovery, learning goals, ratings, GenAI plans, and communication.
-- Write setup, API, architecture, GenAI, and deployment documentation.
+- Polish overall documentation
 - Run final release checklist, architecture review, and security/privacy review.
