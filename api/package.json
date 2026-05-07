@@ -1,6 +1,7 @@
 {
   "name": "api",
   "version": "1.0.0",
+  "private": true,
   "description": "API project for generating OpenAPI specifications and code for multiple services",
   "scripts": {
     "specs:generate": "rm -rf specs/ && tsp compile . --output-dir output/ && mv output/@typespec/openapi3 specs/ && rm -rf output/",
