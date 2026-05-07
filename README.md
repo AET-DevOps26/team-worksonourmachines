@@ -5,6 +5,7 @@ Repository for team WorksOnOurMachines
 ## Deliverables for the DevOps Course
 
 - The problem statement is defined in its own [file](./docs/problem-statement.md).
+- The high-level system overview can be found in the [system-overview.md](./docs/system-overview.md) file.
 - The uml diagrams reside in the [docs/uml folder](./docs/uml/).
 
 ## Local development
