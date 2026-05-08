@@ -599,11 +599,11 @@
     {
       "id": "7041e61b-f8b2-4239-a3ab-66993b2c66c8",
       "width": 210,
-      "height": 160,
+      "height": 190,
       "type": "class",
       "position": {
-        "x": 410,
-        "y": 360
+        "x": 480,
+        "y": 350
       },
       "parentId": "f66bb3f5-fc94-41bc-b41d-3ee6a399d689",
       "data": {
@@ -626,12 +626,16 @@
           {
             "id": "56d50a3c-791f-49d6-ac2b-461e87586196",
             "name": "- isApproved: boolean"
+          },
+          {
+            "id": "4267fa2b-9de7-4dc0-be4a-dad1224f08db",
+            "name": "- moduleId: String"
           }
         ]
       },
       "measured": {
         "width": 210,
-        "height": 160
+        "height": 190
       }
     },
     {
@@ -879,7 +883,24 @@
       "sourceHandle": "right-top",
       "targetHandle": "right-bottom",
       "data": {
-        "points": []
+        "points": [
+          {
+            "x": -389,
+            "y": 406
+          },
+          {
+            "x": -258.9568750000001,
+            "y": 406
+          },
+          {
+            "x": -258.9568750000001,
+            "y": -54
+          },
+          {
+            "x": -419,
+            "y": -54
+          }
+        ]
       }
     },
     {
