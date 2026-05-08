@@ -58,7 +58,7 @@
     {
       "id": "92e3f95f-33c6-43ee-b0b0-db50fd114d82",
       "width": 270,
-      "height": 370,
+      "height": 340,
       "type": "class",
       "position": {
         "x": 30,
@@ -99,10 +99,6 @@
           {
             "id": "6bff161c-a54f-42b7-baf0-e434084233fc",
             "name": "- availability: List<TimeSlot>"
-          },
-          {
-            "id": "f936b9e7-6527-444b-9a35-8bbc47f4368b",
-            "name": "- approvals: List<TutorApproval>"
           }
         ],
         "methods": [
@@ -118,7 +114,7 @@
       },
       "measured": {
         "width": 270,
-        "height": 370
+        "height": 340
       }
     },
     {
@@ -170,7 +166,7 @@
     {
       "id": "cfad7156-0564-4d26-b76e-46c589f1da5a",
       "width": 240,
-      "height": 200,
+      "height": 170,
       "type": "class",
       "position": {
         "x": 720,
@@ -183,10 +179,6 @@
           {
             "id": "2d60a9c5-4ea1-4ac6-b9f2-46c55a828e99",
             "name": "- topicId: String"
-          },
-          {
-            "id": "b34ff6ec-b27a-4ad2-a7d7-8ab0dd86c140",
-            "name": "- moduleId: String"
           },
           {
             "id": "79268da7-a4a3-45b1-bb9a-19d4ad70f08b",
@@ -205,13 +197,13 @@
       },
       "measured": {
         "width": 240,
-        "height": 200
+        "height": 170
       }
     },
     {
       "id": "8bd050f4-34d1-40c5-99b7-c8fe23324c4d",
       "width": 250,
-      "height": 160,
+      "height": 130,
       "type": "class",
       "position": {
         "x": 370,
@@ -226,10 +218,6 @@
             "name": "- coverageId: String"
           },
           {
-            "id": "37598d77-6f44-4b2d-a552-ce3a3e6af836",
-            "name": "- tutorId: String"
-          },
-          {
             "id": "70fe4d99-2295-4f23-bb43-5e7c472bd102",
             "name": "- moduleId: String"
           },
@@ -242,13 +230,13 @@
       },
       "measured": {
         "width": 250,
-        "height": 160
+        "height": 130
       }
     },
     {
       "id": "9d798fd1-aa08-4c37-84ef-7f73d4d2fdde",
       "width": 190,
-      "height": 190,
+      "height": 160,
       "type": "class",
       "position": {
         "x": 30,
@@ -261,10 +249,6 @@
           {
             "id": "c76acd82-6b6c-470c-a1a1-66ff37ac151c",
             "name": "- ratingId: String"
-          },
-          {
-            "id": "cdcf395a-423b-429e-9004-47c0f7e01e71",
-            "name": "- tutorId: String"
           },
           {
             "id": "93bd955f-2439-48b6-8518-c64b16fc4801",
@@ -283,7 +267,7 @@
       },
       "measured": {
         "width": 190,
-        "height": 190
+        "height": 160
       }
     },
     {
@@ -339,7 +323,7 @@
     {
       "id": "0338d0c8-5d46-4534-af89-0cd658ae9eb8",
       "width": 340,
-      "height": 340,
+      "height": 310,
       "type": "class",
       "position": {
         "x": 600,
@@ -352,10 +336,6 @@
           {
             "id": "b271566d-556a-4751-8ea1-26b45832b09e",
             "name": "- goalId: String"
-          },
-          {
-            "id": "6a73d0bf-eab8-47e4-852c-b7e93b98aeed",
-            "name": "- studentId: String"
           },
           {
             "id": "e59b9c4d-a25d-42fc-afe6-637f06b02a5c",
@@ -395,13 +375,13 @@
       },
       "measured": {
         "width": 340,
-        "height": 340
+        "height": 310
       }
     },
     {
       "id": "b7602774-89c1-4329-a0e8-e448de643465",
       "width": 260,
-      "height": 280,
+      "height": 250,
       "type": "class",
       "position": {
         "x": 40,
@@ -414,10 +394,6 @@
           {
             "id": "1f67abc4-d499-433b-ab27-19e0fafdf9bf",
             "name": "- planId: String"
-          },
-          {
-            "id": "aaf42f1d-ff3b-4d8e-93e6-773000763771",
-            "name": "- goalID: String"
           },
           {
             "id": "7a7b72c4-6330-4927-b416-41dac83adb2a",
@@ -449,13 +425,13 @@
       },
       "measured": {
         "width": 260,
-        "height": 280
+        "height": 250
       }
     },
     {
       "id": "76a0cdd9-8f19-45e4-803f-4edde51e9e82",
       "width": 230,
-      "height": 220,
+      "height": 190,
       "type": "class",
       "position": {
         "x": 680,
@@ -468,10 +444,6 @@
           {
             "id": "457af1ae-b406-48be-8955-50f0f0f27d56",
             "name": "- milestoneId: String"
-          },
-          {
-            "id": "2afe04da-efe1-4906-97e7-61041f11309e",
-            "name": "- planId: String"
           },
           {
             "id": "e5ba7531-52fb-4b25-81fe-f7bfce7b15ae",
@@ -495,7 +467,7 @@
       },
       "measured": {
         "width": 230,
-        "height": 220
+        "height": 190
       }
     },
     {
@@ -585,7 +557,7 @@
     {
       "id": "38fea599-f2fc-411a-9cec-085db9cf6f31",
       "width": 220,
-      "height": 220,
+      "height": 190,
       "type": "class",
       "position": {
         "x": 610,
@@ -598,10 +570,6 @@
           {
             "id": "56bd4089-ecac-4a1c-81db-bc6462be062b",
             "name": "- messageId: String"
-          },
-          {
-            "id": "57ded7c4-5479-408f-8a41-7a7414cf4ea9",
-            "name": "- conversationId: String"
           },
           {
             "id": "e8384e03-437e-4bbe-8a3d-49e579826fe7",
@@ -625,7 +593,7 @@
       },
       "measured": {
         "width": 220,
-        "height": 220
+        "height": 190
       }
     },
     {
@@ -812,23 +780,6 @@
       }
     },
     {
-      "id": "00b5183c-a0d3-477b-a66b-5ccd95c59709",
-      "source": "42f63270-ee62-4f02-85fc-d248ddcfa8a4",
-      "target": "b7602774-89c1-4329-a0e8-e448de643465",
-      "type": "ClassBidirectional",
-      "sourceHandle": "bottom",
-      "targetHandle": "top",
-      "data": {
-        "sourceRole": "student",
-        "targetRole": "studyPlans",
-        "sourceLabel": "receives",
-        "targetLabel": "generated for",
-        "points": [],
-        "sourceMultiplicity": "1",
-        "targetMultiplicity": "*"
-      }
-    },
-    {
       "id": "37c924b9-d656-4205-9d1d-cd0a0b5c4ec7",
       "source": "b7602774-89c1-4329-a0e8-e448de643465",
       "target": "76a0cdd9-8f19-45e4-803f-4edde51e9e82",
@@ -951,6 +902,21 @@
       "targetHandle": "right-bottom",
       "data": {
         "points": []
+      }
+    },
+    {
+      "id": "77d1922b-503f-4f37-b7c9-61de60f99f3c",
+      "source": "b7602774-89c1-4329-a0e8-e448de643465",
+      "target": "0338d0c8-5d46-4534-af89-0cd658ae9eb8",
+      "type": "ClassBidirectional",
+      "sourceHandle": "right-top",
+      "targetHandle": "left-bottom",
+      "data": {
+        "points": [],
+        "sourceMultiplicity": "1",
+        "sourceRole": "studyPlan",
+        "targetMultiplicity": "1..*",
+        "targetRole": "learningGoals"
       }
     }
   ],
