@@ -5,7 +5,9 @@ Repository for team WorksOnOurMachines
 ## Deliverables for the DevOps Course
 
 - The problem statement is defined in its own [file](./docs/problem-statement.md).
-- The uml diagrams reside in the [docs/uml folder](./docs/uml/).
+- The high-level system overview can be found in the [system-overview.md](./docs/system-overview.md) file.
+- The UML diagrams reside in the [docs/uml folder](./docs/uml/).
+- The initial project backlog has been drafted in [initial-backlog.md](./docs/initial-backlog.md) file.
 
 ## Local development
 
