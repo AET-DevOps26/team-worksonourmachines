@@ -5,6 +5,7 @@ api/output/
 .vscode/
 .venv/
 .env
+.make/
 .pnpm-store/
 .vite/
 __pycache__/
