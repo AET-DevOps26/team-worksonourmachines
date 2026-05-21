@@ -14,3 +14,8 @@ app = FastAPI(title="TutorMatch AI Service", version="0.0.1")
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/v1/test")
+def test() -> dict[str, str]:
+    return {"message": "AI service is up"}
