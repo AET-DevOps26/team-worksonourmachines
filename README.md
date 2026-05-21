@@ -11,14 +11,17 @@ Repository for team WorksOnOurMachines
 
 ## Local development
 
-The project is configured to run locally using Docker Compose. Common commands are provided via make. Use `make help` to view the available commands. If you only want to run the project, it is sufficient to execute `make setup-env` and then `docker compose up`.
+The project is configured to run locally using Docker Compose. Common commands are provided via make. Use `make help` to view the available commands.
 
 ### Prerequisites
 
 - You need to have a container runtime installed with a docker compose complient command.
 - You need to have `make` installed.
-- You need to have `pnpm` installed.
 
 ### Setup
 
 Run the command `make init` to setup a local development environment.
+
+### Run only
+
+If you only want to run the project, it is sufficient to execute `make setup-env` and then `docker compose up`.

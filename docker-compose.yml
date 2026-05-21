@@ -4,7 +4,7 @@ services:
   client-web:
     build:
       context: .
-      dockerfile: artifacts/client-web/Dockerfile
+      dockerfile: artifacts/client-web/docker/Dockerfile
       target: dev
     volumes:
       - ./artifacts/client-web:/app:Z
@@ -21,7 +21,7 @@ services:
   ai:
     build:
       context: .
-      dockerfile: docker/ai.Dockerfile
+      dockerfile: artifacts/ai/docker/Dockerfile
       target: dev
     volumes:
       - ./artifacts/ai:/app:Z
@@ -42,35 +42,47 @@ services:
       - 11434:11434
 
   # ----------------------------- tooling -----------------------------
-  
-  client-web-tooling:
-    profiles: ["tooling"]
-    build:
-      context: .
-      dockerfile: artifacts/client-web/Dockerfile
-      target: tooling
-    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
-    userns_mode: keep-id
-    environment:
-      - CI=true
-    volumes:
-      - ./artifacts/client-web:/workspace/artifacts/client-web:Z
-      - ./.git:/workspace/.git:Z
-      - ./.gitignore:/workspace/.gitignore:Z
-      - pnpm-store:/pnpm/store
 
   api-tooling:
     profiles: ["tooling"]
     build:
       context: .
-      dockerfile: api/Dockerfile
+      dockerfile: api/docker/Dockerfile
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     userns_mode: keep-id
     environment:
-      - CI=true
+      CI: "true"
     volumes:
       - ./api:/workspace/api:Z
       - pnpm-store:/pnpm/store
+
+  client-web-tooling:
+    profiles: ["tooling"]
+    build:
+      context: .
+      dockerfile: artifacts/client-web/docker/Dockerfile
+      target: tooling
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    userns_mode: keep-id
+    environment:
+      CI: "true"
+    volumes:
+      - ./artifacts/client-web:/workspace/artifacts/client-web:Z
+      - ./.git:/workspace/.git:Z # git mounts necessary for biome
+      - ./.gitignore:/workspace/.gitignore:Z
+      - pnpm-store:/pnpm/store
+
+  ai-tooling:
+    profiles: ["tooling"]
+    build:
+      context: .
+      dockerfile: artifacts/ai/docker/Dockerfile
+      target: tooling
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    userns_mode: keep-id
+    volumes:
+      - ./artifacts/ai:/workspace/artifacts/ai:Z
+      - /workspace/artifacts/ai/.venv # prevent venv from overriding host venv
 
 volumes:
   pnpm-store:

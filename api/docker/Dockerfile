@@ -2,6 +2,7 @@ FROM node:24-bookworm
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+ENV PNPM_STORE_DIR="/pnpm/store"
 ENV COREPACK_HOME=/pnpm/corepack
 RUN mkdir -p $COREPACK_HOME && corepack enable && corepack prepare pnpm@10.18.0 --activate && chmod -R a+rwX $COREPACK_HOME
 

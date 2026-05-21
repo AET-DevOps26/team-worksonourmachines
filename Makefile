@@ -21,11 +21,21 @@ RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
 help: ## Show this help message
 	@grep -hE '^[a-zA-Z][a-zA-Z0-9_-]*:.*?## .*$$' $(MAKEFILE_LIST) | LC_ALL=C sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-22s  %s\n", $$1, $$2}'
 
+# ----------------------------- app -----------------------------
+
+.PHONY: up
+up: ## Start all services
+	@$(COMPOSE) up -d
+
+.PHONY: down
+down: ## Stop all services
+	@$(COMPOSE) down
+
 # ----------------------------- tooling -----------------------------
 
 .PHONY: build-tooling-images
 build-tooling-images: ## Build all tooling images
-	@$(COMPOSE_TOOLING) build api-tooling client-web-tooling
+	@$(COMPOSE_TOOLING) build api-tooling client-web-tooling ai-tooling
 
 .PHONY: api-generate
 api-generate: ## Generate the API specs and stubs
@@ -38,13 +48,17 @@ format: ## Format all code
 	@echo "Formatting client-web code..."
 	@$(RUN_TOOLING) client-web-tooling run format
 	@echo "Formatting AI code..."
-	@echo "Not implemented yet; TODO replace with actual formatting command"
+	@$(RUN_TOOLING) ai-tooling run format
 	@echo "Formatting server-communication code..."
 	@echo "Not implemented yet; TODO replace with actual formatting command"
 	@echo "Formatting server-marketplace code..."
 	@echo "Not implemented yet; TODO replace with actual formatting command"
 	@echo "Formatting server-student code..."
 	@echo "Not implemented yet; TODO replace with actual formatting command"
+
+.PHONY: fmt
+fmt: ## Alias for format
+	@$(MAKE) format
 
 .PHONY: lint
 lint: ## Lint all code
@@ -53,7 +67,7 @@ lint: ## Lint all code
 	@echo "Linting client-web code..."
 	@$(RUN_TOOLING) client-web-tooling run lint
 	@echo "Linting AI code..."
-	@echo "Not implemented yet; TODO replace with actual linting command"
+	@$(RUN_TOOLING) ai-tooling run lint
 	@echo "Linting server-communication code..."
 	@echo "Not implemented yet; TODO replace with actual linting command"
 	@echo "Linting server-marketplace code..."
@@ -66,7 +80,7 @@ test: ## Run all tests
 	@echo "Testing client-web code..."
 	@$(RUN_TOOLING) client-web-tooling run test
 	@echo "Testing AI code..."
-	@echo "Not implemented yet; TODO replace with actual testing command"
+	@$(RUN_TOOLING) ai-tooling run test
 	@echo "Testing server-communication code..."
 	@echo "Not implemented yet; TODO replace with actual testing command"
 	@echo "Testing server-marketplace code..."
@@ -87,7 +101,7 @@ client-web-pnpm: ## Run any pnpm command in client-web/ — e.g. make client-web
 # ----------------------------- local dev setup -----------------------------
 
 .PHONY: init
-init: setup-env setup-git-hooks build-tooling-images ## Initialize local development
+init: setup-env setup-git-hooks build-tooling-images ai-host-install ## Initialize local development
 	$(RUN_TOOLING) api-tooling install
 	$(RUN_TOOLING) client-web-tooling install
 
@@ -108,6 +122,17 @@ setup-git-hooks: ## Install git hooks
 	chmod +x "$$repo/git/hooks/pre-commit.sh"; \
 	ln -sf ../../git/hooks/pre-commit.sh "$$repo/.git/hooks/pre-commit"
 
+.PHONY: ai-host-install
+ai-host-install: ## Create a virtual environment for the AI service to have IDE support
+	@if command -v python >/dev/null 2>&1; then \
+		if [ ! -e "$(AI_DIR)/.venv/bin/activate" ]; then \
+			python -m venv $(AI_DIR)/.venv; \
+		fi; \
+		$(AI_DIR)/.venv/bin/pip install -r $(AI_DIR)/requirements.txt; \
+	else \
+		echo "\033[33mPython not found. Please install Python for IDE support.\033[0m"; \
+	fi
+
 .PHONY: clean
 clean: ## Clean all node_modules and build artifacts
 	@rm -rf $(API_DIR)/node_modules
@@ -116,6 +141,9 @@ clean: ## Clean all node_modules and build artifacts
 	@rm -rf $(CLIENT_WEB_DIR)/node_modules
 	@rm -rf $(CLIENT_WEB_DIR)/.vite
 	@rm -rf $(CLIENT_WEB_DIR)/.react-router
+	@rm -rf $(AI_DIR)/.venv
+	@rm -rf $(AI_DIR)/__pycache__
+	@rm -rf $(AI_DIR)/.ruff_cache
 
 .PHONY: deep-clean
 deep-clean: clean ## Same as clean but also remove container items and pnpm stores
@@ -123,3 +151,13 @@ deep-clean: clean ## Same as clean but also remove container items and pnpm stor
 	@$(COMPOSE) down -v --rmi all --remove-orphans
 	@rm -rf $(API_DIR)/.pnpm-store
 	@rm -rf $(CLIENT_WEB_DIR)/.pnpm-store
+	@env_file=".env"; \
+	if [ -f "$$env_file" ]; then \
+		read -p "Do you want to remove the .env file? (y/N): " rm_env; \
+		if [ "$$rm_env" = "y" ] || [ "$$rm_env" = "Y" ]; then \
+			rm -f "$$env_file"; \
+			echo ".env removed."; \
+		else \
+			echo "Keeping existing .env."; \
+		fi; \
+	fi

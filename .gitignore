@@ -9,6 +9,7 @@ api/output/
 .pnpm-store/
 .vite/
 __pycache__/
+.ruff_cache/
 build/
 dist/
 target/
