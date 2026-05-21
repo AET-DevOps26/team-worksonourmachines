@@ -10,3 +10,7 @@
 **/.env
 .react-router/
 *.md
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.venv

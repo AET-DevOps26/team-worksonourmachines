@@ -18,6 +18,31 @@ services:
       SERVER_MARKETPLACE_API_URL: tbd
       SERVER_STUDENT_API_URL: tbd
 
+  ai:
+    build:
+      context: .
+      dockerfile: docker/ai.Dockerfile
+      target: dev
+    volumes:
+      - ./artifacts/ai:/app:Z
+    ports:
+      - 8000:8000
+    environment:
+      LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - 11434:11434
+
+  # ----------------------------- tooling -----------------------------
+  
   client-web-tooling:
     profiles: ["tooling"]
     build:
@@ -50,3 +75,4 @@ services:
 volumes:
   pnpm-store:
   client-web-node-modules:
+  ollama_data:
