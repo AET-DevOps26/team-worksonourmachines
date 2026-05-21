@@ -34,15 +34,25 @@ setup-env: ## Setup the environment variables; This will overwrite the existing 
 format: ## Format the code
 	pnpm --dir $(API_DIR) run format
 	pnpm --dir $(CLIENT_WEB_DIR) run format
+	${MAKE} ai-format
 
 .PHONY: lint
 lint: ## Lint the code
 	pnpm --dir $(API_DIR) run lint
 	pnpm --dir $(CLIENT_WEB_DIR) run lint
+	${MAKE} ai-lint
 
 .PHONY: ai-install
 ai-install: ## Install AI service dependencies locally (requires Python 3.12+)
 	pip install -r $(AI_DIR)/requirements.txt
+
+.PHONY: ai-format
+ai-format: ## Format AI service code
+	ruff format $(AI_DIR)
+
+.PHONY: ai-lint
+ai-lint: ## Lint AI service code
+	ruff check $(AI_DIR)
 
 .PHONY: ai-dev
 ai-dev: ## Run AI service locally with hot reload (requires ai-install first)
