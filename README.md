@@ -13,6 +13,8 @@ Repository for team WorksOnOurMachines
 
 The project is configured to run locally using Docker Compose. Common commands are provided via make. Use `make help` to view the available commands.
 
+For architecture, container roles, environment variables, VS Code workspace, git hooks, and troubleshooting, see the [technical local setup doc](./docs/technical/local-setup.md).
+
 ### Prerequisites
 
 - You need to have a container runtime installed with a docker compose complient command.
@@ -20,8 +22,12 @@ The project is configured to run locally using Docker Compose. Common commands a
 
 ### Setup
 
-Run the command `make init` to setup a local development environment.
+Run the command `make init` to setup a local development environment including the env files, installing dependencies and setting up git hooks.
 
-### Run only
+### Running the Application
 
-If you only want to run the project, it is sufficient to execute `make setup-env` and then `docker compose up`.
+To start the project without initializing the full development environment, run `make setup-env` and then `make up` (or `docker compose up`). Stop services with `make down`.
+
+### Cleaning up
+
+Use `make clean` to remove local dependencies and build artifacts, or `make deep-clean` to also reset containers, images, and pnpm stores.
