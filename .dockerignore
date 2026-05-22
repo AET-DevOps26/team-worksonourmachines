@@ -9,3 +9,7 @@
 .DS_Store
 **/.env
 .react-router/
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.venv
