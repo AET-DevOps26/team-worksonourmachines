@@ -9,7 +9,8 @@
         "dev": "react-router dev",
         "build": "react-router build",
         "typegen": "react-router typegen",
-        "start": "react-router-serve ./build/server/index.js"
+        "start": "react-router-serve ./build/server/index.js",
+        "test": "echo 'No tests yet'"
     },
     "keywords": [],
     "author": "worksounourmachine",
