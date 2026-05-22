@@ -250,104 +250,6 @@
       }
     },
     {
-      "id": "6ff83c0c-7abd-443b-b000-a65fc8e67911",
-      "width": 490,
-      "height": 400,
-      "type": "componentSubsystem",
-      "position": {
-        "x": 150,
-        "y": 930
-      },
-      "data": {
-        "name": "Observability",
-        "isComponentSubsystemHeaderShown": true,
-        "strokeColor": "#fd9644"
-      },
-      "measured": {
-        "width": 490,
-        "height": 400
-      }
-    },
-    {
-      "id": "8028fafd-378d-4ade-aa51-e20793039842",
-      "width": 130,
-      "height": 70,
-      "type": "component",
-      "position": {
-        "x": 300,
-        "y": 60
-      },
-      "parentId": "6ff83c0c-7abd-443b-b000-a65fc8e67911",
-      "data": {
-        "name": "Grafana :3000",
-        "isComponentHeaderShown": true,
-        "strokeColor": "#fd9644"
-      },
-      "measured": {
-        "width": 130,
-        "height": 70
-      }
-    },
-    {
-      "id": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "width": 150,
-      "height": 70,
-      "type": "component",
-      "position": {
-        "x": 40,
-        "y": 60
-      },
-      "parentId": "6ff83c0c-7abd-443b-b000-a65fc8e67911",
-      "data": {
-        "name": "Prometheus :9090",
-        "isComponentHeaderShown": true,
-        "strokeColor": "#fd9644"
-      },
-      "measured": {
-        "width": 150,
-        "height": 70
-      }
-    },
-    {
-      "id": "5175a8b7-d222-488b-8f1a-16388c171fd6",
-      "width": 290,
-      "height": 200,
-      "type": "componentSubsystem",
-      "position": {
-        "x": -250,
-        "y": 690
-      },
-      "data": {
-        "name": "Documentation",
-        "isComponentSubsystemHeaderShown": true,
-        "strokeColor": "#fed330"
-      },
-      "measured": {
-        "width": 290,
-        "height": 200
-      }
-    },
-    {
-      "id": "f9b0507e-5909-4bb1-a10d-118d45b45aa9",
-      "width": 220,
-      "height": 90,
-      "type": "component",
-      "position": {
-        "x": 30,
-        "y": 90
-      },
-      "parentId": "5175a8b7-d222-488b-8f1a-16388c171fd6",
-      "data": {
-        "name": "Swagger UI :8084",
-        "isComponentHeaderShown": true,
-        "strokeColor": "#fed330"
-      },
-      "measured": {
-        "width": 220,
-        "height": 90
-      }
-    },
-    {
       "id": "775f5c59-ef90-41e0-99d2-1a2ae64920f9",
       "width": 360,
       "height": 250,
@@ -461,8 +363,8 @@
       "height": 220,
       "type": "componentSubsystem",
       "position": {
-        "x": 1330,
-        "y": 1080
+        "x": 1430,
+        "y": 810
       },
       "data": {
         "name": "External APIs",
@@ -505,7 +407,7 @@
       },
       "parentId": "20ede45a-7a15-4a9c-b830-994a51e3577f",
       "data": {
-        "name": "Frontend",
+        "name": "UI",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -568,25 +470,6 @@
       }
     },
     {
-      "id": "ba8967ac-7fae-4b87-a80c-e0a96512dab4",
-      "width": 30,
-      "height": 30,
-      "type": "componentInterface",
-      "position": {
-        "x": -690,
-        "y": 810
-      },
-      "data": {
-        "name": "swagger.tutormatch.de:443",
-        "fillColor": "",
-        "strokeColor": "#fed330"
-      },
-      "measured": {
-        "width": 30,
-        "height": 30
-      }
-    },
-    {
       "id": "07e70100-7d34-4515-a60e-833df953ba97",
       "width": 30,
       "height": 30,
@@ -601,44 +484,6 @@
       "measured": {
         "width": 30,
         "height": 30
-      }
-    },
-    {
-      "id": "9c27fb20-7373-48c5-afaf-5ee44ae089c5",
-      "width": 30,
-      "height": 30,
-      "type": "componentInterface",
-      "position": {
-        "x": -780,
-        "y": 1080
-      },
-      "data": {
-        "name": "grafana.tutormatch.de:443",
-        "strokeColor": "#fd9644"
-      },
-      "measured": {
-        "width": 30,
-        "height": 30
-      }
-    },
-    {
-      "id": "9d102235-edef-43e7-aab7-ffbb91fc0354",
-      "width": 180,
-      "height": 120,
-      "type": "component",
-      "position": {
-        "x": 30,
-        "y": 260
-      },
-      "parentId": "6ff83c0c-7abd-443b-b000-a65fc8e67911",
-      "data": {
-        "name": "Loki:6000",
-        "isComponentHeaderShown": true,
-        "strokeColor": "#fd9644"
-      },
-      "measured": {
-        "width": 180,
-        "height": 120
       }
     }
   ],
@@ -732,54 +577,6 @@
       }
     },
     {
-      "id": "c4d05945-d086-4194-a9c2-447383f8ed1b",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "30dad2ea-a6b7-4bb6-b3e5-3f59108b02ec",
-      "type": "ComponentDependency",
-      "sourceHandle": "left",
-      "targetHandle": "right",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
-      "id": "df26f360-5180-4b39-b785-a2123b841f17",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "7937ad73-78a8-4a50-ad2e-e38a075fb000",
-      "type": "ComponentDependency",
-      "sourceHandle": "left",
-      "targetHandle": "right-bottom",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
-      "id": "05c328e5-0708-4ce7-b103-3b3783abcb05",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "afcd5e5a-eb44-44bb-8619-86bfbd918283",
-      "type": "ComponentDependency",
-      "sourceHandle": "left",
-      "targetHandle": "right",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
-      "id": "47dc5f16-05be-4abc-9107-5e6cfdb375fc",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "e11389a6-9d1e-4fd4-839a-7732429fb50f",
-      "type": "ComponentDependency",
-      "sourceHandle": "top-mid-right",
-      "targetHandle": "bottom",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
       "id": "b4976441-2128-402a-83bb-50b896e4031e",
       "source": "67429b57-ac37-47d8-915d-69cbda474dcf",
       "target": "325d0f77-85dc-49e0-a5c1-2d980faf9178",
@@ -819,7 +616,7 @@
       "source": "2a0f7431-9bb3-4fd4-a079-d30a47632407",
       "target": "02f7abfc-3712-49fc-99e4-c203a9665ee9",
       "type": "ComponentDependency",
-      "sourceHandle": "bottom",
+      "sourceHandle": "right",
       "targetHandle": "left",
       "data": {
         "strokeColor": "#26de81",
@@ -850,18 +647,6 @@
       }
     },
     {
-      "id": "db3559e7-f97b-4c0e-bee2-93dc4f61a3a0",
-      "source": "ba8967ac-7fae-4b87-a80c-e0a96512dab4",
-      "target": "f9b0507e-5909-4bb1-a10d-118d45b45aa9",
-      "type": "ComponentProvidedInterface",
-      "sourceHandle": "right",
-      "targetHandle": "left",
-      "data": {
-        "points": [],
-        "strokeColor": "#fed330"
-      }
-    },
-    {
       "id": "90863150-18a5-4fca-8c8f-9fa0f0faaf9b",
       "source": "07e70100-7d34-4515-a60e-833df953ba97",
       "target": "67429b57-ac37-47d8-915d-69cbda474dcf",
@@ -870,54 +655,6 @@
       "targetHandle": "left",
       "data": {
         "points": []
-      }
-    },
-    {
-      "id": "73287af2-33ac-4b9c-b3b4-8aaa95e8cec3",
-      "source": "9c27fb20-7373-48c5-afaf-5ee44ae089c5",
-      "target": "8028fafd-378d-4ade-aa51-e20793039842",
-      "type": "ComponentProvidedInterface",
-      "sourceHandle": "right",
-      "targetHandle": "bottom-left",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
-      "id": "3d78fc5c-1d78-421c-b3b0-9e319ee28cf7",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "67429b57-ac37-47d8-915d-69cbda474dcf",
-      "type": "ComponentDependency",
-      "sourceHandle": "top-left",
-      "targetHandle": "right-top",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
-      "id": "65db3f34-8c77-43df-948c-c4e9c75c02fc",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "714f9f3a-c6ee-4184-a757-45bfff0237fa",
-      "type": "ComponentDependency",
-      "sourceHandle": "top",
-      "targetHandle": "bottom-right",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
-      "id": "cbd8419f-69c7-46e6-8301-abf21709eeb3",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "2a0f7431-9bb3-4fd4-a079-d30a47632407",
-      "type": "ComponentDependency",
-      "sourceHandle": "top-right",
-      "targetHandle": "left",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
       }
     },
     {
@@ -993,42 +730,6 @@
       }
     },
     {
-      "id": "51335b32-d083-4c96-846c-de65c13bec7b",
-      "source": "ad5c6bbb-aaa3-416f-82b2-c7a353ec83db",
-      "target": "ba8967ac-7fae-4b87-a80c-e0a96512dab4",
-      "type": "ComponentRequiredInterface",
-      "sourceHandle": "bottom-left",
-      "targetHandle": "top",
-      "data": {
-        "points": [],
-        "strokeColor": "#fed330"
-      }
-    },
-    {
-      "id": "9d696443-e8a8-4f6a-8e46-6ebf0ce6646c",
-      "source": "ad5c6bbb-aaa3-416f-82b2-c7a353ec83db",
-      "target": "9c27fb20-7373-48c5-afaf-5ee44ae089c5",
-      "type": "ComponentRequiredInterface",
-      "sourceHandle": "left",
-      "targetHandle": "top",
-      "data": {
-        "strokeColor": "#fd9644",
-        "points": []
-      }
-    },
-    {
-      "id": "12ef43de-d8a1-4550-81ad-2995cd58656c",
-      "source": "8028fafd-378d-4ade-aa51-e20793039842",
-      "target": "9d102235-edef-43e7-aab7-ffbb91fc0354",
-      "type": "ComponentDependency",
-      "sourceHandle": "bottom-mid-left",
-      "targetHandle": "top",
-      "data": {
-        "points": [],
-        "strokeColor": "#fd9644"
-      }
-    },
-    {
       "id": "6e168bbe-233e-444d-b4f5-ea3502793a7f",
       "source": "ad5c6bbb-aaa3-416f-82b2-c7a353ec83db",
       "target": "07e70100-7d34-4515-a60e-833df953ba97",
@@ -1036,31 +737,6 @@
       "sourceHandle": "right",
       "targetHandle": "left",
       "data": {
-        "points": []
-      }
-    },
-    {
-      "id": "9196a4a5-55ed-4e78-8568-d5b5dffbb664",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "f9b0507e-5909-4bb1-a10d-118d45b45aa9",
-      "type": "ComponentDependency",
-      "sourceHandle": "left",
-      "targetHandle": "right",
-      "data": {
-        "strokeColor": "#fd9644",
-        "points": []
-      }
-    },
-    {
-      "id": "92c6ff7c-e5d7-4c24-b805-30c5ccb8dd22",
-      "source": "916fc003-7bd9-47ee-980b-371175cd88a9",
-      "target": "ad5c6bbb-aaa3-416f-82b2-c7a353ec83db",
-      "type": "ComponentDependency",
-      "sourceHandle": "left",
-      "targetHandle": "bottom-mid-right",
-      "data": {
-        "textColor": "",
-        "strokeColor": "#fd9644",
         "points": []
       }
     }

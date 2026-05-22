@@ -102,7 +102,7 @@
       },
       "parentId": "20d69562-c78e-43d6-90f6-f797b570820b",
       "data": {
-        "name": "Contribute to student community"
+        "name": "Chatting functionality to connect student with tutor"
       },
       "measured": {
         "width": 330,
@@ -369,6 +369,17 @@
       "type": "UseCaseInclude",
       "sourceHandle": "top",
       "targetHandle": "bottom",
+      "data": {
+        "points": []
+      }
+    },
+    {
+      "id": "7392d256-b261-4262-9c7b-815135bf4f12",
+      "source": "82bf0a58-9ed6-4cc0-bad8-4c51f4a141d3",
+      "target": "8dc4fcab-da98-4ec0-a35d-055c0068e6e0",
+      "type": "UseCaseAssociation",
+      "sourceHandle": "left",
+      "targetHandle": "right-mid-bottom",
       "data": {
         "points": []
       }
