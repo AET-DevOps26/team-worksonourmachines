@@ -2,6 +2,9 @@ import logging
 import os
 
 from fastapi import FastAPI
+from openapi_server.apis.default_api import router as v1_router
+
+import app.ai_impl  # noqa: F401 — registers DefaultApiImpl with BaseDefaultApi
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
@@ -16,6 +19,4 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/v1/test")
-def test() -> dict[str, str]:
-    return {"message": "AI service is up"}
+app.include_router(v1_router)
