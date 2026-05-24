@@ -20,6 +20,18 @@ CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "
 
 # -----------------------------
 
+FROM base AS tooling
+
+COPY artifacts/ai/docker/tooling-entrypoint.sh /usr/local/bin/tooling-entrypoint
+RUN chmod +x /usr/local/bin/tooling-entrypoint
+
+WORKDIR /workspace/artifacts/ai
+
+ENTRYPOINT ["tooling-entrypoint"]
+CMD ["run", "lint"]
+
+# -----------------------------
+
 FROM base AS prod
 
 RUN adduser --disabled-password --gecos "" appuser
