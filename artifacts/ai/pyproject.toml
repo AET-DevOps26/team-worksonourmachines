@@ -6,6 +6,8 @@ requires-python = ">=3.12"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 verbosity_assertions = 2
+pythonpath = [".", "generated/src"]
+
 [tool.ruff]
 exclude = ["generated/"]
 
