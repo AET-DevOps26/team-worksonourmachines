@@ -129,6 +129,7 @@ ai-host-install: ## Create a virtual environment for the AI service to have IDE 
 			python -m venv $(AI_DIR)/.venv; \
 		fi; \
 		$(AI_DIR)/.venv/bin/pip install -r $(AI_DIR)/requirements.txt; \
+		$(AI_DIR)/.venv/bin/pip install -e $(AI_DIR)/generated; \
 	else \
 		echo "\033[33mPython not found. Please install Python for IDE support.\033[0m"; \
 	fi

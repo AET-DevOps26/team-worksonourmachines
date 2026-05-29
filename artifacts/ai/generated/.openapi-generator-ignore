@@ -1,0 +1,13 @@
+# Only keep the generated API code under src/openapi_server/.
+# Everything else is either owned by artifacts/ai/ or not needed.
+Dockerfile
+docker-compose.yaml
+openapi.yaml
+README.md
+requirements.txt
+pyproject.toml
+setup.cfg
+.flake8
+.gitignore
+src/openapi_server/main.py
+tests/
