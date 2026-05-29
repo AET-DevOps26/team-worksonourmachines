@@ -15,11 +15,12 @@ if [ "$1" = "run" ]; then
 		;;
 	lint)
 		shift
-		exec ruff check "$@" .
+		ruff check "$@" .
+		exec ruff format --check "$@" .
 		;;
 	test)
 		shift
-		exec echo "No tests yet"
+		exec pytest "$@"
 		;;
 	*)
 		exec "$@"
