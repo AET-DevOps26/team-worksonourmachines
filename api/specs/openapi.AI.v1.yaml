@@ -4,6 +4,33 @@ info:
   version: v1
 tags: []
 paths:
+  /v1/chat:
+    post:
+      operationId: chat
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+              required:
+                - prompt
   /v1/test:
     get:
       operationId: test
