@@ -1,8 +1,9 @@
-from app.llm import get_llm
 from langchain_core.messages import HumanMessage
 from openapi_server.apis.default_api_base import BaseDefaultApi
 from openapi_server.models.chat200_response import Chat200Response
 from openapi_server.models.test200_response import Test200Response
+
+from app.llm import get_llm
 
 
 class DefaultApiImpl(BaseDefaultApi):
