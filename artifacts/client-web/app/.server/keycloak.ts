@@ -52,11 +52,13 @@ const sessionStorage = createCookieSessionStorage<KeycloakSession>({
     },
 });
 
+// Reads the authenticated user summary from the HTTP-only session cookie.
 export async function getAuthenticatedUser(request: Request): Promise<AuthenticatedUser | null> {
     const session = await sessionStorage.getSession(request.headers.get('Cookie'));
     return session.get('user') ?? null;
 }
 
+// Starts the Keycloak authorization-code login flow with PKCE and state protection.
 export async function startKeycloakLogin(request: Request): Promise<Response> {
     const session = await sessionStorage.getSession(request.headers.get('Cookie'));
     const state = randomToken();
@@ -82,6 +84,7 @@ export async function startKeycloakLogin(request: Request): Promise<Response> {
     });
 }
 
+// Handles the Keycloak callback, exchanges the code, and stores the user session.
 export async function completeKeycloakLogin(request: Request): Promise<Response> {
     const requestUrl = new URL(request.url);
     const code = requestUrl.searchParams.get('code');
@@ -126,6 +129,7 @@ export async function completeKeycloakLogin(request: Request): Promise<Response>
     });
 }
 
+// Clears the local session and redirects to Keycloak's logout endpoint.
 export async function endKeycloakSession(request: Request): Promise<Response> {
     const session = await sessionStorage.getSession(request.headers.get('Cookie'));
     const logoutUrl = new URL(`${keycloakIssuerPublic}/protocol/openid-connect/logout`);
@@ -145,10 +149,12 @@ export async function endKeycloakSession(request: Request): Promise<Response> {
     });
 }
 
+// Builds the absolute callback URL registered with the Keycloak client.
 function callbackUrl(): string {
     return `${appBaseUrl}${callbackPath}`;
 }
 
+// Exchanges the authorization code and PKCE verifier for Keycloak tokens.
 async function exchangeCodeForToken(code: string, codeVerifier: string): Promise<TokenResponse> {
     const response = await fetch(`${keycloakIssuerInternal}/protocol/openid-connect/token`, {
         body: new URLSearchParams({
@@ -175,6 +181,7 @@ async function exchangeCodeForToken(code: string, codeVerifier: string): Promise
     return response.json() as Promise<TokenResponse>;
 }
 
+// Fetches the authenticated user's OIDC profile from Keycloak.
 async function fetchUserInfo(accessToken: string): Promise<UserInfoResponse> {
     const response = await fetch(`${keycloakIssuerInternal}/protocol/openid-connect/userinfo`, {
         headers: {
@@ -192,10 +199,12 @@ async function fetchUserInfo(accessToken: string): Promise<UserInfoResponse> {
     return response.json() as Promise<UserInfoResponse>;
 }
 
+// Creates the PKCE S256 challenge from the generated code verifier.
 function createCodeChallenge(codeVerifier: string): string {
     return createHash('sha256').update(codeVerifier).digest('base64url');
 }
 
+// Decodes a JWT payload without verifying it so the demo can read local claims.
 function decodeJwtPayload(token: string): Record<string, unknown> {
     const payload = token.split('.')[1];
 
@@ -206,6 +215,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
     return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Record<string, unknown>;
 }
 
+// Extracts Keycloak realm roles from access-token claims.
 function extractRealmRoles(claims: Record<string, unknown>): string[] {
     const realmAccess = claims.realm_access;
 
@@ -216,20 +226,24 @@ function extractRealmRoles(claims: Record<string, unknown>): string[] {
     return realmAccess.roles.filter((role): role is string => typeof role === 'string');
 }
 
+// Generates a cryptographically random URL-safe token.
 function randomToken(): string {
     return randomBytes(32).toString('base64url');
 }
 
+// Sends the user back to the homepage with an authentication error message.
 function redirectWithError(message: string): Response {
     const redirectUrl = new URL('/', appBaseUrl);
     redirectUrl.searchParams.set('auth_error', message);
     return redirect(redirectUrl.pathname + redirectUrl.search);
 }
 
+// Normalizes configured base URLs by removing a trailing slash.
 function stripTrailingSlash(value: string): string {
     return value.endsWith('/') ? value.slice(0, -1) : value;
 }
 
+// Narrows unknown values to object records for safe claim inspection.
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null;
 }
