@@ -13,9 +13,25 @@ spec:
       labels:
         app: ai
     spec:
+      initContainers:
+        - name: pull-model
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              curl -sf -X POST "${OLLAMA_BASE_URL}/api/pull" \
+                -H "Content-Type: application/json" \
+                -d "{\"name\": \"${OLLAMA_MODEL}\"}"
+          env:
+            - name: OLLAMA_BASE_URL
+              value: {{ .Values.ai.ollamaBaseUrl }}
+            - name: OLLAMA_MODEL
+              value: {{ .Values.ai.ollamaModel }}
       containers:
         - name: ai
           image: {{ .Values.ai.image }}
+          imagePullPolicy: {{ .Values.ai.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 8000
           env:
@@ -23,6 +39,8 @@ spec:
               value: INFO
             - name: OLLAMA_BASE_URL
               value: {{ .Values.ai.ollamaBaseUrl }}
+            - name: OLLAMA_MODEL
+              value: {{ .Values.ai.ollamaModel }}
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:

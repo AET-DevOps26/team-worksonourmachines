@@ -16,6 +16,7 @@ spec:
       containers:
         - name: client-web
           image: {{ .Values.clientWeb.image }}
+          imagePullPolicy: {{ .Values.clientWeb.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 5173
           env:
