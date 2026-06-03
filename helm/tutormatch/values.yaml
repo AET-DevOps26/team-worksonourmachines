@@ -1,0 +1,19 @@
+namespace: team-worksonourmachines
+
+ingress:
+  host: team-worksonourmachines.stud.k8s.aet.cit.tum.de
+
+ai:
+  image: ghcr.io/aet-devops26/team-worksonourmachines/ai:latest
+  ollamaBaseUrl: http://ollama:11434
+  openaiApiKey: ""  # Set via --set ai.openaiApiKey=sk-... or pre-create secret
+
+clientWeb:
+  image: ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
+  serverCommunicationApiUrl: tbd
+  serverMarketplaceApiUrl: tbd
+  serverStudentApiUrl: tbd
+
+ollama:
+  image: ollama/ollama:latest
+  storage: 20Gi

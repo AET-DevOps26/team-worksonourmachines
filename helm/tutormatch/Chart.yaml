@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tutormatch
+description: TutorMatch full-stack application (AI + client-web + Ollama)
+type: application
+version: 0.1.0
+appVersion: "latest"
