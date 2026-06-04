@@ -1,0 +1,245 @@
+{
+  "realm": "tutormatch",
+  "displayName": "TUtorMatch",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "student",
+        "description": "Learner role for TUtorMatch students."
+      },
+      {
+        "name": "tutor",
+        "description": "Teaching role for TUtorMatch tutors."
+      },
+      {
+        "name": "admin",
+        "description": "Administrative role for local TUtorMatch development."
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "students",
+      "realmRoles": ["student"]
+    },
+    {
+      "name": "tutors",
+      "realmRoles": ["tutor"]
+    },
+    {
+      "name": "admins",
+      "realmRoles": ["admin"]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "client-web",
+      "name": "TUtorMatch React Router BFF",
+      "description": "Local development OIDC client for the web backend-for-frontend.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "client-web-dev-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      }
+    },
+    {
+      "clientId": "tutormatch-dev-cli",
+      "name": "TUtorMatch Dev CLI",
+      "description": "Local-only public client for requesting test tokens with dummy users.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "admin.tutormatch@example.com",
+      "email": "admin.tutormatch@example.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/admins"],
+      "realmRoles": ["admin"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "lukas.student@example.com",
+      "email": "lukas.student@example.com",
+      "firstName": "Lukas",
+      "lastName": "Weber",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/students"],
+      "realmRoles": ["student"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "maria.student@example.com",
+      "email": "maria.student@example.com",
+      "firstName": "Maria",
+      "lastName": "Schneider",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/students"],
+      "realmRoles": ["student"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "jonas.student@example.com",
+      "email": "jonas.student@example.com",
+      "firstName": "Jonas",
+      "lastName": "Fischer",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/students"],
+      "realmRoles": ["student"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "emma.student@example.com",
+      "email": "emma.student@example.com",
+      "firstName": "Emma",
+      "lastName": "Bauer",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/students"],
+      "realmRoles": ["student"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "noah.student@example.com",
+      "email": "noah.student@example.com",
+      "firstName": "Noah",
+      "lastName": "Klein",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/students"],
+      "realmRoles": ["student"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "anna.tutor@example.com",
+      "email": "anna.tutor@example.com",
+      "firstName": "Anna",
+      "lastName": "Muller",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/tutors"],
+      "realmRoles": ["tutor"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "max.tutor@example.com",
+      "email": "max.tutor@example.com",
+      "firstName": "Max",
+      "lastName": "Hoffmann",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/tutors"],
+      "realmRoles": ["tutor"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "lea.tutor@example.com",
+      "email": "lea.tutor@example.com",
+      "firstName": "Lea",
+      "lastName": "Wagner",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/tutors"],
+      "realmRoles": ["tutor"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "omar.tutor@example.com",
+      "email": "omar.tutor@example.com",
+      "firstName": "Omar",
+      "lastName": "Yilmaz",
+      "enabled": true,
+      "emailVerified": true,
+      "groups": ["/tutors"],
+      "realmRoles": ["tutor"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutormatch123!",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

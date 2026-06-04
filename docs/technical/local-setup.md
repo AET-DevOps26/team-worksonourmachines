@@ -39,6 +39,8 @@ Each service mounts host source code. Runtime dependencies are either baked into
 - **client-web** binds `./artifacts/client-web` to `/app` and uses a named volume `client-web-node-modules` for `/app/node_modules`. The running dev server does not use the host `node_modules` folder. After `make init`, you may still have `node_modules` on the host for the IDE; that is separate from what the container runs.
 - **ai** binds `./artifacts/ai` to `/app`. Python packages are installed in the image when the image is built. Uvicorn runs with reload on file changes.
 - **ollama** uses the upstream image. Model data persists in the `ollama_data` volume. The AI service depends on it.
+- **postgres** uses the upstream Postgres image. Database files persist in the `postgres_data` volume. Initialization scripts under `docker/postgres/init/` run only when this volume is first created.
+- **keycloak** uses the upstream Keycloak image in development mode. It imports the committed TUtorMatch realm from `docker/keycloak/import/` on first startup and stores state in Postgres.
 
 Rebuild dev images when you change a `Dockerfile` or `requirements.txt` / lockfiles that affect the image build:
 
@@ -88,6 +90,24 @@ Run init again after `make deep-clean` or when tooling images or lockfiles chang
 4. After changing TypeSpec or OpenAPI related sources, run `make api-generate` and commit the generated output if your change requires it.
 5. Before committing, run `make lint`. The pre-commit hook runs the same command.
 
+## Local Keycloak
+
+The local stack starts Keycloak at <http://localhost:8080>. The admin console uses the development credentials `admin` / `admin` unless overridden through `KEYCLOAK_ADMIN` and `KEYCLOAK_ADMIN_PASSWORD`.
+
+The committed realm import is `docker/keycloak/import/tutormatch-realm.json`. It creates:
+
+- realm: `tutormatch`
+- roles: `student`, `tutor`, `admin`
+- client: `client-web` for the React Router backend-for-frontend
+- client: `tutormatch-dev-cli` for local token checks
+- users: 10 dummy users with password `Tutormatch123!`
+
+The startup import uses Keycloak's `--import-realm` mode. Keycloak imports JSON files from `/opt/keycloak/data/import` and skips the import if the realm already exists, so local state is not overwritten on every restart. To force a clean re-import, remove the Compose volumes with `docker compose down -v` or run `make deep-clean`.
+
+The web client contains a minimal login demo on <http://localhost:5173>. The login button redirects to Keycloak, then Keycloak redirects back to `/auth/keycloak/callback`. The React Router backend-for-frontend exchanges the authorization code for tokens, reads the Keycloak userinfo endpoint, and stores a small authenticated-user summary in an HTTP-only session cookie. Use one of the imported dummy users, for example `lukas.student@example.com` / `Tutormatch123!`.
+
+For local development, Keycloak's public issuer is pinned to `http://localhost:8080` through `KEYCLOAK_HOSTNAME`. The web container still calls Keycloak through Docker DNS at `http://keycloak:8080`, configured as `KEYCLOAK_ISSUER_INTERNAL`. The container also uses `KEYCLOAK_LOGIN_FEATURE=v1` by default because the newer Keycloak login theme rendered a disabled sign-in button in this local demo setup.
+
 ## Code quality commands
 
 Root make targets run the same checks for every wired artifact:
@@ -116,7 +136,7 @@ We keep `.env.dist` small on purpose. Only put variables there that someone need
 | Location | Role | Examples today |
 |----------|------|----------------|
 | `.env.dist` copied to `.env` | Required secrets or values every developer must provide | `OPENAI_API_KEY` |
-| `docker-compose.yml` | Defaults for tuning, internal URLs, log levels | `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `OLLAMA_BASE_URL`, placeholder server API URLs |
+| `docker-compose.yml` | Defaults for tuning, internal URLs, log levels | `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `OLLAMA_BASE_URL`, `KEYCLOAK_ADMIN`, `KEYCLOAK_HOSTNAME`, placeholder server API URLs |
 | `.env` optional overrides | Override any variable referenced as `${VAR:-default}` in compose without editing compose | e.g. `AI_LOG_LEVEL=DEBUG` |
 
 When adding new configuration:
