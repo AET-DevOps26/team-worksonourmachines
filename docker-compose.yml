@@ -38,7 +38,7 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
     volumes:
-      - ./docker/keycloak/import:/opt/keycloak/data/import:ro,Z
+      - ./artifacts/keycloak/import:/opt/keycloak/data/import:ro,Z
     ports:
       - 8080:8080
     depends_on:
