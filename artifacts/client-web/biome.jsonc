@@ -40,6 +40,7 @@
                 "noForEach": "off"
             },
             "style": {
+                "noProcessEnv": "error",
                 "noNonNullAssertion": "info",
                 "useComponentExportOnlyModules": {
                     "level": "warn",
@@ -83,7 +84,7 @@
                     }
                 }
             },
-            "includes": ["biome.jsonc", "**/tsconfig.json", "**/package.json"]
+            "includes": ["biome.jsonc", "**/tsconfig.json", "**/package.json", ".dependency-cruiser.cjs", "knip.jsonc"]
         }
     ]
 }
