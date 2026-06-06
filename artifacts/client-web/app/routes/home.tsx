@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from 'react-router';
-import { Link, useLoaderData } from 'react-router';
+import { Form, Link, useLoaderData } from 'react-router';
 import { logger } from '~/.server/lib/logger';
 import { getSessionUser } from '~/.server/service/session';
 
@@ -64,12 +64,14 @@ export default function HomeRoute() {
                                 </div>
                             </dl>
 
-                            <a
-                                className="inline-flex w-fit items-center rounded-md bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-white"
-                                href="/auth/logout"
-                            >
-                                Sign out
-                            </a>
+                            <Form action="/auth/logout" method="post">
+                                <button
+                                    className="inline-flex w-fit items-center rounded-md bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-white"
+                                    type="submit"
+                                >
+                                    Sign out
+                                </button>
+                            </Form>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-5">

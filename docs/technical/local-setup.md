@@ -121,7 +121,7 @@ The committed realm config is `artifacts/keycloak/import/tutormatch-realm.json`.
 - roles: `student`, `tutor`, `admin`
 - client scope: `roles` (adds a `realm_roles` claim to access tokens)
 - client: `client-web` for the React Router backend-for-frontend
-- client: `tutormatch-dev-cli` for local token checks
+- client: `tutormatch-dev-cli` for local token checks (disabled by default; set `KEYCLOAK_DEV_CLI_ENABLED=true` in `.env` and re-run config-cli)
 - users: 10 dummy users with password `Tutormatch123!`
 
 After Keycloak is healthy, the one-shot `keycloak-config-cli` container (`adorsys/keycloak-config-cli:latest`) applies that file via the Admin API. The `client-web` redirect URIs use `$(APP_HOSTNAME)` substitution, so local dev and nip.io share one config file.
@@ -184,7 +184,7 @@ We keep `.env.dist` small on purpose. Only put variables there that someone need
 | Location | Role | Examples today |
 |----------|------|----------------|
 | `.env.dist` copied to `.env` | Required secrets or values every developer must provide | `OPENAI_API_KEY` |
-| `docker-compose.yml` | Defaults for tuning, internal URLs, log levels, gateway hostnames | `APP_HOSTNAME`, `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `OLLAMA_BASE_URL`, `KEYCLOAK_ADMIN`, `KEYCLOAK_ISSUER`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`, `REDIS_URL`, `NODE_TLS_REJECT_UNAUTHORIZED`, placeholder server API URLs |
+| `docker-compose.yml` | Defaults for tuning, internal URLs, log levels, gateway hostnames | `APP_HOSTNAME`, `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `OLLAMA_BASE_URL`, `KEYCLOAK_ADMIN`, `KEYCLOAK_DEV_CLI_ENABLED`, `KEYCLOAK_ISSUER`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`, `REDIS_URL`, `NODE_TLS_REJECT_UNAUTHORIZED`, placeholder server API URLs |
 | `.env` optional overrides | Override any variable referenced as `${VAR:-default}` in compose without editing compose | e.g. `AI_LOG_LEVEL=DEBUG` |
 
 When adding new configuration:

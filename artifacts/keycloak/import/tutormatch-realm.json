@@ -90,7 +90,7 @@
       "clientId": "tutormatch-dev-cli",
       "name": "TUtorMatch Dev CLI",
       "description": "Local-only public client for requesting test tokens with dummy users.",
-      "enabled": true,
+      "enabled": "$${javascript: env.KEYCLOAK_DEV_CLI_ENABLED === 'true'}",
       "protocol": "openid-connect",
       "publicClient": true,
       "standardFlowEnabled": false,

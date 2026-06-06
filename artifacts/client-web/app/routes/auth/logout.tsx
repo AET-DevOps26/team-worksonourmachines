@@ -2,15 +2,15 @@ import type { LoaderFunctionArgs } from 'react-router';
 import { redirect } from 'react-router';
 import { logger } from '~/.server/lib/logger';
 import { logout } from '~/.server/service/auth';
-import { destroySession, getSession } from '~/.server/service/session';
+import { protectedAction } from '~/.server/service/routeProtection';
+import { destroySession } from '~/.server/service/session';
 
-export async function loader({ request }: LoaderFunctionArgs) {
-    const sessionResult = await getSession(request);
-    if (sessionResult.isErr) {
-        logger.error('Failed to load session for logout', { error: sessionResult.error });
-    }
+export async function loader(_args: LoaderFunctionArgs) {
+    return redirect('/');
+}
 
-    const { sidCookie, sidTxnCookie, url } = await logout(sessionResult.isOk ? sessionResult.value : null);
+export const action = protectedAction(async ({ request, session }) => {
+    const { sidCookie, sidTxnCookie, url } = await logout(session);
     const destroyResult = await destroySession(request);
     if (destroyResult.isErr) {
         logger.error('Failed to destroy session during logout', { error: destroyResult.error });
@@ -21,4 +21,4 @@ export async function loader({ request }: LoaderFunctionArgs) {
     headers.append('Set-Cookie', sidTxnCookie);
 
     return redirect(url, { headers });
-}
+});

@@ -42,7 +42,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.1
-    command: ["start-dev"]
+    command: ["start"]
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
@@ -77,12 +77,17 @@ services:
 
   keycloak-config-cli:
     image: adorsys/keycloak-config-cli:latest
+    command:
+      - "--import.var-substitution.enabled=true"
+      - "--import.var-substitution.script-evaluation-enabled=true"
     environment:
       APP_HOSTNAME: ${APP_HOSTNAME:-tutormatch.localhost}
-      IMPORT_FILES_LOCATIONS: /config/*
+      IMPORT_FILES_LOCATIONS: /config/tutormatch-realm.json
       IMPORT_MANAGED: partial
       IMPORT_REMOTESTATE_ENABLED: "true"
       IMPORT_VARSUBSTITUTION_ENABLED: "true"
+      JAVA_OPTS: "-Duser.home=/tmp"
+      KEYCLOAK_DEV_CLI_ENABLED: ${KEYCLOAK_DEV_CLI_ENABLED:-false}
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
       KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: 120s
       KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
