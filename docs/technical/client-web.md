@@ -81,6 +81,21 @@ Environment variables are defined once in `app/.server/lib/env.ts` and validated
 
 Server code follows a no-throw policy: functions return `Result` from `app/.server/lib/result.ts` instead of throwing. Routes map `Err` values to HTTP responses at the boundary.
 
+## Authentication
+
+The BFF authenticates users with Keycloak over OIDC. Session data and tokens live in Redis; the browser receives an httpOnly `sid` cookie with an opaque session ID.
+
+| Route | Role |
+|-------|------|
+| `/login` | Sign-in page |
+| `/auth/login` | Starts the OIDC flow |
+| `/auth/callback` | Handles the Keycloak redirect |
+| `/auth/logout` | Ends the session |
+
+Protected routes use `protectedLoader` and `protectedAction` from `app/.server/service/routeProtection.ts`. Outbound API clients attach the Keycloak access token as a `Bearer` header via `app/.server/lib/requestAuth.ts`.
+
+For local sign-in, realm config, and environment variables, see [local-setup.md](./local-setup.md#local-keycloak).
+
 ## Tooling
 
 | Command | What it checks |

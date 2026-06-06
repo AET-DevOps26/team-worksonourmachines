@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+// biome-ignore lint/style/noProcessEnv: Vite config runs outside the app env module
 const appBaseUrl = process.env.APP_BASE_URL ?? 'https://tutormatch.localhost';
 const appUsesGateway = appBaseUrl.startsWith('https://');
 const gatewayHostname = new URL(appBaseUrl).hostname;

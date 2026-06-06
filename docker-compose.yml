@@ -15,6 +15,10 @@ services:
     depends_on:
       - client-web
       - keycloak
+    networks:
+      default:
+        aliases:
+          - auth.${APP_HOSTNAME:-tutormatch.localhost}
 
   postgres:
     image: postgres:17-alpine
@@ -63,6 +67,14 @@ services:
       retries: 30
       start_period: 60s
 
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   keycloak-config-cli:
     image: adorsys/keycloak-config-cli:latest
     environment:
@@ -92,20 +104,23 @@ services:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
     environment:
+      CI: "true"
       LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
       LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
       APP_BASE_URL: ${APP_BASE_URL:-https://${APP_HOSTNAME:-tutormatch.localhost}}
-      KEYCLOAK_ISSUER_PUBLIC: ${KEYCLOAK_ISSUER_PUBLIC:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
-      KEYCLOAK_ISSUER_INTERNAL: ${KEYCLOAK_ISSUER_INTERNAL:-http://keycloak:8080/realms/tutormatch}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
+      NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-0}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
-      SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret-change-before-production}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       SERVER_COMMUNICATION_API_URL: tbd
       SERVER_MARKETPLACE_API_URL: tbd
       SERVER_STUDENT_API_URL: tbd
     depends_on:
       keycloak-config-cli:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
 
   ai:
     build:
