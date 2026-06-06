@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from 'react-router';
 import { useLoaderData } from 'react-router';
-import { getAuthenticatedUser } from '~/.server/keycloak';
+import { getAuthenticatedUser } from '~/.server/service/keycloak';
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const requestUrl = new URL(request.url);

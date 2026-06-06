@@ -1,3 +1,5 @@
+// biome-ignore-all lint/style/noProcessEnv: centralized env access
+
 import { type } from 'arktype';
 
 const Env = type({
