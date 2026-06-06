@@ -3,13 +3,13 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { createCookieSessionStorage, redirect, redirectDocument } from 'react-router';
 
+const appBaseUrl = stripTrailingSlash(process.env.APP_BASE_URL ?? 'https://tutormatch.localhost');
 const keycloakIssuerPublic = stripTrailingSlash(
-    process.env.KEYCLOAK_ISSUER_PUBLIC ?? 'http://localhost:8080/realms/tutormatch',
+    process.env.KEYCLOAK_ISSUER_PUBLIC ?? `https://auth.${new URL(appBaseUrl).hostname}/realms/tutormatch`,
 );
 const keycloakIssuerInternal = stripTrailingSlash(process.env.KEYCLOAK_ISSUER_INTERNAL ?? keycloakIssuerPublic);
 const keycloakClientId = process.env.KEYCLOAK_CLIENT_ID ?? 'client-web';
 const keycloakClientSecret = process.env.KEYCLOAK_CLIENT_SECRET ?? 'client-web-dev-secret';
-const appBaseUrl = stripTrailingSlash(process.env.APP_BASE_URL ?? 'http://localhost:5173');
 const callbackPath = '/auth/keycloak/callback';
 const sessionSecret = process.env.SESSION_SECRET ?? 'dev-session-secret-change-before-production';
 
@@ -50,7 +50,7 @@ const sessionStorage = createCookieSessionStorage<KeycloakSession>({
         path: '/',
         sameSite: 'lax',
         secrets: [sessionSecret],
-        secure: process.env.NODE_ENV === 'production',
+        secure: appBaseUrl.startsWith('https://') || process.env.NODE_ENV === 'production',
     },
 });
 

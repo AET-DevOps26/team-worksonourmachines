@@ -1,0 +1,13 @@
+{
+	local_certs
+}
+
+{$APP_HOSTNAME} {
+	tls internal
+	reverse_proxy client-web:5173
+}
+
+auth.{$APP_HOSTNAME} {
+	tls internal
+	reverse_proxy keycloak:8080
+}
