@@ -105,7 +105,7 @@ services:
     environment:
       CI: "true"
     volumes:
-      - ./api:/workspace/api:Z
+      - ./:/workspace/:Z
       - pnpm-store:/pnpm/store
 
   client-web-tooling:
