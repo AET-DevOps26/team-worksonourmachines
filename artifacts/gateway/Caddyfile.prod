@@ -1,0 +1,7 @@
+{$APP_HOSTNAME} {
+	reverse_proxy client-web:5173
+}
+
+auth.{$APP_HOSTNAME} {
+	reverse_proxy keycloak:8080
+}
