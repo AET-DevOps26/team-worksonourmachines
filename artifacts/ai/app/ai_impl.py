@@ -20,27 +20,24 @@ class DefaultApiImpl(BaseDefaultApi):
             response = await get_llm().ainvoke(
                 [HumanMessage(content=chat_request.prompt)]
             )
-            latency_ms = (time.perf_counter() - start) * 1000
+            latency_ms = round((time.perf_counter() - start) * 1000, 1)
             logger.info(
-                "chat completed",
-                extra={
-                    "latency_ms": round(latency_ms, 1),
-                    "prompt_length": prompt_length,
-                    "response_length": len(response.content),
-                    "provider": llm_info["provider"],
-                    "model": llm_info["model"],
-                },
+                "chat completed provider=%s model=%s latency_ms=%s"
+                " prompt_length=%s response_length=%s",
+                llm_info["provider"],
+                llm_info["model"],
+                latency_ms,
+                prompt_length,
+                len(response.content),
             )
             return Chat200Response(message=response.content)
         except Exception:
-            latency_ms = (time.perf_counter() - start) * 1000
+            latency_ms = round((time.perf_counter() - start) * 1000, 1)
             logger.exception(
-                "chat failed",
-                extra={
-                    "latency_ms": round(latency_ms, 1),
-                    "prompt_length": prompt_length,
-                    "provider": llm_info["provider"],
-                    "model": llm_info["model"],
-                },
+                "chat failed provider=%s model=%s latency_ms=%s prompt_length=%s",
+                llm_info["provider"],
+                llm_info["model"],
+                latency_ms,
+                prompt_length,
             )
             raise
