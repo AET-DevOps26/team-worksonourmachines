@@ -140,6 +140,7 @@ services:
       LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
     depends_on:
       - ollama
 
@@ -162,7 +163,7 @@ services:
     environment:
       CI: "true"
     volumes:
-      - ./api:/workspace/api:Z
+      - ./:/workspace/:Z
       - pnpm-store:/pnpm/store
 
   client-web-tooling:
