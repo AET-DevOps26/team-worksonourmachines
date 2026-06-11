@@ -4,21 +4,31 @@ from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 
 _llm = None
+_provider: str = "ollama"
+_model: str = ""
 
 
 def get_llm():
-    global _llm
+    global _llm, _provider, _model
     if _llm is None:
-        provider = os.getenv("LLM_PROVIDER", "ollama").lower()
-        if provider == "lmstudio":
+        _provider = os.getenv("LLM_PROVIDER", "ollama").lower()
+        if _provider in ("lmstudio", "openwebui"):
+            _model = os.getenv("LLM_MODEL", "local-model")
             _llm = ChatOpenAI(
-                base_url=os.environ["LM_STUDIO_BASE_URL"],
-                api_key="lm-studio",
-                model=os.getenv("LM_STUDIO_MODEL", "local-model"),
+                base_url=os.environ["LLM_BASE_URL"],
+                api_key="not-required",
+                model=_model,
             )
         else:
+            _provider = "ollama"
+            _model = os.environ["OLLAMA_MODEL"]
             _llm = ChatOllama(
                 base_url=os.environ["OLLAMA_BASE_URL"],
-                model=os.environ["OLLAMA_MODEL"],
+                model=_model,
             )
     return _llm
+
+
+def get_llm_info() -> dict:
+    get_llm()
+    return {"provider": _provider, "model": _model}
