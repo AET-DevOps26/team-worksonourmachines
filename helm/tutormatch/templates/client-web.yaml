@@ -57,7 +57,12 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: client-web-tls
   rules:
     - host: {{ .Values.ingress.host }}
       http:
