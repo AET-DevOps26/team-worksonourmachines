@@ -19,6 +19,13 @@ def get_llm():
                 api_key="not-required",
                 model=_model,
             )
+        elif _provider == "logos":
+            _model = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
+            _llm = ChatOpenAI(
+                base_url=os.environ["LLM_BASE_URL"],
+                api_key=os.environ["LLM_API_KEY"],
+                model=_model,
+            )
         else:
             _provider = "ollama"
             _model = os.environ["OLLAMA_MODEL"]
