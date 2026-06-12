@@ -13,21 +13,6 @@ spec:
       labels:
         app: ai
     spec:
-      initContainers:
-        - name: pull-model
-          image: curlimages/curl:latest
-          command:
-            - sh
-            - -c
-            - |
-              curl -sf -X POST "${OLLAMA_BASE_URL}/api/pull" \
-                -H "Content-Type: application/json" \
-                -d "{\"name\": \"${OLLAMA_MODEL}\"}"
-          env:
-            - name: OLLAMA_BASE_URL
-              value: {{ .Values.ai.ollamaBaseUrl }}
-            - name: OLLAMA_MODEL
-              value: {{ .Values.ai.ollamaModel }}
       containers:
         - name: ai
           image: {{ .Values.ai.image }}
@@ -37,15 +22,17 @@ spec:
           env:
             - name: LOG_LEVEL
               value: INFO
-            - name: OLLAMA_BASE_URL
-              value: {{ .Values.ai.ollamaBaseUrl }}
-            - name: OLLAMA_MODEL
-              value: {{ .Values.ai.ollamaModel }}
-            - name: OPENAI_API_KEY
+            - name: LLM_PROVIDER
+              value: {{ .Values.ai.llmProvider }}
+            - name: LLM_BASE_URL
+              value: {{ .Values.ai.llmBaseUrl }}
+            - name: LLM_MODEL
+              value: {{ .Values.ai.llmModel }}
+            - name: LLM_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: ai-secrets
-                  key: OPENAI_API_KEY
+                  key: LLM_API_KEY
           readinessProbe:
             httpGet:
               path: /health

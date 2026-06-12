@@ -5,16 +5,13 @@ ingress:
 
 ai:
   image: ghcr.io/aet-devops26/team-worksonourmachines/ai:latest
-  ollamaBaseUrl: http://ollama:11434
-  ollamaModel: llama3.2
-  openaiApiKey: ""  # Set via --set ai.openaiApiKey=sk-... or pre-create secret
+  llmProvider: logos
+  llmBaseUrl: https://logos.aet.cit.tum.de
+  llmModel: openai/gpt-oss-120b
+  llmApiKey: ""  # Set via --set ai.llmApiKey=lg-...
 
 clientWeb:
   image: ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
   serverCommunicationApiUrl: tbd
   serverMarketplaceApiUrl: tbd
   serverStudentApiUrl: tbd
-
-ollama:
-  image: ollama/ollama:latest
-  storage: 20Gi
