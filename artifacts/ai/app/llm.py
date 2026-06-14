@@ -1,16 +1,22 @@
 import os
 
+from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 
-# Module-level singleton — created once on first call, reused for all requests.
 _llm = None
 _provider: str = "lmstudio"
 _model: str = ""
 
 
-def _build_llm() -> ChatOpenAI:
+def _build_llm():
     global _provider, _model
     _provider = os.getenv("LLM_PROVIDER", "lmstudio").lower()
+    if _provider == "ollama":
+        _model = os.environ["OLLAMA_MODEL"]
+        return ChatOllama(
+            base_url=os.environ["OLLAMA_BASE_URL"],
+            model=_model,
+        )
     _model = os.getenv(
         "LLM_MODEL",
         "openai/gpt-oss-120b" if _provider == "logos" else "local-model",
@@ -23,7 +29,7 @@ def _build_llm() -> ChatOpenAI:
     )
 
 
-def get_llm() -> ChatOpenAI:
+def get_llm():
     global _llm
     if _llm is None:
         _llm = _build_llm()
@@ -31,6 +37,5 @@ def get_llm() -> ChatOpenAI:
 
 
 def get_llm_info() -> dict:
-    # Ensures _provider and _model are populated before returning them.
     get_llm()
     return {"provider": _provider, "model": _model}
