@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from __future__ import annotations
 import pprint
 import re  # noqa: F401

@@ -39,6 +39,10 @@ Each service mounts host source code. Runtime dependencies are either baked into
 - **client-web** binds `./artifacts/client-web` to `/app` and uses a named volume `client-web-node-modules` for `/app/node_modules`. The running dev server does not use the host `node_modules` folder. After `make init`, you may still have `node_modules` on the host for the IDE; that is separate from what the container runs.
 - **ai** binds `./artifacts/ai` to `/app`. Python packages are installed in the image when the image is built. Uvicorn runs with reload on file changes.
 - **ollama** uses the upstream image. Model data persists in the `ollama_data` volume. The AI service depends on it.
+- **postgres** uses the upstream Postgres image. Database files persist in the `postgres_data` volume. Initialization scripts under `docker/postgres/init/` run only when this volume is first created.
+- **keycloak** uses the upstream Keycloak image in development mode and stores state in Postgres. It is not published to the host; reach it through the gateway at `https://auth.tutormatch.localhost`.
+- **keycloak-config-cli** applies the committed realm config from `artifacts/keycloak/import/` after Keycloak is healthy (see Local Keycloak below).
+- **gateway** runs Caddy and is the only service that publishes ports `80` and `443`. It terminates TLS and routes traffic to `client-web` and `keycloak`.
 
 Rebuild dev images when you change a `Dockerfile` or `requirements.txt` / lockfiles that affect the image build:
 
@@ -88,6 +92,58 @@ Run init again after `make deep-clean` or when tooling images or lockfiles chang
 4. After changing TypeSpec or OpenAPI related sources, run `make api-generate` and commit the generated output if your change requires it.
 5. Before committing, run `make lint`. The pre-commit hook runs the same command.
 
+## Public gateway
+
+The stack exposes a single HTTPS entry point through Caddy (`gateway` service). Use these URLs in the browser:
+
+| Service | URL |
+|---------|-----|
+| Web app (BFF + frontend) | <https://tutormatch.localhost> |
+| Keycloak (login + admin console) | <https://auth.tutormatch.localhost> |
+
+Browsers resolve `*.localhost` to `127.0.0.1` (RFC 6761), so no `/etc/hosts` entries are needed.
+
+Caddy uses an internal CA for local HTTPS (`tls internal`). Your browser may warn on the first visit — accept the certificate or trust Caddy's local root to continue.
+
+Configuration lives under `artifacts/gateway/`. Both Caddyfiles route `{$APP_HOSTNAME}` to the web app and `auth.{$APP_HOSTNAME}` to Keycloak. Default `APP_HOSTNAME` is `tutormatch.localhost`.
+
+- `Caddyfile.dev` — local development with `tls internal` (default)
+- `Caddyfile.prod` — VPS deployment with nip.io hostnames and automatic Let's Encrypt certificates
+
+### Local Keycloak
+
+Keycloak is available at <https://auth.tutormatch.localhost>. The admin console uses the development credentials `admin` / `admin` unless overridden through `KEYCLOAK_ADMIN` and `KEYCLOAK_ADMIN_PASSWORD`.
+
+The committed realm config is `artifacts/keycloak/import/tutormatch-realm.json`. It defines:
+
+- realm: `tutormatch`
+- roles: `student`, `tutor`, `admin`
+- client: `client-web` for the React Router backend-for-frontend
+- client: `tutormatch-dev-cli` for local token checks
+- users: 10 dummy users with password `Tutormatch123!`
+
+After Keycloak is healthy, the one-shot `keycloak-config-cli` container (`adorsys/keycloak-config-cli:latest`) applies that file via the Admin API. The `client-web` redirect URIs use `$(APP_HOSTNAME)` substitution, so local dev and nip.io share one config file.
+
+**Does it overwrite existing data?** It syncs resources **defined in the JSON** to match the file — for example updating `client-web` redirect URIs when `APP_HOSTNAME` changes. It does **not** wipe the whole database. With our defaults (`IMPORT_MANAGED=partial`, `IMPORT_REMOTESTATE_ENABLED=true`):
+
+- Resources in the JSON are created or updated.
+- Resources **not** in the JSON are left alone.
+- Nothing is deleted automatically (`partial` mode).
+
+Manual changes in the Keycloak admin UI to resources **outside** the JSON (for example an extra test client you added by hand) are kept. Manual edits to resources **in** the JSON (roles, users, `client-web` settings) are overwritten on the next config-cli run to match Git.
+
+Re-run config after changing `APP_HOSTNAME` or the realm file:
+
+```bash
+docker compose up -d --force-recreate keycloak-config-cli
+```
+
+To reset Keycloak entirely, remove Compose volumes with `docker compose down -v` or run `make deep-clean`.
+
+The web client contains a minimal login demo on <https://tutormatch.localhost>. The login button redirects to Keycloak, then Keycloak redirects back to `/auth/keycloak/callback`. The React Router backend-for-frontend exchanges the authorization code for tokens, reads the Keycloak userinfo endpoint, and stores a small authenticated-user summary in an HTTP-only session cookie. Use one of the imported dummy users, for example `lukas.student@example.com` / `Tutormatch123!`.
+
+Keycloak's public issuer is `https://auth.tutormatch.localhost/realms/tutormatch`, configured through `KEYCLOAK_ISSUER_PUBLIC` and `KEYCLOAK_HOSTNAME`. The web container still calls Keycloak through Docker DNS at `http://keycloak:8080`, configured as `KEYCLOAK_ISSUER_INTERNAL`. The container also uses `KEYCLOAK_LOGIN_FEATURE=v1` by default because the newer Keycloak login theme rendered a disabled sign-in button in this local demo setup.
+
 ## Code quality commands
 
 Root make targets run the same checks for every wired artifact:
@@ -116,7 +172,7 @@ We keep `.env.dist` small on purpose. Only put variables there that someone need
 | Location | Role | Examples today |
 |----------|------|----------------|
 | `.env.dist` copied to `.env` | Required secrets or values every developer must provide | `OPENAI_API_KEY` |
-| `docker-compose.yml` | Defaults for tuning, internal URLs, log levels | `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `OLLAMA_BASE_URL`, placeholder server API URLs |
+| `docker-compose.yml` | Defaults for tuning, internal URLs, log levels, gateway hostnames | `APP_HOSTNAME`, `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `OLLAMA_BASE_URL`, `KEYCLOAK_ADMIN`, placeholder server API URLs |
 | `.env` optional overrides | Override any variable referenced as `${VAR:-default}` in compose without editing compose | e.g. `AI_LOG_LEVEL=DEBUG` |
 
 When adding new configuration:
@@ -156,6 +212,7 @@ Hooks are stored under `git/hooks/` in the repository so they are version contro
 | Dependency or lockfile changes not picked up | `make init` or run tooling install again |
 | Permission errors on files created by tooling | Check you are not mixing root-owned files with host UID tooling. Re-run init tooling steps after fixing ownership. |
 | Lint fails in pre-commit but you thought you were done | Run `make lint` locally; same command as the hook |
+| Keycloak rejects login / invalid redirect URI after hostname change | Re-run `docker compose up -d --force-recreate keycloak-config-cli client-web gateway` |
 
 `make clean` removes api and client-web `node_modules`, client-web build artifacts, and AI `.venv`, `__pycache__`, and ruff cache.
 

@@ -1,20 +1,41 @@
 import os
 
 from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 
-# Module-level singleton — created once on first use, reused on subsequent calls.
-_llm: ChatOllama | None = None
+_llm = None
+_provider: str = "lmstudio"
+_model: str = ""
 
 
-def get_llm() -> ChatOllama:
-    """Return the shared ChatOllama instance, initializing it on first call."""
+def _build_llm():
+    global _provider, _model
+    _provider = os.getenv("LLM_PROVIDER", "lmstudio").lower()
+    if _provider == "ollama":
+        _model = os.environ["OLLAMA_MODEL"]
+        return ChatOllama(
+            base_url=os.environ["OLLAMA_BASE_URL"],
+            model=_model,
+        )
+    _model = os.getenv(
+        "LLM_MODEL",
+        "openai/gpt-oss-120b" if _provider == "logos" else "local-model",
+    )
+    return ChatOpenAI(
+        base_url=os.environ["LLM_BASE_URL"],
+        # LM Studio/OpenWebUI don't require a real key but reject an empty value.
+        api_key=os.getenv("LLM_API_KEY", "not-required"),
+        model=_model,
+    )
+
+
+def get_llm():
     global _llm
     if _llm is None:
-        # ChatOllama is LangChain's wrapper around Ollama's /api/chat endpoint.
-        # base_url points to the Ollama server (local or in-cluster via k8s Service).
-        # model is the Ollama model tag to use, e.g. "llama3.2".
-        _llm = ChatOllama(
-            base_url=os.environ["OLLAMA_BASE_URL"],
-            model=os.environ["OLLAMA_MODEL"],
-        )
+        _llm = _build_llm()
     return _llm
+
+
+def get_llm_info() -> dict:
+    get_llm()
+    return {"provider": _provider, "model": _model}

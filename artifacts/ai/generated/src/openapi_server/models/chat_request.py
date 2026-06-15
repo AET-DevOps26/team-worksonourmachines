@@ -27,12 +27,12 @@ try:
 except ImportError:
     from typing_extensions import Self
 
-class Test200Response(BaseModel):
+class ChatRequest(BaseModel):
     """
-    Test200Response
+    ChatRequest
     """ # noqa: E501
-    message: StrictStr
-    __properties: ClassVar[List[str]] = ["message"]
+    prompt: StrictStr
+    __properties: ClassVar[List[str]] = ["prompt"]
 
     model_config = {
         "populate_by_name": True,
@@ -52,7 +52,7 @@ class Test200Response(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Self:
-        """Create an instance of Test200Response from a JSON string"""
+        """Create an instance of ChatRequest from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -75,7 +75,7 @@ class Test200Response(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Dict) -> Self:
-        """Create an instance of Test200Response from a dict"""
+        """Create an instance of ChatRequest from a dict"""
         if obj is None:
             return None
 
@@ -83,7 +83,7 @@ class Test200Response(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "message": obj.get("message")
+            "prompt": obj.get("prompt")
         })
         return _obj
 

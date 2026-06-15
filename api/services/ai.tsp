@@ -10,9 +10,13 @@ enum AiVersions {
 @versioned(AiVersions)
 @route("/v1")
 namespace Ai {
-  @get
-  @route("/test")
-  op test(): {
+  @post
+  @route("/chat")
+  op chat(
+    @body body: {
+      prompt: string;
+    },
+  ): {
     @header contentType: "application/json";
     @statusCode statusCode: 200;
     message: string;
