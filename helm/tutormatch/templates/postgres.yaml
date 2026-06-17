@@ -17,6 +17,7 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
+  progressDeadlineSeconds: 900
   selector:
     matchLabels:
       app: postgres
