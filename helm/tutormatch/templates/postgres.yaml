@@ -18,9 +18,6 @@ metadata:
 spec:
   replicas: 1
   progressDeadlineSeconds: 900
-  strategy:
-    type: Recreate
-    rollingUpdate: null
   selector:
     matchLabels:
       app: postgres
