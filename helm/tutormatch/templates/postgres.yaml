@@ -18,6 +18,8 @@ metadata:
 spec:
   replicas: 1
   progressDeadlineSeconds: 900
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: postgres

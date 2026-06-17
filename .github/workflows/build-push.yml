@@ -81,6 +81,11 @@ jobs:
           if [[ "$STATUS" == "pending-upgrade" || "$STATUS" == "pending-install" || "$STATUS" == "pending-rollback" ]]; then
             helm rollback tutormatch 0 --namespace team-worksonourmachines || true
           fi
+          # One-time migration: clear rollingUpdate from postgres so we can switch to Recreate
+          kubectl patch deployment postgres -n team-worksonourmachines \
+            --type=json \
+            -p='[{"op":"remove","path":"/spec/strategy/rollingUpdate"}]' \
+            --kubeconfig ~/.kube/config 2>/dev/null || true
           helm upgrade --install tutormatch ./helm/tutormatch \
             --namespace team-worksonourmachines \
             --create-namespace \
