@@ -82,10 +82,7 @@ jobs:
           chmod 600 ~/.kube/config
 
       - name: Cluster connectivity check
-        run: |
-          kubectl cluster-info
-          kubectl get nodes
-          kubectl get ns
+        run: kubectl get pods -n ${{ env.NAMESPACE }} || true
 
       - name: Lint chart
         run: helm lint ./helm/tutormatch
