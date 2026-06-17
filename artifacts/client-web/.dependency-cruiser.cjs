@@ -2,14 +2,14 @@
 module.exports = {
     forbidden: [
         {
-            name: 'server-only-in-routes',
+            name: 'server-only-imported-by-routes',
             severity: 'error',
-            comment: 'Only routes may import from .server/, and only from .server/service/',
+            comment: 'Only routes may import from .server/',
             from: { pathNot: ['(^|/)routes/', '(^|/)\\.server/'] },
             to: { path: '(^|/)\\.server/' },
         },
         {
-            name: 'server-only-in-routes',
+            name: 'routes-only-use-server-service',
             severity: 'error',
             comment: 'Routes must use .server/service/, not .server/api/ or .server/lib/',
             from: { path: '(^|/)routes/' },
