@@ -84,11 +84,8 @@ jobs:
           if [[ "$STATUS" == "pending-upgrade" || "$STATUS" == "pending-install" || "$STATUS" == "pending-rollback" ]]; then
             helm rollback tutormatch 0 --namespace team-worksonourmachines || true
           fi
-          # One-time migration: clear rollingUpdate from postgres so we can switch to Recreate
-          kubectl patch deployment postgres -n team-worksonourmachines \
-            --type=merge \
-            -p='{"spec":{"strategy":{"type":"Recreate","rollingUpdate":null}}}' \
-            2>/dev/null || true
+          # Delete postgres deployment so Helm recreates it without stale managed fields
+          kubectl delete deployment postgres -n team-worksonourmachines 2>/dev/null || true
           helm upgrade --install tutormatch ./helm/tutormatch \
             --namespace team-worksonourmachines \
             --create-namespace \
