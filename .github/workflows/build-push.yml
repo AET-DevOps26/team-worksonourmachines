@@ -76,11 +76,17 @@ jobs:
           mkdir -p ~/.kube
           echo "$KUBECONFIG_DATA" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
+          # Unlock any stuck pending-upgrade/pending-install state from prior failed runs
+          STATUS=$(helm status tutormatch --namespace team-worksonourmachines -o json 2>/dev/null | jq -r '.info.status' || echo "not-found")
+          if [[ "$STATUS" == "pending-upgrade" || "$STATUS" == "pending-install" || "$STATUS" == "pending-rollback" ]]; then
+            helm rollback tutormatch 0 --namespace team-worksonourmachines || true
+          fi
           helm upgrade --install tutormatch ./helm/tutormatch \
             --namespace team-worksonourmachines \
             --create-namespace \
             --set ai.image=${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }} \
             --set clientWeb.image=${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }} \
             --set ai.llmApiKey="$LLM_API_KEY" \
+            --cleanup-on-fail \
             --wait \
             --timeout 15m
