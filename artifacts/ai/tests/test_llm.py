@@ -13,8 +13,6 @@ def _reload(env: dict):
         "LLM_MODEL",
         "LLM_BASE_URL",
         "LLM_API_KEY",
-        "OLLAMA_BASE_URL",
-        "OLLAMA_MODEL",
     ):
         os.environ.pop(k, None)
     os.environ.update(env)
@@ -31,8 +29,6 @@ def clean_env():
         "LLM_MODEL",
         "LLM_BASE_URL",
         "LLM_API_KEY",
-        "OLLAMA_BASE_URL",
-        "OLLAMA_MODEL",
     ):
         os.environ.pop(k, None)
     llm_module._llm = None
@@ -79,8 +75,8 @@ def test_ollama():
     _reload(
         {
             "LLM_PROVIDER": "ollama",
-            "OLLAMA_BASE_URL": "http://localhost:11434",
-            "OLLAMA_MODEL": "llama3",
+            "LLM_BASE_URL": "http://localhost:11434",
+            "LLM_MODEL": "llama3",
         }
     )
     llm = llm_module.get_llm()
@@ -91,10 +87,15 @@ def test_ollama():
     assert info["model"] == "llama3"
 
 
-def test_ollama_missing_env():
-    _reload({"LLM_PROVIDER": "ollama", "OLLAMA_BASE_URL": "http://localhost:11434"})
-    with pytest.raises(KeyError):
-        llm_module.get_llm()
+def test_ollama_defaults():
+    from langchain_ollama import ChatOllama
+
+    _reload({"LLM_PROVIDER": "ollama"})
+    llm = llm_module.get_llm()
+    info = llm_module.get_llm_info()
+
+    assert isinstance(llm, ChatOllama)
+    assert info["model"] == "llama3.2:latest"
 
 
 def test_lmstudio_missing_base_url():
