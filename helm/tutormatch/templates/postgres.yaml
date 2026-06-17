@@ -71,7 +71,7 @@ spec:
               mountPath: /docker-entrypoint-initdb.d
           readinessProbe:
             exec:
-              command: ["/bin/sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+              command: ["/bin/sh", "-c", "pg_isready -U {{ .Values.postgres.user }} -d {{ .Values.postgres.db }}"]
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 10
