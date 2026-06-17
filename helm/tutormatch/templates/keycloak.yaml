@@ -203,14 +203,12 @@ spec:
             - name: KC_PROXY_HEADERS
               value: xforwarded
           readinessProbe:
-            exec:
-              command:
-                - bash
-                - -c
-                - "exec 3<>/dev/tcp/127.0.0.1/9000; printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"
+            httpGet:
+              path: /health/ready
+              port: 9000
             initialDelaySeconds: 60
             periodSeconds: 10
-            failureThreshold: 12
+            failureThreshold: 18
           resources:
             requests:
               cpu: 250m
