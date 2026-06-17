@@ -15,3 +15,17 @@ clientWeb:
   serverCommunicationApiUrl: tbd
   serverMarketplaceApiUrl: tbd
   serverStudentApiUrl: tbd
+
+postgres:
+  db: tutormatch
+  user: tutormatch
+  password: tutormatch  # Override in production
+  keycloakDb: keycloak
+  keycloakUser: keycloak
+  keycloakPassword: keycloak  # Override in production
+  storageSize: 1Gi
+
+keycloak:
+  adminUser: admin
+  adminPassword: admin  # Override in production
+  clientWebSecret: client-web-secret  # Override in production

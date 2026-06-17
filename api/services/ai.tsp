@@ -21,16 +21,4 @@ namespace Ai {
     @statusCode statusCode: 200;
     message: string;
   };
-
-  @post
-  @route("/chat")
-  op chat(
-    @body body: {
-      prompt: string;
-    },
-  ): {
-    @header contentType: "application/json";
-    @statusCode statusCode: 200;
-    message: string;
-  };
 }

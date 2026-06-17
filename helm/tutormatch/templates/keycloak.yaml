@@ -1,0 +1,306 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm
+  namespace: {{ .Values.namespace }}
+data:
+  tutormatch-realm.json: |
+    {
+      "realm": "tutormatch",
+      "displayName": "TUtorMatch",
+      "enabled": true,
+      "registrationAllowed": false,
+      "loginWithEmailAllowed": true,
+      "duplicateEmailsAllowed": false,
+      "resetPasswordAllowed": true,
+      "roles": {
+        "realm": [
+          { "name": "student", "description": "Learner role for TUtorMatch students." },
+          { "name": "tutor",   "description": "Teaching role for TUtorMatch tutors." },
+          { "name": "admin",   "description": "Administrative role for local TUtorMatch development." }
+        ]
+      },
+      "groups": [
+        { "name": "students", "realmRoles": ["student"] },
+        { "name": "tutors",   "realmRoles": ["tutor"] },
+        { "name": "admins",   "realmRoles": ["admin"] }
+      ],
+      "clients": [
+        {
+          "clientId": "client-web",
+          "name": "TUtorMatch React Router BFF",
+          "enabled": true,
+          "protocol": "openid-connect",
+          "publicClient": false,
+          "clientAuthenticatorType": "client-secret",
+          "secret": "{{ .Values.keycloak.clientWebSecret }}",
+          "standardFlowEnabled": true,
+          "implicitFlowEnabled": false,
+          "directAccessGrantsEnabled": false,
+          "serviceAccountsEnabled": false,
+          "redirectUris": ["https://{{ .Values.ingress.host }}/*"],
+          "webOrigins": ["https://{{ .Values.ingress.host }}"],
+          "attributes": {
+            "pkce.code.challenge.method": "S256",
+            "post.logout.redirect.uris": "https://{{ .Values.ingress.host }}/*"
+          }
+        },
+        {
+          "clientId": "tutormatch-dev-cli",
+          "name": "TUtorMatch Dev CLI",
+          "enabled": true,
+          "protocol": "openid-connect",
+          "publicClient": true,
+          "standardFlowEnabled": false,
+          "implicitFlowEnabled": false,
+          "directAccessGrantsEnabled": true,
+          "serviceAccountsEnabled": false
+        }
+      ],
+      "users": [
+        {
+          "username": "admin.tutormatch@example.com",
+          "email": "admin.tutormatch@example.com",
+          "firstName": "Admin", "lastName": "User",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/admins"], "realmRoles": ["admin"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "lukas.student@example.com",
+          "email": "lukas.student@example.com",
+          "firstName": "Lukas", "lastName": "Weber",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/students"], "realmRoles": ["student"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "maria.student@example.com",
+          "email": "maria.student@example.com",
+          "firstName": "Maria", "lastName": "Schneider",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/students"], "realmRoles": ["student"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "jonas.student@example.com",
+          "email": "jonas.student@example.com",
+          "firstName": "Jonas", "lastName": "Fischer",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/students"], "realmRoles": ["student"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "emma.student@example.com",
+          "email": "emma.student@example.com",
+          "firstName": "Emma", "lastName": "Bauer",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/students"], "realmRoles": ["student"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "noah.student@example.com",
+          "email": "noah.student@example.com",
+          "firstName": "Noah", "lastName": "Klein",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/students"], "realmRoles": ["student"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "anna.tutor@example.com",
+          "email": "anna.tutor@example.com",
+          "firstName": "Anna", "lastName": "Muller",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/tutors"], "realmRoles": ["tutor"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "max.tutor@example.com",
+          "email": "max.tutor@example.com",
+          "firstName": "Max", "lastName": "Hoffmann",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/tutors"], "realmRoles": ["tutor"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "lea.tutor@example.com",
+          "email": "lea.tutor@example.com",
+          "firstName": "Lea", "lastName": "Wagner",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/tutors"], "realmRoles": ["tutor"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "omar.tutor@example.com",
+          "email": "omar.tutor@example.com",
+          "firstName": "Omar", "lastName": "Yilmaz",
+          "enabled": true, "emailVerified": true,
+          "groups": ["/tutors"], "realmRoles": ["tutor"],
+          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        }
+      ]
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:26.6.1
+          args: ["start"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_ADMIN
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_ADMIN_PASSWORD
+            - name: KC_DB
+              value: postgres
+            - name: KC_DB_URL_HOST
+              value: postgres
+            - name: KC_DB_URL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: KEYCLOAK_DB
+            - name: KC_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: KEYCLOAK_DB_USER
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: KEYCLOAK_DB_PASSWORD
+            - name: KC_HEALTH_ENABLED
+              value: "true"
+            - name: KC_HOSTNAME
+              value: "https://auth.{{ .Values.ingress.host }}"
+            - name: KC_HTTP_ENABLED
+              value: "true"
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+            - name: KC_PROXY_HEADERS
+              value: xforwarded
+          readinessProbe:
+            exec:
+              command:
+                - bash
+                - -c
+                - "exec 3<>/dev/tcp/127.0.0.1/9000; printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 12
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-config
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: keycloak-config-cli
+          image: adorsys/keycloak-config-cli:latest
+          env:
+            - name: KEYCLOAK_URL
+              value: http://keycloak:8080
+            - name: KEYCLOAK_USER
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_ADMIN
+            - name: KEYCLOAK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_ADMIN_PASSWORD
+            - name: IMPORT_FILES_LOCATIONS
+              value: /config/*
+            - name: IMPORT_MANAGED
+              value: partial
+            - name: IMPORT_REMOTESTATE_ENABLED
+              value: "true"
+            - name: IMPORT_VARSUBSTITUTION_ENABLED
+              value: "false"
+            - name: KEYCLOAK_AVAILABILITYCHECK_ENABLED
+              value: "true"
+            - name: KEYCLOAK_AVAILABILITYCHECK_TIMEOUT
+              value: 120s
+          volumeMounts:
+            - name: realm-config
+              mountPath: /config
+      volumes:
+        - name: realm-config
+          configMap:
+            name: keycloak-realm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: keycloak
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloak
+  namespace: {{ .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - auth.{{ .Values.ingress.host }}
+      secretName: keycloak-tls
+  rules:
+    - host: auth.{{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
