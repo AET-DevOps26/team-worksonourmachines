@@ -108,7 +108,7 @@ jobs:
             --set clientWeb.image=${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }} \
             --set ai.llmApiKey="$LLM_API_KEY" \
             --atomic \
-            --timeout 15m \
+            --timeout 5m \
             --debug
 
       - name: Deployment diagnostics
@@ -130,4 +130,8 @@ jobs:
           kubectl describe pods -n ${{ env.NAMESPACE }}
 
           echo "=== Pod Logs ==="
-          kubectl logs -n ${{ env.NAMESPACE }} --all-containers=true --tail=200 || true
+          for pod in $(kubectl get pods -n ${{ env.NAMESPACE }} -o name); do
+            echo "--- $pod ---"
+            kubectl logs -n ${{ env.NAMESPACE }} $pod --all-containers=true --tail=50 --previous 2>&1 || \
+            kubectl logs -n ${{ env.NAMESPACE }} $pod --all-containers=true --tail=50 2>&1 || true
+          done
