@@ -129,6 +129,15 @@ jobs:
           echo "=== Describe Pods ==="
           kubectl describe pods -n ${{ env.NAMESPACE }}
 
+          echo "=== Postgres Logs ==="
+          PGPOD=$(kubectl get pods -n ${{ env.NAMESPACE }} -l app=postgres -o name | head -1)
+          if [ -n "$PGPOD" ]; then
+            kubectl logs -n ${{ env.NAMESPACE }} $PGPOD --previous 2>&1 || \
+            kubectl logs -n ${{ env.NAMESPACE }} $PGPOD 2>&1 || true
+          else
+            echo "No postgres pod found"
+          fi
+
           echo "=== Pod Logs ==="
           for pod in $(kubectl get pods -n ${{ env.NAMESPACE }} -o name); do
             echo "--- $pod ---"
