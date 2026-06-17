@@ -94,15 +94,26 @@ jobs:
             helm rollback ${{ env.RELEASE_NAME }} 0 --namespace ${{ env.NAMESPACE }} || true
           fi
 
-      - name: Delete postgres deployment and PVC to clear stale state
-        run: |
-          kubectl delete deployment postgres -n ${{ env.NAMESPACE }} 2>/dev/null || true
-          kubectl delete pvc postgres-data -n ${{ env.NAMESPACE }} 2>/dev/null || true
+      - name: Delete postgres deployment to reset managed fields
+        run: kubectl delete deployment postgres -n ${{ env.NAMESPACE }} 2>/dev/null || true
 
       - name: Deploy
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
         run: |
+          # Start background log capture for postgres before it gets rolled back
+          (
+            for i in $(seq 1 60); do
+              PGPOD=$(kubectl get pods -n ${{ env.NAMESPACE }} -l app=postgres -o name 2>/dev/null | head -1)
+              if [ -n "$PGPOD" ]; then
+                echo "=== Postgres pod found: $PGPOD ==="
+                kubectl logs -n ${{ env.NAMESPACE }} $PGPOD -f 2>&1 | head -100 &
+                break
+              fi
+              sleep 5
+            done
+          ) &
+
           helm upgrade --install ${{ env.RELEASE_NAME }} ./helm/tutormatch \
             --namespace ${{ env.NAMESPACE }} \
             --create-namespace \
@@ -110,7 +121,7 @@ jobs:
             --set clientWeb.image=${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }} \
             --set ai.llmApiKey="$LLM_API_KEY" \
             --atomic \
-            --timeout 5m \
+            --timeout 15m \
             --debug
 
       - name: Deployment diagnostics
