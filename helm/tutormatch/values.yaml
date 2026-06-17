@@ -8,7 +8,7 @@ ai:
   llmProvider: logos
   llmBaseUrl: https://logos.aet.cit.tum.de
   llmModel: openai/gpt-oss-120b
-  llmApiKey: ""  # Set via --set ai.llmApiKey=lg-...
+  llmApiKey: ""  # Set via the LLM_API_KEY GitHub Actions secret
 
 clientWeb:
   image: ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
