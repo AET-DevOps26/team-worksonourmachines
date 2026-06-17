@@ -5,7 +5,11 @@
     "private": true,
     "scripts": {
         "format": "biome format --write",
-        "lint": "biome check --diagnostic-level=warn",
+        "lint": "pnpm run lint:code && pnpm run lint:deps && pnpm run lint:unused",
+        "lint:code": "biome check --diagnostic-level=warn",
+        "lint:deps": "depcruise app --config .dependency-cruiser.cjs",
+        "lint:deps:test": "node scripts/test-dependency-cruiser.mjs",
+        "lint:unused": "knip",
         "dev": "react-router dev",
         "build": "react-router build",
         "typegen": "react-router typegen",
@@ -34,7 +38,8 @@
         "@types/node": "^22.19.19",
         "@types/react": "^19.2.15",
         "@types/react-dom": "^19.2.3",
-        "@vitejs/plugin-react": "^4.7.0",
+        "dependency-cruiser": "^17.3.7",
+        "knip": "^5.63.0",
         "typescript": "^5.9.3",
         "vite": "^6.4.2",
         "vite-tsconfig-paths": "^5.1.4"
