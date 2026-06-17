@@ -94,8 +94,10 @@ jobs:
             helm rollback ${{ env.RELEASE_NAME }} 0 --namespace ${{ env.NAMESPACE }} || true
           fi
 
-      - name: Delete postgres deployment to clear managed fields
-        run: kubectl delete deployment postgres -n ${{ env.NAMESPACE }} 2>/dev/null || true
+      - name: Delete postgres deployment and PVC to clear stale state
+        run: |
+          kubectl delete deployment postgres -n ${{ env.NAMESPACE }} 2>/dev/null || true
+          kubectl delete pvc postgres-data -n ${{ env.NAMESPACE }} 2>/dev/null || true
 
       - name: Deploy
         env:
