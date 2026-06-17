@@ -107,6 +107,11 @@ services:
       keycloak-config-cli:
         condition: service_completed_successfully
 
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama_data:/root/.ollama
+
   ai:
     build:
       context: .
@@ -122,6 +127,8 @@ services:
       LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:1234/v1}
       LLM_MODEL: ${LLM_MODEL:-local-model}
       LLM_API_KEY: ${LLM_API_KEY:-}
+    depends_on:
+      - ollama
 
   # ----------------------------- tooling -----------------------------
 
@@ -172,3 +179,4 @@ volumes:
   client-web-node-modules:
   caddy_data:
   caddy_config:
+  ollama_data:
