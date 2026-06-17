@@ -12,9 +12,9 @@ def _build_llm():
     global _provider, _model
     _provider = os.getenv("LLM_PROVIDER", "lmstudio").lower()
     if _provider == "ollama":
-        _model = os.environ["OLLAMA_MODEL"]
+        _model = os.getenv("LLM_MODEL", "llama3.2:latest")
         return ChatOllama(
-            base_url=os.environ["OLLAMA_BASE_URL"],
+            base_url=os.getenv("LLM_BASE_URL", "http://ollama:11434"),
             model=_model,
         )
     _model = os.getenv(
