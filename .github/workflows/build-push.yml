@@ -83,4 +83,4 @@ jobs:
             --set clientWeb.image=${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }} \
             --set ai.llmApiKey="$LLM_API_KEY" \
             --wait \
-            --timeout 10m
+            --timeout 15m
