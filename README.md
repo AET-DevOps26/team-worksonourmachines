@@ -14,6 +14,7 @@ Repository for team WorksOnOurMachines
 The project is configured to run locally using Docker Compose. Common commands are provided via make. Use `make help` to view the available commands.
 
 For architecture, container roles, environment variables, VS Code workspace, git hooks, and troubleshooting, see the [technical local setup doc](./docs/technical/local-setup.md).
+For the first Azure VM setup using Terraform and Ansible, see the [Azure VM setup doc](./docs/technical/azure-vm-setup.md).
 
 ### Prerequisites
 
