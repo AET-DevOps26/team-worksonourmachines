@@ -111,6 +111,13 @@ services:
     image: ollama/ollama
     volumes:
       - ollama_data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull ${LLM_MODEL:-llama3.2:latest} && wait"]
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list | grep -q ${LLM_MODEL:-llama3.2:latest}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
 
   ai:
     build:
@@ -123,12 +130,13 @@ services:
       - 8000:8000
     environment:
       LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
-      LLM_PROVIDER: ${LLM_PROVIDER:-lmstudio}
-      LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:1234/v1}
-      LLM_MODEL: ${LLM_MODEL:-local-model}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434}
+      LLM_MODEL: ${LLM_MODEL:-llama3.2:latest}
       LLM_API_KEY: ${LLM_API_KEY:-}
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
 
   # ----------------------------- tooling -----------------------------
 
