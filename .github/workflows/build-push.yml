@@ -101,7 +101,7 @@ jobs:
           # Capture keycloak and keycloak-config-cli logs in background for diagnostics
           (
             for i in $(seq 1 60); do
-              POD=$(kubectl get pods -n ${{ env.NAMESPACE }} -l app=keycloak -o name 2>/dev/null | head -1)
+              POD=$(kubectl get pods -n ${{ env.NAMESPACE }} -l app=keycloak --field-selector=status.phase=Running -o name 2>/dev/null | head -1)
               if [ -n "$POD" ]; then
                 echo "=== Keycloak pod: $POD ===" && kubectl logs -n ${{ env.NAMESPACE }} $POD -f 2>&1 | head -200 &
                 break
@@ -111,7 +111,7 @@ jobs:
           ) &
           (
             for i in $(seq 1 120); do
-              POD=$(kubectl get pods -n ${{ env.NAMESPACE }} -l job-name=keycloak-config -o name 2>/dev/null | head -1)
+              POD=$(kubectl get pods -n ${{ env.NAMESPACE }} -l job-name=keycloak-config --field-selector=status.phase=Running -o name 2>/dev/null | head -1)
               if [ -n "$POD" ]; then
                 echo "=== keycloak-config-cli pod: $POD ===" && kubectl logs -n ${{ env.NAMESPACE }} $POD -f 2>&1 | head -200 &
                 break
