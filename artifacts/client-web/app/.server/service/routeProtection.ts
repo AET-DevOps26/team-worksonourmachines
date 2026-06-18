@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
-import { runWithAuthenticatedRequest } from '~/.server/lib/requestAuth';
+import { runWithRequestAccessToken } from '~/.server/lib/requestAuth';
 import { isErr } from '~/.server/lib/result';
 import { requireAuthInLoader } from '~/.server/service/auth';
 import type { SessionPayload } from '~/.server/service/session';
@@ -16,7 +16,9 @@ export function protectedLoader<T>(
             throw sessionResult.error;
         }
 
-        return runWithAuthenticatedRequest(args.request, () => loader({ ...args, session: sessionResult.value }));
+        return runWithRequestAccessToken(sessionResult.value.accessToken, () =>
+            loader({ ...args, session: sessionResult.value }),
+        );
     };
 }
 
@@ -29,6 +31,8 @@ export function protectedAction<T>(
             throw sessionResult.error;
         }
 
-        return runWithAuthenticatedRequest(args.request, () => action({ ...args, session: sessionResult.value }));
+        return runWithRequestAccessToken(sessionResult.value.accessToken, () =>
+            action({ ...args, session: sessionResult.value }),
+        );
     };
 }

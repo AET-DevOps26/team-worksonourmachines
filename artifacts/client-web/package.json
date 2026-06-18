@@ -8,6 +8,7 @@
         "lint": "pnpm run lint:code && pnpm run lint:deps && pnpm run lint:unused && pnpm run lint:types",
         "lint:code": "biome check --diagnostic-level=warn",
         "lint:deps": "depcruise app --config .dependency-cruiser.cjs",
+        "lint:deps:test": "node scripts/test-dependency-cruiser.mjs",
         "lint:unused": "knip",
         "lint:types": "tsc --noEmit",
         "dev": "react-router dev",

@@ -1,5 +1,5 @@
 {
-    "include": ["**/*", "**/.server/**/*", "**/.client/**/*", ".react-router/types/**/*"],
+    "include": ["app/**/*", "app/.server/**/*", ".react-router/types/**/*", "reset.d.ts"],
     "compilerOptions": {
         "noEmit": true,
         "lib": ["DOM", "DOM.Iterable", "ES2023"],

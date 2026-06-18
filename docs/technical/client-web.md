@@ -19,6 +19,7 @@ flowchart TB
     serverLib[lib/]
   end
   routes --> service
+  routes --> serverLib
   routes --> components
   routes --> lib
   components --> lib
@@ -54,26 +55,31 @@ app/
 | Path | Purpose |
 |------|---------|
 | `.server/api/` | All outbound network calls. Wrap failures in typed errors (`error.ts`). |
-| `.server/service/` | Business logic. Routes import from here, not from `api/` directly. |
-| `.server/lib/` | Server-only shared code. |
+| `.server/service/` | Business logic. Routes import from here for domain logic, not from `api/` directly. |
+| `.server/lib/` | Server-only shared code (env, result, request auth, …). Routes may import utilities from here. |
 | `routes/` | Loaders, actions, and page composition. |
 | `components/<feature>/` | Feature UI. One `index` file is the only entry point for outside imports. |
 | `components/<feature>/ui/` | Optional. Presentational pieces private to the feature. |
 | `components/ui/` | Shared presentational components without business logic. |
-| `lib/` | Utilities used on the client or from both sides (not `.server`-only). |
+| `lib/` | Utilities used on the client or from both sides (not `.server`-only). Must not import from `routes/` or `components/`. |
 
 `components/` and `lib/` are scaffolded but mostly empty until features land.
 
 ## Import rules
 
-These are enforced by dependency-cruiser (`pnpm run lint:deps`).
+These are enforced by dependency-cruiser (`pnpm run lint:deps`). Rule behaviour is covered by tests in `test-dependency-cruiser/` (`pnpm run lint:deps:test`).
 
-- `components/` and `lib/` must not import from `.server/`.
-- `.server/` must not import from `components/`.
-- `routes/` must not import from `.server/api/`; use `.server/service/` instead.
-- `.server/api/` must not import from `.server/service/`.
-- Outside a feature folder, only import from that feature's `index.ts` (or `index.tsx`), not from internal files or `ui/`.
-- A feature may import freely within its own folder, including `ui/`.
+| Rule | What it enforces |
+|------|------------------|
+| `server-only-imported-by-routes`, `routes-only-use-server-service-or-lib` | Only `routes/` may import from `.server/`, and only from `.server/service/` or `.server/lib/` (not `api/`). |
+| `self-contained-server` | `.server/` must not import from outside `.server/`. |
+| `server-api-no-service` | `.server/api/` must not import from `.server/service/`. |
+| `server-lib-isolated` | `.server/lib/` must not import from `.server/api/` or `.server/service/`. |
+| `dumb-components` | `components/ui/` and `components/<feature>/ui/` must not import from app code; sibling imports within the same `ui/` folder are allowed. |
+| `feature-index` | Import another feature only via that feature's `index.ts` or `index.tsx` (from routes, `lib/`, or a different feature folder). |
+| `client-lib-isolated` | Client `lib/` must not import from `routes/` or `components/`. |
+
+Within a feature folder, imports from the same feature are free (including `ui/`). Service code may import from both `api/` and `lib/`.
 
 ## Policies
 
@@ -100,10 +106,11 @@ For local sign-in, realm config, and environment variables, see [local-setup.md]
 
 | Command | What it checks |
 |---------|----------------|
-| `pnpm run lint` | All lint targets |
+| `pnpm run lint` | All lint targets apart from the lint test target |
 | `pnpm run lint:code` | Biome check |
 | `pnpm run lint:deps` | dependency-cruiser layer rules |
+| `pnpm run lint:deps:test` | dependency-cruiser rule tests |
 | `pnpm run lint:unused` | knip dead code |
 | `pnpm run format` | Biome formatter |
 
-From the repo root, `make lint` runs the client-web lint script inside the tooling container and similar `make format`.
+From the repo root, `make lint` and `make format` run the respective npm scripts inside the tooling container.
