@@ -107,6 +107,18 @@ services:
       keycloak-config-cli:
         condition: service_completed_successfully
 
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull ${LLM_MODEL:-llama3.2:latest} && wait"]
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list | grep -q ${LLM_MODEL:-llama3.2:latest}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
   ai:
     build:
       context: .
@@ -118,18 +130,13 @@ services:
       - 8000:8000
     environment:
       LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434}
+      LLM_MODEL: ${LLM_MODEL:-llama3.2:latest}
+      LLM_API_KEY: ${LLM_API_KEY:-}
     depends_on:
-      - ollama
-
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - 11434:11434
+      ollama:
+        condition: service_healthy
 
   # ----------------------------- tooling -----------------------------
 
@@ -178,6 +185,6 @@ volumes:
   postgres_data:
   pnpm-store:
   client-web-node-modules:
-  ollama_data:
   caddy_data:
   caddy_config:
+  ollama_data:
