@@ -6,9 +6,10 @@
     ],
     "project": ["app/**/*.{ts,tsx}"],
     "ignore": ["**/.server/api/**/generated/**"],
-    "ignoreDependencies": ["tailwindcss"],
+    "ignoreDependencies": ["tailwindcss", "@fontsource-variable/inter", "tw-animate-css", "shadcn"],
     "ignoreUnresolved": ["tslib"],
     "ignoreIssues": {
-        "app/.server/service/**": ["types"]
+        "app/.server/service/**": ["types"],
+        "app/components/ui/**": ["exports", "types"]
     }
 }

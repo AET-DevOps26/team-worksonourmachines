@@ -42,12 +42,7 @@
             "style": {
                 "noProcessEnv": "error",
                 "noNonNullAssertion": "info",
-                "useComponentExportOnlyModules": {
-                    "level": "warn",
-                    "options": {
-                        "allowExportNames": ["loader", "action", "meta", "links", "scripts"]
-                    }
-                }
+                "useComponentExportOnlyModules": "off"
             },
             "security": {
                 "noDangerouslySetInnerHtml": "off"
