@@ -24,23 +24,26 @@ import {
 const FALLBACK_ACCESS_TOKEN_LIFETIME_MS = 60 * 60 * 1000;
 const OIDC_SCOPE = 'openid profile email';
 
-let oidcConfigPromise: Promise<client.Configuration> | null = null;
-
-async function getOidcConfig(): Promise<client.Configuration> {
-    if (!oidcConfigPromise) {
-        oidcConfigPromise = client.discovery(
-            new URL(env.get('KEYCLOAK_ISSUER')),
-            env.get('KEYCLOAK_CLIENT_ID'),
-            {
-                client_secret: env.get('KEYCLOAK_CLIENT_SECRET'),
-                token_endpoint_auth_method: 'client_secret_post',
-            },
-            client.ClientSecretPost(env.get('KEYCLOAK_CLIENT_SECRET')),
-        );
-    }
-
-    return oidcConfigPromise;
-}
+const oidcConfig = await client
+    .discovery(
+        new URL(env.get('KEYCLOAK_ISSUER')),
+        env.get('KEYCLOAK_CLIENT_ID'),
+        {
+            client_secret: env.get('KEYCLOAK_CLIENT_SECRET'),
+            token_endpoint_auth_method: 'client_secret_post',
+        },
+        client.ClientSecretPost(env.get('KEYCLOAK_CLIENT_SECRET')),
+    )
+    .then((config) => {
+        logger.info('OIDC configuration discovered successfully');
+        return config;
+    })
+    .catch((error) => {
+        logger.error('Failed to discover OIDC configuration', {
+            error: error instanceof Error ? error : new Error(String(error)),
+        });
+        throw error;
+    });
 
 function buildCallbackUrl(): string {
     return `${env.get('APP_BASE_URL')}/auth/callback`;
@@ -75,8 +78,7 @@ function getStringClaim(value: unknown): string | null {
 }
 
 async function mapUserInfo(accessToken: string, expectedSubject: string): Promise<SessionUser> {
-    const config = await getOidcConfig();
-    const userInfo = await client.fetchUserInfo(config, accessToken, expectedSubject);
+    const userInfo = await client.fetchUserInfo(oidcConfig, accessToken, expectedSubject);
     const claims = userInfo as Record<string, unknown>;
 
     return {
@@ -178,7 +180,6 @@ export async function getAccessToken(request: Request): Promise<string | null> {
 export async function login(
     redirectTo?: string | null,
 ): AsyncResult<{ readonly sidTxnCookie: string; readonly url: string }> {
-    const config = await getOidcConfig();
     const codeVerifier = client.randomPKCECodeVerifier();
     const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
     const state = crypto.randomUUID();
@@ -192,7 +193,7 @@ export async function login(
         return txnResult;
     }
 
-    const authUrl = client.buildAuthorizationUrl(config, {
+    const authUrl = client.buildAuthorizationUrl(oidcConfig, {
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
         redirect_uri: buildCallbackUrl(),
@@ -211,8 +212,7 @@ export async function exchangeCodeForAuthPayload(
     transaction: AuthTransaction,
 ): AsyncResult<AuthPayload> {
     try {
-        const config = await getOidcConfig();
-        const tokenSet = await client.authorizationCodeGrant(config, currentUrl, {
+        const tokenSet = await client.authorizationCodeGrant(oidcConfig, currentUrl, {
             expectedState: transaction.state,
             pkceCodeVerifier: transaction.codeVerifier,
         });
@@ -262,8 +262,7 @@ export async function logout(session: SessionPayload | null): Promise<{
 }> {
     if (session?.refreshToken) {
         try {
-            const config = await getOidcConfig();
-            await client.tokenRevocation(config, session.refreshToken, {
+            await client.tokenRevocation(oidcConfig, session.refreshToken, {
                 token_type_hint: 'refresh_token',
             });
         } catch (error) {
@@ -296,8 +295,7 @@ async function refreshAccessToken(sessionId: string, session: SessionPayload): P
             return null;
         }
 
-        const config = await getOidcConfig();
-        const tokenSet = await client.refreshTokenGrant(config, session.refreshToken);
+        const tokenSet = await client.refreshTokenGrant(oidcConfig, session.refreshToken);
 
         if (!tokenSet.access_token) {
             return null;

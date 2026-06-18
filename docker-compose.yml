@@ -108,13 +108,14 @@ services:
     volumes:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
+      - caddy_data:/caddy-data:ro
     environment:
       CI: "true"
       LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
       LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
       APP_BASE_URL: ${APP_BASE_URL:-https://${APP_HOSTNAME:-tutormatch.localhost}}
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
-      NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-0}
+      NODE_EXTRA_CA_CERTS: /caddy-data/caddy/pki/authorities/local/root.crt
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
