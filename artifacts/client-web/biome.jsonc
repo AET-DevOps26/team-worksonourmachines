@@ -84,7 +84,14 @@
                     }
                 }
             },
-            "includes": ["biome.jsonc", "**/tsconfig.json", "**/package.json", ".dependency-cruiser.cjs", "knip.jsonc"]
+            "includes": [
+                "biome.jsonc",
+                "**/tsconfig.json",
+                "**/package.json",
+                ".dependency-cruiser.cjs",
+                "knip.jsonc",
+                "components.json"
+            ]
         }
     ]
 }

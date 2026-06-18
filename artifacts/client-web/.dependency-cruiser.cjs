@@ -44,7 +44,7 @@ module.exports = {
             from: { path: '((?:^|/)components/(?:[^/]+/ui/|ui/))[^/]+' },
             to: {
                 path: '(^|/)(routes/|lib/|\\.server/|components/)',
-                pathNot: '$1',
+                pathNot: ['$1', '(^|/)lib/ui/'],
             },
         },
         {
