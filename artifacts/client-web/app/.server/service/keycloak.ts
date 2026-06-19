@@ -1,3 +1,5 @@
+// biome-ignore-all lint/style/noProcessEnv: temporary fix for keycloak
+
 import { createHash, randomBytes } from 'node:crypto';
 import { createCookieSessionStorage, redirect, redirectDocument } from 'react-router';
 
