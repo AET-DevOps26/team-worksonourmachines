@@ -38,7 +38,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     const profileMenuGroups = user ? getProfileMenuGroups(user.roles) : [];
 
     return (
-        <header className="sticky top-0 z-40 border-b border-border bg-background">
+        <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
             <div className="mx-auto grid h-14 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-6">
                 <Logo />
 
@@ -52,7 +52,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                             />
                         </div>
                     ) : (
-                        <nav aria-label="Main" className="hidden items-center gap-1 sm:flex">
+                        <nav aria-label="Main" className="hidden items-center gap-2 sm:flex">
                             {publicNavLinks.map((link) => (
                                 <Link
                                     className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))}
@@ -66,10 +66,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     )}
                 </div>
 
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="flex shrink-0 items-center gap-2">
                     {user ? (
                         <>
-                            <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+                            <nav aria-label="Main" className="hidden items-center gap-2 md:flex">
                                 {appNavLinks.map((link) => (
                                     <Link
                                         className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))}

@@ -11,13 +11,15 @@ export function PlaceholderPage({ title, description, paragraphCount = 2 }: Plac
 
     return (
         <div className="mx-auto w-full max-w-3xl px-6 py-12">
-            <header className="flex flex-col gap-2 border-b border-border pb-6">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Placeholder</p>
-                <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
-                {description ? <p className="text-sm leading-relaxed text-muted-foreground">{description}</p> : null}
+            <header className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm">
+                <p className="w-fit rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
+                    Placeholder
+                </p>
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground">{title}</h1>
+                {description ? <p className="text-base leading-relaxed text-muted-foreground">{description}</p> : null}
             </header>
 
-            <div className="mt-8 flex flex-col gap-4 text-sm leading-relaxed text-muted-foreground">
+            <div className="mt-8 flex flex-col gap-4 rounded-xl border border-border/40 bg-muted/30 p-6 text-sm leading-relaxed text-muted-foreground">
                 {paragraphs.map((paragraph) => (
                     <p key={paragraph.slice(0, 24)}>{paragraph}</p>
                 ))}

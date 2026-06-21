@@ -6,7 +6,7 @@ export function SiteFooter() {
     const year = new Date().getFullYear();
 
     return (
-        <footer className="border-t border-border bg-background">
+        <footer className="border-t border-border/60 bg-card/30">
             <div className="mx-auto max-w-6xl px-6 py-10">
                 <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
@@ -23,7 +23,7 @@ export function SiteFooter() {
                             <nav aria-label={section.title} className="flex flex-col gap-1">
                                 {section.links.map((link) => (
                                     <Link
-                                        className="text-sm text-muted-foreground hover:text-foreground"
+                                        className="text-sm text-muted-foreground transition-colors hover:text-primary"
                                         key={link.href}
                                         to={link.href}
                                     >

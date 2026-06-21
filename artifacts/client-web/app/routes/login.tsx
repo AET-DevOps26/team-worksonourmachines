@@ -39,7 +39,7 @@ export default function LoginRoute() {
 
     return (
         <div className="flex min-h-svh flex-col bg-background text-foreground">
-            <header className="sticky top-0 z-40 border-b border-border bg-background">
+            <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
                 <div className="mx-auto grid h-14 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center px-6">
                     <Logo />
                 </div>
@@ -60,16 +60,16 @@ export default function LoginRoute() {
                         </div>
                     ) : null}
 
-                    <section className="flex flex-col gap-5 rounded-lg border border-border bg-card p-6">
-                        <a className={cn(buttonVariants({ size: 'lg' }))} href={loginHref}>
+                    <section className="flex flex-col gap-6 rounded-xl border border-border/60 bg-card/70 p-8 shadow-sm backdrop-blur-sm">
+                        <a className={cn(buttonVariants({ size: 'lg' }), 'w-full justify-center')} href={loginHref}>
                             Sign in with Keycloak
                         </a>
 
-                        <Link className="text-sm text-muted-foreground hover:text-foreground" to="/">
+                        <Link className="text-center text-sm text-muted-foreground hover:text-primary" to="/">
                             Back to home
                         </Link>
 
-                        <div className="rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                        <div className="rounded-lg border border-border/50 bg-secondary/40 p-4 text-sm text-muted-foreground">
                             <p className="font-medium text-foreground">Demo credentials</p>
                             <p className="mt-2 font-mono text-xs">lukas.student@example.com / Tutormatch123!</p>
                             <p className="mt-1 font-mono text-xs">anna.tutor@example.com / Tutormatch123!</p>
