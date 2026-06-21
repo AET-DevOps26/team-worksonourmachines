@@ -1,9 +1,6 @@
-const footerLinks = [
-    { href: '/about', label: 'About' },
-    { href: '/help', label: 'Help' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/become-a-tutor', label: 'Become a tutor' },
-] as const;
+import { Link } from 'react-router';
+
+import { footerSections } from './nav';
 
 export function SiteFooter() {
     const year = new Date().getFullYear();
@@ -11,40 +8,31 @@ export function SiteFooter() {
     return (
         <footer className="border-t border-border bg-background">
             <div className="mx-auto max-w-6xl px-6 py-10">
-                <div className="grid gap-8 sm:grid-cols-3">
-                    <div className="flex flex-col gap-2">
+                <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
                         <p className="text-sm font-medium text-foreground">TUtorMatch</p>
                         <p className="text-sm leading-relaxed text-muted-foreground">
-                            TUtorMatch connects TUM students with qualified tutors for personalized learning.
+                            TUtorMatch helps students find tutors who know their course modules — personalized,
+                            affordable, and independent of any university.
                         </p>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <p className="text-sm font-medium text-foreground">Legal</p>
-                        <nav aria-label="Legal" className="flex flex-col gap-1">
-                            <a className="text-sm text-muted-foreground hover:text-foreground" href="/terms">
-                                Terms of Service
-                            </a>
-                            <a className="text-sm text-muted-foreground hover:text-foreground" href="/privacy">
-                                Privacy Policy
-                            </a>
-                        </nav>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                        <p className="text-sm font-medium text-foreground">Links</p>
-                        <nav aria-label="Footer links" className="flex flex-col gap-1">
-                            {footerLinks.map((link) => (
-                                <a
-                                    className="text-sm text-muted-foreground hover:text-foreground"
-                                    href={link.href}
-                                    key={link.label}
-                                >
-                                    {link.label}
-                                </a>
-                            ))}
-                        </nav>
-                    </div>
+                    {footerSections.map((section) => (
+                        <div className="flex flex-col gap-2" key={section.title}>
+                            <p className="text-sm font-medium text-foreground">{section.title}</p>
+                            <nav aria-label={section.title} className="flex flex-col gap-1">
+                                {section.links.map((link) => (
+                                    <Link
+                                        className="text-sm text-muted-foreground hover:text-foreground"
+                                        key={link.href}
+                                        to={link.href}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                        </div>
+                    ))}
                 </div>
 
                 <p className="mt-8 border-t border-border pt-6 text-sm text-muted-foreground">

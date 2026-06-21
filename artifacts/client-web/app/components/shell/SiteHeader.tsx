@@ -1,4 +1,5 @@
-import { Form } from 'react-router';
+import { Fragment } from 'react';
+import { Form, Link } from 'react-router';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button, buttonVariants } from '~/components/ui/button';
 import {
@@ -13,6 +14,8 @@ import {
 import { Input } from '~/components/ui/input';
 import { cn } from '~/lib/ui/utils';
 
+import { Logo } from './Logo';
+import { appNavLinks, getProfileMenuGroups, publicNavLinks } from './nav';
 import { ThemeToggle } from './ThemeToggle';
 import type { ShellUser } from './types';
 
@@ -32,35 +35,61 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ user }: SiteHeaderProps) {
-    return (
-        <header className="border-b border-border bg-background">
-            <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-6">
-                <a className="shrink-0" href="/">
-                    <img
-                        alt="TUtorMatch"
-                        className="h-8 w-auto"
-                        height={32}
-                        src="https://placehold.co/120x32/png?text=TUtorMatch"
-                        width={120}
-                    />
-                </a>
+    const profileMenuGroups = user ? getProfileMenuGroups(user.roles) : [];
 
-                {user ? (
-                    <div className="mx-auto hidden w-full max-w-md sm:block">
-                        <Input aria-label="Search tutors" placeholder="Search tutors…" type="search" />
-                    </div>
-                ) : (
-                    <div className="flex-1" />
-                )}
+    return (
+        <header className="sticky top-0 z-40 border-b border-border bg-background">
+            <div className="mx-auto grid h-14 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-6">
+                <Logo />
+
+                <div className="flex min-w-0 items-center justify-center">
+                    {user ? (
+                        <div className="hidden w-full max-w-md sm:block">
+                            <Input
+                                aria-label="Search tutors and modules"
+                                placeholder="Search tutors and modules…"
+                                type="search"
+                            />
+                        </div>
+                    ) : (
+                        <nav aria-label="Main" className="hidden items-center gap-1 sm:flex">
+                            {publicNavLinks.map((link) => (
+                                <Link
+                                    className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))}
+                                    key={link.href}
+                                    to={link.href}
+                                >
+                                    {link.label}
+                                </Link>
+                            ))}
+                        </nav>
+                    )}
+                </div>
 
                 <div className="flex shrink-0 items-center gap-1">
-                    <ThemeToggle />
-
                     {user ? (
                         <>
-                            <a className={cn(buttonVariants({ variant: 'ghost' }))} href="/chat">
+                            <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+                                {appNavLinks.map((link) => (
+                                    <Link
+                                        className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))}
+                                        key={link.href}
+                                        to={link.href}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </nav>
+
+                            <Link className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))} to="/notifications">
+                                Alerts
+                            </Link>
+
+                            <Link className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))} to="/chat">
                                 Chat
-                            </a>
+                            </Link>
+
+                            <ThemeToggle />
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger
@@ -90,17 +119,40 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                             </div>
                                         </DropdownMenuLabel>
                                     </DropdownMenuGroup>
+
+                                    {profileMenuGroups.map((group, groupIndex) => (
+                                        <Fragment key={group.label ?? `group-${groupIndex}`}>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuGroup>
+                                                {group.label ? (
+                                                    <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
+                                                ) : null}
+                                                {group.links.map((link) => (
+                                                    <DropdownMenuItem
+                                                        key={link.href}
+                                                        render={<Link to={link.href}>{link.label}</Link>}
+                                                    />
+                                                ))}
+                                            </DropdownMenuGroup>
+                                        </Fragment>
+                                    ))}
+
                                     <DropdownMenuSeparator />
-                                    <Form action="/auth/logout" method="post">
-                                        <DropdownMenuItem render={<button type="submit">Sign out</button>} />
-                                    </Form>
+                                    <DropdownMenuGroup>
+                                        <Form action="/auth/logout" method="post">
+                                            <DropdownMenuItem render={<button type="submit">Sign out</button>} />
+                                        </Form>
+                                    </DropdownMenuGroup>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </>
                     ) : (
-                        <a className={cn(buttonVariants())} href="/login">
-                            Log in
-                        </a>
+                        <>
+                            <ThemeToggle />
+                            <Link className={cn(buttonVariants())} to="/login">
+                                Log in
+                            </Link>
+                        </>
                     )}
                 </div>
             </div>

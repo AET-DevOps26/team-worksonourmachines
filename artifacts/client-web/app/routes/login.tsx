@@ -3,6 +3,9 @@ import { Link, redirect, useLoaderData } from 'react-router';
 import { logger } from '~/.server/lib/logger';
 import { safeRedirectPath } from '~/.server/lib/redirect';
 import { getSession } from '~/.server/service/session';
+import { Logo } from '~/components/shell';
+import { buttonVariants } from '~/components/ui/button';
+import { cn } from '~/lib/ui/utils';
 
 const AUTH_ERRORS: Record<string, string> = {
     auth_failed: 'Sign-in failed. Please try again.',
@@ -35,42 +38,46 @@ export default function LoginRoute() {
     const { authError, loginHref } = useLoaderData<typeof loader>();
 
     return (
-        <main className="min-h-svh bg-zinc-950 px-6 py-10 text-zinc-100">
-            <div className="mx-auto flex w-full max-w-lg flex-col gap-8">
-                <header className="flex flex-col gap-3">
-                    <p className="text-sm font-medium uppercase tracking-wide text-emerald-300">TUtorMatch</p>
-                    <h1 className="text-3xl font-semibold tracking-normal text-white">Sign in</h1>
-                    <p className="text-base leading-7 text-zinc-300">
-                        Continue with your Keycloak account to access TUtorMatch.
-                    </p>
-                </header>
+        <div className="flex min-h-svh flex-col bg-background text-foreground">
+            <header className="sticky top-0 z-40 border-b border-border bg-background">
+                <div className="mx-auto grid h-14 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center px-6">
+                    <Logo />
+                </div>
+            </header>
 
-                {authError ? (
-                    <div className="rounded-md border border-red-400/40 bg-red-950/40 px-4 py-3 text-sm text-red-100">
-                        {authError}
-                    </div>
-                ) : null}
+            <main className="flex flex-1 items-center justify-center px-6 py-12">
+                <div className="flex w-full max-w-md flex-col gap-8">
+                    <header className="flex flex-col gap-2">
+                        <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                            Continue with your Keycloak account to access TUtorMatch.
+                        </p>
+                    </header>
 
-                <section className="flex flex-col gap-5 rounded-md border border-zinc-800 bg-zinc-900 p-6 shadow-xl shadow-black/20">
-                    <a
-                        className="inline-flex w-fit items-center rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-300"
-                        href={loginHref}
-                    >
-                        Sign in with Keycloak
-                    </a>
+                    {authError ? (
+                        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                            {authError}
+                        </div>
+                    ) : null}
 
-                    <Link className="text-sm text-zinc-400 transition hover:text-zinc-200" to="/">
-                        Back to home
-                    </Link>
+                    <section className="flex flex-col gap-5 rounded-lg border border-border bg-card p-6">
+                        <a className={cn(buttonVariants({ size: 'lg' }))} href={loginHref}>
+                            Sign in with Keycloak
+                        </a>
 
-                    <div className="rounded-md bg-zinc-950 p-4 text-sm text-zinc-300">
-                        <p className="font-medium text-zinc-100">Demo credentials</p>
-                        <p className="mt-2 font-mono">lukas.student@example.com / Tutormatch123!</p>
-                        <p className="mt-1 font-mono">anna.tutor@example.com / Tutormatch123!</p>
-                        <p className="mt-1 font-mono">admin.tutormatch@example.com / Tutormatch123!</p>
-                    </div>
-                </section>
-            </div>
-        </main>
+                        <Link className="text-sm text-muted-foreground hover:text-foreground" to="/">
+                            Back to home
+                        </Link>
+
+                        <div className="rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                            <p className="font-medium text-foreground">Demo credentials</p>
+                            <p className="mt-2 font-mono text-xs">lukas.student@example.com / Tutormatch123!</p>
+                            <p className="mt-1 font-mono text-xs">anna.tutor@example.com / Tutormatch123!</p>
+                            <p className="mt-1 font-mono text-xs">admin.tutormatch@example.com / Tutormatch123!</p>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
     );
 }
