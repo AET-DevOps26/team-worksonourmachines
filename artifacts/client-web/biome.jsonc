@@ -9,7 +9,7 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "includes": ["**", "!**/generated"]
+        "includes": ["**", "!**/generated", "!**/tsconfig.tsbuildinfo"]
     },
     "formatter": {
         "enabled": true,

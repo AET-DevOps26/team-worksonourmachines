@@ -1,23 +1,23 @@
 import type { LoaderFunctionArgs } from 'react-router';
-import { useLoaderData, useRouteLoaderData } from 'react-router';
-import type { ShellUser } from '~/components/shell';
+import { useLoaderData } from 'react-router';
+import { logger } from '~/.server/lib/logger';
+import { getSessionUser } from '~/.server/service/session';
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const requestUrl = new URL(request.url);
+    const userResult = await getSessionUser(request);
+    if (userResult.isErr) {
+        logger.error('Failed to load session user on home page', { error: userResult.error });
+    }
 
     return {
         authError: requestUrl.searchParams.get('auth_error'),
+        user: userResult.isOk ? userResult.value : null,
     };
 }
 
-type AppLayoutLoaderData = {
-    user: ShellUser | null;
-};
-
 export default function HomeRoute() {
-    const { authError } = useLoaderData<typeof loader>();
-    const layoutData = useRouteLoaderData('routes/app-layout') as AppLayoutLoaderData | undefined;
-    const user = layoutData?.user;
+    const { authError, user } = useLoaderData<typeof loader>();
 
     return (
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-16">
@@ -29,7 +29,7 @@ export default function HomeRoute() {
 
             <div className="rounded-md border border-green-400/40 bg-green-100 px-4 py-3 text-sm text-green-700">
                 {user ? (
-                    `Welcome back, ${user.name ?? user.username}.`
+                    `Welcome back, ${user.name ?? user.preferredUsername}.`
                 ) : (
                     <div>
                         <p className="font-medium text-black">Demo credentials</p>

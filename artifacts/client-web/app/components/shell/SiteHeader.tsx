@@ -1,3 +1,4 @@
+import { Form } from 'react-router';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button, buttonVariants } from '~/components/ui/button';
 import {
@@ -90,12 +91,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                         </DropdownMenuLabel>
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem render={<a href="/auth/keycloak/logout">Sign out</a>} />
+                                    <Form action="/auth/logout" method="post">
+                                        <DropdownMenuItem render={<button type="submit">Sign out</button>} />
+                                    </Form>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </>
                     ) : (
-                        <a className={cn(buttonVariants())} href="/auth/keycloak/login">
+                        <a className={cn(buttonVariants())} href="/login">
                             Log in
                         </a>
                     )}

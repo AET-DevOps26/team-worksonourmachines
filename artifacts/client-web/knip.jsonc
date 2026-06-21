@@ -1,11 +1,8 @@
 {
     "$schema": "https://unpkg.com/knip@5/schema.json",
-    "entry": [
-        "app/routes/**/*.{ts,tsx}",
-        "app/.server/**/*.ts" // TODO: remove this after keycloak is fixed; generated will become relevant after the clean up as well
-    ],
+    "entry": ["app/routes/**/*.{ts,tsx}"],
     "project": ["app/**/*.{ts,tsx}"],
-    "ignore": ["**/.server/api/**/generated/**"],
+    "ignore": ["**/.server/**/*"], // todo remove when api is connected
     "ignoreDependencies": ["tailwindcss", "@fontsource-variable/inter", "tw-animate-css", "shadcn"],
     "ignoreUnresolved": ["tslib"],
     "ignoreIssues": {

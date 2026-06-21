@@ -15,6 +15,10 @@ services:
     depends_on:
       - client-web
       - keycloak
+    networks:
+      default:
+        aliases:
+          - auth.${APP_HOSTNAME:-tutormatch.localhost}
 
   postgres:
     image: postgres:17-alpine
@@ -38,7 +42,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.1
-    command: ["start-dev"]
+    command: ["start"]
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
@@ -49,7 +53,7 @@ services:
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
       KC_FEATURE_LOGIN: ${KEYCLOAK_LOGIN_FEATURE:-v1}
       KC_HEALTH_ENABLED: "true"
-      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}}
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-https://auth.tutormatch.localhost}
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
       KC_PROXY_HEADERS: xforwarded
@@ -63,14 +67,27 @@ services:
       retries: 30
       start_period: 60s
 
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   keycloak-config-cli:
     image: adorsys/keycloak-config-cli:latest
+    command:
+      - "--import.var-substitution.enabled=true"
+      - "--import.var-substitution.script-evaluation-enabled=true"
     environment:
       APP_HOSTNAME: ${APP_HOSTNAME:-tutormatch.localhost}
-      IMPORT_FILES_LOCATIONS: /config/*
+      IMPORT_FILES_LOCATIONS: /config/tutormatch-realm.json
       IMPORT_MANAGED: partial
       IMPORT_REMOTESTATE_ENABLED: "true"
       IMPORT_VARSUBSTITUTION_ENABLED: "true"
+      JAVA_OPTS: "-Duser.home=/tmp"
+      KEYCLOAK_DEV_CLI_ENABLED: ${KEYCLOAK_DEV_CLI_ENABLED:-false}
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
       KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: 120s
       KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
@@ -91,21 +108,37 @@ services:
     volumes:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
+      - caddy_data:/caddy-data:ro
     environment:
+      CI: "true"
       LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
       LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
-      APP_BASE_URL: ${APP_BASE_URL:-https://${APP_HOSTNAME:-tutormatch.localhost}}
-      KEYCLOAK_ISSUER_PUBLIC: ${KEYCLOAK_ISSUER_PUBLIC:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
-      KEYCLOAK_ISSUER_INTERNAL: ${KEYCLOAK_ISSUER_INTERNAL:-http://keycloak:8080/realms/tutormatch}
+      APP_BASE_URL: ${APP_BASE_URL:-https://tutormatch.localhost}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
+      NODE_EXTRA_CA_CERTS: /caddy-data/caddy/pki/authorities/local/root.crt
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
-      SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret-change-before-production}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       SERVER_COMMUNICATION_API_URL: tbd
       SERVER_MARKETPLACE_API_URL: tbd
       SERVER_STUDENT_API_URL: tbd
     depends_on:
       keycloak-config-cli:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull ${LLM_MODEL:-llama3.2:latest} && wait"]
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list | grep -q ${LLM_MODEL:-llama3.2:latest}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
 
   ai:
     build:
@@ -118,18 +151,13 @@ services:
       - 8000:8000
     environment:
       LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434}
+      LLM_MODEL: ${LLM_MODEL:-llama3.2:latest}
+      LLM_API_KEY: ${LLM_API_KEY:-}
     depends_on:
-      - ollama
-
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - 11434:11434
+      ollama:
+        condition: service_healthy
 
   # ----------------------------- tooling -----------------------------
 
@@ -178,6 +206,6 @@ volumes:
   postgres_data:
   pnpm-store:
   client-web-node-modules:
-  ollama_data:
   caddy_data:
   caddy_config:
+  ollama_data:

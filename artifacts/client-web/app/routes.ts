@@ -1,8 +1,11 @@
-import { index, layout, type RouteConfig, route } from '@react-router/dev/routes';
+import { index, layout, prefix, type RouteConfig, route } from '@react-router/dev/routes';
 
 export default [
     layout('routes/app-layout.tsx', [index('routes/home.tsx')]),
-    route('auth/keycloak/login', 'routes/auth.keycloak.login.tsx'),
-    route('auth/keycloak/callback', 'routes/auth.keycloak.callback.tsx'),
-    route('auth/keycloak/logout', 'routes/auth.keycloak.logout.tsx'),
+    route('login', 'routes/login.tsx'),
+    ...prefix('auth', [
+        route('login', 'routes/auth/login.tsx'),
+        route('callback', 'routes/auth/callback.tsx'),
+        route('logout', 'routes/auth/logout.tsx'),
+    ]),
 ] satisfies RouteConfig;

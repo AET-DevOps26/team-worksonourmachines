@@ -9,11 +9,11 @@ module.exports = {
             to: { path: '(^|/)\\.server/' },
         },
         {
-            name: 'routes-only-use-server-service',
+            name: 'routes-only-use-server-service-or-lib',
             severity: 'error',
-            comment: 'Routes must use .server/service/, not .server/api/ or .server/lib/',
+            comment: 'Routes may import from .server/service/ and .server/lib/, not .server/api/',
             from: { path: '(^|/)routes/' },
-            to: { path: '(^|/)\\.server/', pathNot: '(^|/)\\.server/service/' },
+            to: { path: '(^|/)\\.server/', pathNot: '(^|/)\\.server/(service|lib)/' },
         },
         {
             name: 'self-contained-server',
