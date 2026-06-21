@@ -25,7 +25,11 @@ import type { TestRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const api = new DefaultApi();
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: KeycloakBearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new DefaultApi(config);
 
   try {
     const data = await api.test();
@@ -49,7 +53,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-No authorization required
+[KeycloakBearerAuth](../README.md#KeycloakBearerAuth)
 
 ### HTTP request headers
 

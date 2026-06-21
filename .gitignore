@@ -15,3 +15,4 @@ dist/
 target/
 .DS_Store
 .react-router/
+tsconfig.tsbuildinfo

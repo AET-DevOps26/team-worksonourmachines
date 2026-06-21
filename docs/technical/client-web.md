@@ -19,6 +19,7 @@ flowchart TB
     serverLib[lib/]
   end
   routes --> service
+  routes --> serverLib
   routes --> components
   routes --> lib
   components --> lib
@@ -54,10 +55,10 @@ app/
 | Path | Purpose |
 |------|---------|
 | `.server/api/` | All outbound network calls. Wrap failures in typed errors (`error.ts`). |
-| `.server/service/` | Business logic. Routes import from here, not from `api/` directly. |
-| `.server/lib/` | Server-only shared code. |
+| `.server/service/` | Business logic. Routes import from here for domain logic, not from `api/` directly. |
+| `.server/lib/` | Server-only shared code (env, result, request auth, …). Routes may import utilities from here. |
 | `routes/` | Loaders, actions, and page composition. |
-| `components/<feature>/` | Feature UI. One `index` file is the public entry point for imports from other features or routes. |
+| `components/<feature>/` | Feature UI. One `index` file is the only entry point for outside imports. |
 | `components/<feature>/ui/` | Optional. Presentational pieces private to the feature. |
 | `components/ui/` | Shared presentational components without business logic. |
 | `lib/` | Utilities used on the client or from both sides (not `.server`-only). Must not import from `routes/` or `components/`. |
@@ -70,7 +71,7 @@ These are enforced by dependency-cruiser (`pnpm run lint:deps`). Rule behaviour 
 
 | Rule | What it enforces |
 |------|------------------|
-| `server-only-in-routes` | Only `routes/` may import from `.server/`, and only from `.server/service/` (not `api/` or `lib/`). |
+| `server-only-imported-by-routes`, `routes-only-use-server-service-or-lib` | Only `routes/` may import from `.server/`, and only from `.server/service/` or `.server/lib/` (not `api/`). |
 | `self-contained-server` | `.server/` must not import from outside `.server/`. |
 | `server-api-no-service` | `.server/api/` must not import from `.server/service/`. |
 | `server-lib-isolated` | `.server/lib/` must not import from `.server/api/` or `.server/service/`. |
@@ -86,6 +87,21 @@ Environment variables are defined once in `app/.server/lib/env.ts` and validated
 
 Server code follows a no-throw policy: functions return `Result` from `app/.server/lib/result.ts` instead of throwing. Routes map `Err` values to HTTP responses at the boundary.
 
+## Authentication
+
+The BFF authenticates users with Keycloak over OIDC. Session data and tokens live in Redis; the browser receives an httpOnly `sid` cookie with an opaque session ID.
+
+| Route | Role |
+|-------|------|
+| `/login` | Sign-in page |
+| `/auth/login` | Starts the OIDC flow |
+| `/auth/callback` | Handles the Keycloak redirect |
+| `/auth/logout` | Ends the session |
+
+Protected routes use `protectedLoader` and `protectedAction` from `app/.server/service/routeProtection.ts`. Outbound API clients attach the Keycloak access token as a `Bearer` header via `app/.server/lib/requestAuth.ts`.
+
+For local sign-in, realm config, and environment variables, see [local-setup.md](./local-setup.md#local-keycloak).
+
 ## Tooling
 
 | Command | What it checks |
@@ -93,7 +109,7 @@ Server code follows a no-throw policy: functions return `Result` from `app/.serv
 | `pnpm run lint` | All lint targets apart from the lint test target |
 | `pnpm run lint:code` | Biome check |
 | `pnpm run lint:deps` | dependency-cruiser layer rules |
-| `pnpm run lint:deps:test` | dependency-cruiser rule fixtures |
+| `pnpm run lint:deps:test` | dependency-cruiser rule tests |
 | `pnpm run lint:unused` | knip dead code |
 | `pnpm run format` | Biome formatter |
 
