@@ -26,10 +26,8 @@ spec:
               value: info
             - name: APP_BASE_URL
               value: "https://{{ .Values.ingress.host }}"
-            - name: KEYCLOAK_ISSUER_PUBLIC
+            - name: KEYCLOAK_ISSUER
               value: "https://auth.{{ .Values.ingress.host }}/realms/tutormatch"
-            - name: KEYCLOAK_ISSUER_INTERNAL
-              value: "http://keycloak:8080/realms/tutormatch"
             - name: KEYCLOAK_CLIENT_ID
               value: client-web
             - name: KEYCLOAK_CLIENT_SECRET
@@ -37,11 +35,8 @@ spec:
                 secretKeyRef:
                   name: keycloak-secrets
                   key: KEYCLOAK_CLIENT_WEB_SECRET
-            - name: SESSION_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak-secrets
-                  key: SESSION_SECRET
+            - name: REDIS_URL
+              value: "redis://redis:6379"
             - name: SERVER_COMMUNICATION_API_URL
               value: {{ .Values.clientWeb.serverCommunicationApiUrl | quote }}
             - name: SERVER_MARKETPLACE_API_URL
@@ -77,6 +72,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
         - {{ .Values.ingress.host }}

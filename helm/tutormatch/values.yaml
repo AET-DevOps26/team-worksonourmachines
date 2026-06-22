@@ -29,4 +29,3 @@ keycloak:
   adminUser: admin
   adminPassword: admin  # Override in production
   clientWebSecret: client-web-secret  # Override in production
-  sessionSecret: change-me-in-production  # Override in production
