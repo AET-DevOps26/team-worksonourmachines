@@ -27,6 +27,9 @@ const gatewayHostname = new URL(appBaseUrl).hostname;
 
 export default defineConfig({
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), oidcWarmup()],
+    build: {
+        target: 'esnext',
+    },
     server: {
         allowedHosts: [gatewayHostname, 'localhost'],
         hmr: appUsesGateway
