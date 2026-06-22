@@ -5,6 +5,8 @@ info:
 servers:
 - description: Marketplace API
   url: https://marketplace.example.local
+security:
+- KeycloakBearerAuth: []
 paths:
   /v1/test:
     get:
@@ -30,3 +32,8 @@ components:
       required:
       - message
       type: object
+  securitySchemes:
+    KeycloakBearerAuth:
+      description: Keycloak access token issued to the BFF client
+      scheme: Bearer
+      type: http

@@ -16,10 +16,10 @@ const jsonFormat = winston.format.combine(
     winston.format.json(),
 );
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-export type LogFormat = 'pretty' | 'json';
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogFormat = 'pretty' | 'json';
 
-export function createLogger(logFormat: LogFormat, logLevel: LogLevel) {
+function createLogger(logFormat: LogFormat, logLevel: LogLevel) {
     const format = logFormat === 'pretty' ? prettyFormat : jsonFormat;
     const level = logLevel;
     return winston.createLogger({

@@ -1,4 +1,6 @@
-using Http;
+import "../shared/security.tsp";
+
+using TypeSpec.Http;
 using TypeSpec.Versioning;
 
 enum StudentVersions {
@@ -8,6 +10,7 @@ enum StudentVersions {
 @service(#{ title: "Student API" })
 @server("https://student.example.local", "Student API")
 @versioned(StudentVersions)
+@useAuth(KeycloakBearerAuth)
 @route("/v1")
 namespace Student {
   @get

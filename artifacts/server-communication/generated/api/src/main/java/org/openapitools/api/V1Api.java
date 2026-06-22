@@ -54,6 +54,9 @@ public interface V1Api {
             @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = Test200Response.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
         }
     )
     @RequestMapping(

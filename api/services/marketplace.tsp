@@ -1,4 +1,6 @@
-using Http;
+import "../shared/security.tsp";
+
+using TypeSpec.Http;
 using TypeSpec.Versioning;
 
 enum MarketplaceVersions {
@@ -8,6 +10,7 @@ enum MarketplaceVersions {
 @service(#{ title: "Marketplace API" })
 @server("https://marketplace.example.local", "Marketplace API")
 @versioned(MarketplaceVersions)
+@useAuth(KeycloakBearerAuth)
 @route("/v1")
 namespace Marketplace {
   @get

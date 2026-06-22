@@ -18,17 +18,19 @@ FROM base AS dev
 
 ENV NODE_ENV=development
 
-RUN --mount=type=cache,id=client-web-pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+COPY artifacts/client-web/docker/entrypoint.sh /usr/local/bin/dev-entrypoint
+RUN chmod +x /usr/local/bin/dev-entrypoint
 
 EXPOSE 5173
 
-CMD ["pnpm", "run", "dev"]
+ENTRYPOINT ["dev-entrypoint"]
+CMD ["run", "dev"]
 
 # -----------------------------
 
 FROM base AS tooling
 
-COPY artifacts/client-web/docker/tooling-entrypoint.sh /usr/local/bin/tooling-entrypoint
+COPY artifacts/client-web/docker/entrypoint.sh /usr/local/bin/tooling-entrypoint
 RUN chmod +x /usr/local/bin/tooling-entrypoint
 
 WORKDIR /workspace/artifacts/client-web
