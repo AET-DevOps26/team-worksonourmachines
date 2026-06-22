@@ -26,10 +26,10 @@ const appUsesGateway = appBaseUrl.startsWith('https://');
 const gatewayHostname = new URL(appBaseUrl).hostname;
 
 export default defineConfig({
-    plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), oidcWarmup()],
     build: {
         target: 'esnext',
     },
+    plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), oidcWarmup()],
     server: {
         allowedHosts: [gatewayHostname, 'localhost'],
         hmr: appUsesGateway
