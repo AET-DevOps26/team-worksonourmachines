@@ -1,8 +1,12 @@
 apis/DefaultApi.ts
 apis/index.ts
 docs/DefaultApi.md
-docs/Test200Response.md
+docs/SharedErrorsErrorBody.md
+docs/SharedStudentStudentProfile.md
+docs/SharedStudentStudentProfileInput.md
 index.ts
-models/Test200Response.ts
+models/SharedErrorsErrorBody.ts
+models/SharedStudentStudentProfile.ts
+models/SharedStudentStudentProfileInput.ts
 models/index.ts
 runtime.ts
