@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.model.SharedStudyFocusStudyFocus;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -30,6 +31,8 @@ public class SharedMarketplaceTopicInput {
 
   private String difficultyHint;
 
+  private SharedStudyFocusStudyFocus studyFocus;
+
   public SharedMarketplaceTopicInput() {
     super();
   }
@@ -37,10 +40,11 @@ public class SharedMarketplaceTopicInput {
   /**
    * Constructor with only required parameters
    */
-  public SharedMarketplaceTopicInput(String name, String description, String difficultyHint) {
+  public SharedMarketplaceTopicInput(String name, String description, String difficultyHint, SharedStudyFocusStudyFocus studyFocus) {
     this.name = name;
     this.description = description;
     this.difficultyHint = difficultyHint;
+    this.studyFocus = studyFocus;
   }
 
   public SharedMarketplaceTopicInput name(String name) {
@@ -106,6 +110,27 @@ public class SharedMarketplaceTopicInput {
     this.difficultyHint = difficultyHint;
   }
 
+  public SharedMarketplaceTopicInput studyFocus(SharedStudyFocusStudyFocus studyFocus) {
+    this.studyFocus = studyFocus;
+    return this;
+  }
+
+  /**
+   * Get studyFocus
+   * @return studyFocus
+   */
+  @NotNull @Valid 
+  @Schema(name = "studyFocus", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("studyFocus")
+  public SharedStudyFocusStudyFocus getStudyFocus() {
+    return studyFocus;
+  }
+
+  @JsonProperty("studyFocus")
+  public void setStudyFocus(SharedStudyFocusStudyFocus studyFocus) {
+    this.studyFocus = studyFocus;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -117,12 +142,13 @@ public class SharedMarketplaceTopicInput {
     SharedMarketplaceTopicInput sharedMarketplaceTopicInput = (SharedMarketplaceTopicInput) o;
     return Objects.equals(this.name, sharedMarketplaceTopicInput.name) &&
         Objects.equals(this.description, sharedMarketplaceTopicInput.description) &&
-        Objects.equals(this.difficultyHint, sharedMarketplaceTopicInput.difficultyHint);
+        Objects.equals(this.difficultyHint, sharedMarketplaceTopicInput.difficultyHint) &&
+        Objects.equals(this.studyFocus, sharedMarketplaceTopicInput.studyFocus);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, description, difficultyHint);
+    return Objects.hash(name, description, difficultyHint, studyFocus);
   }
 
   @Override
@@ -132,6 +158,7 @@ public class SharedMarketplaceTopicInput {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    difficultyHint: ").append(toIndentedString(difficultyHint)).append("\n");
+    sb.append("    studyFocus: ").append(toIndentedString(studyFocus)).append("\n");
     sb.append("}");
     return sb.toString();
   }

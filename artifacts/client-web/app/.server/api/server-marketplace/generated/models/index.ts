@@ -25,4 +25,5 @@ export * from './SharedMarketplaceTutorProfileInput';
 export * from './SharedMarketplaceTutorSort';
 export * from './SharedMarketplaceTutorSummary';
 export * from './SharedMarketplaceWeekday';
+export * from './SharedStudyFocusStudyFocus';
 export * from './TutorPage';

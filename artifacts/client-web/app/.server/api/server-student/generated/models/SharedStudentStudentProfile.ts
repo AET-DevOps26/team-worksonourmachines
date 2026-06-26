@@ -14,6 +14,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { SharedStudyFocusStudyFocus } from './SharedStudyFocusStudyFocus';
+import {
+    SharedStudyFocusStudyFocusFromJSON,
+    SharedStudyFocusStudyFocusFromJSONTyped,
+    SharedStudyFocusStudyFocusToJSON,
+    SharedStudyFocusStudyFocusToJSONTyped,
+} from './SharedStudyFocusStudyFocus';
+
 /**
  * 
  * @export
@@ -38,6 +46,12 @@ export interface SharedStudentStudentProfile {
      * @memberof SharedStudentStudentProfile
      */
     languages: Array<string>;
+    /**
+     * Self-assessed strength in each study skill (1 = needs work, 5 = confident).
+     * @type {SharedStudyFocusStudyFocus}
+     * @memberof SharedStudentStudentProfile
+     */
+    studyFocus?: SharedStudyFocusStudyFocus;
 }
 
 /**
@@ -63,6 +77,7 @@ export function SharedStudentStudentProfileFromJSONTyped(json: any, ignoreDiscri
         'displayName': json['displayName'],
         'bio': json['bio'],
         'languages': json['languages'],
+        'studyFocus': json['studyFocus'] == null ? undefined : SharedStudyFocusStudyFocusFromJSON(json['studyFocus']),
     };
 }
 
@@ -80,6 +95,7 @@ export function SharedStudentStudentProfileToJSONTyped(value?: SharedStudentStud
         'displayName': value['displayName'],
         'bio': value['bio'],
         'languages': value['languages'],
+        'studyFocus': SharedStudyFocusStudyFocusToJSON(value['studyFocus']),
     };
 }
 

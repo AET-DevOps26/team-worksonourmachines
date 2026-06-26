@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.openapitools.model.SharedStudyFocusStudyFocus;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -33,6 +34,8 @@ public class SharedStudentStudentProfile {
 
   @Valid
   private List<String> languages = new ArrayList<>();
+
+  private @Nullable SharedStudyFocusStudyFocus studyFocus;
 
   public SharedStudentStudentProfile() {
     super();
@@ -118,6 +121,27 @@ public class SharedStudentStudentProfile {
     this.languages = languages;
   }
 
+  public SharedStudentStudentProfile studyFocus(@Nullable SharedStudyFocusStudyFocus studyFocus) {
+    this.studyFocus = studyFocus;
+    return this;
+  }
+
+  /**
+   * Self-assessed strength in each study skill (1 = needs work, 5 = confident).
+   * @return studyFocus
+   */
+  @Valid 
+  @Schema(name = "studyFocus", description = "Self-assessed strength in each study skill (1 = needs work, 5 = confident).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("studyFocus")
+  public @Nullable SharedStudyFocusStudyFocus getStudyFocus() {
+    return studyFocus;
+  }
+
+  @JsonProperty("studyFocus")
+  public void setStudyFocus(@Nullable SharedStudyFocusStudyFocus studyFocus) {
+    this.studyFocus = studyFocus;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -129,12 +153,13 @@ public class SharedStudentStudentProfile {
     SharedStudentStudentProfile sharedStudentStudentProfile = (SharedStudentStudentProfile) o;
     return Objects.equals(this.displayName, sharedStudentStudentProfile.displayName) &&
         Objects.equals(this.bio, sharedStudentStudentProfile.bio) &&
-        Objects.equals(this.languages, sharedStudentStudentProfile.languages);
+        Objects.equals(this.languages, sharedStudentStudentProfile.languages) &&
+        Objects.equals(this.studyFocus, sharedStudentStudentProfile.studyFocus);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(displayName, bio, languages);
+    return Objects.hash(displayName, bio, languages, studyFocus);
   }
 
   @Override
@@ -144,6 +169,7 @@ public class SharedStudentStudentProfile {
     sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
     sb.append("    bio: ").append(toIndentedString(bio)).append("\n");
     sb.append("    languages: ").append(toIndentedString(languages)).append("\n");
+    sb.append("    studyFocus: ").append(toIndentedString(studyFocus)).append("\n");
     sb.append("}");
     return sb.toString();
   }

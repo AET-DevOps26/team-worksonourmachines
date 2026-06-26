@@ -4,9 +4,11 @@ docs/DefaultApi.md
 docs/SharedErrorsErrorBody.md
 docs/SharedStudentStudentProfile.md
 docs/SharedStudentStudentProfileInput.md
+docs/SharedStudyFocusStudyFocus.md
 index.ts
 models/SharedErrorsErrorBody.ts
 models/SharedStudentStudentProfile.ts
 models/SharedStudentStudentProfileInput.ts
+models/SharedStudyFocusStudyFocus.ts
 models/index.ts
 runtime.ts

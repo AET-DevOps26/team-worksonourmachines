@@ -1,28 +1,29 @@
 
-# SharedStudentStudentProfileInput
+# SharedStudyFocusStudyFocus
 
+Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`displayName` | string
-`bio` | string
-`languages` | Array&lt;string&gt;
-`studyFocus` | [SharedStudyFocusStudyFocus](SharedStudyFocusStudyFocus.md)
+`memorization` | number
+`formalReasoning` | number
+`conceptualUnderstanding` | number
+`problemSolving` | number
 
 ## Example
 
 ```typescript
-import type { SharedStudentStudentProfileInput } from ''
+import type { SharedStudyFocusStudyFocus } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "displayName": null,
-  "bio": null,
-  "languages": null,
-  "studyFocus": null,
-} satisfies SharedStudentStudentProfileInput
+  "memorization": null,
+  "formalReasoning": null,
+  "conceptualUnderstanding": null,
+  "problemSolving": null,
+} satisfies SharedStudyFocusStudyFocus
 
 console.log(example)
 
@@ -31,7 +32,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SharedStudentStudentProfileInput
+const exampleParsed = JSON.parse(exampleJSON) as SharedStudyFocusStudyFocus
 console.log(exampleParsed)
 ```
 

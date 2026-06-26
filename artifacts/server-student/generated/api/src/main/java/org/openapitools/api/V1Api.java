@@ -79,7 +79,7 @@ public interface V1Api {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\" }";
+                    String exampleString = "{ \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\", \"studyFocus\" : \"\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -98,7 +98,7 @@ public interface V1Api {
     String PATH_UPDATE_MY_PROFILE = "/v1/students/me";
     /**
      * PUT /v1/students/me : Update my student profile
-     * Creates or updates the authenticated student&#39;s display name, bio, and languages.
+     * Creates or updates the authenticated student&#39;s display name, bio, languages, and study focus.
      *
      * @param sharedStudentStudentProfileInput  (required)
      * @return The request has succeeded. (status code 200)
@@ -108,7 +108,7 @@ public interface V1Api {
     @Operation(
         operationId = "updateMyProfile",
         summary = "Update my student profile",
-        description = "Creates or updates the authenticated student's display name, bio, and languages.",
+        description = "Creates or updates the authenticated student's display name, bio, languages, and study focus.",
         responses = {
             @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = SharedStudentStudentProfile.class))
@@ -136,7 +136,7 @@ public interface V1Api {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\" }";
+                    String exampleString = "{ \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\", \"studyFocus\" : \"\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

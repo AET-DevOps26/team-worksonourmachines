@@ -4,3 +4,4 @@
 export * from './SharedErrorsErrorBody';
 export * from './SharedStudentStudentProfile';
 export * from './SharedStudentStudentProfileInput';
+export * from './SharedStudyFocusStudyFocus';

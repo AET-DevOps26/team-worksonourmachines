@@ -727,10 +727,20 @@ components:
           name: name
           description: description
           id: id
+          studyFocus:
+            memorization: 1
+            conceptualUnderstanding: 1
+            problemSolving: 3
+            formalReasoning: 3
         - difficultyHint: difficultyHint
           name: name
           description: description
           id: id
+          studyFocus:
+            memorization: 1
+            conceptualUnderstanding: 1
+            problemSolving: 3
+            formalReasoning: 3
         difficultyHint: difficultyHint
         description: description
         id: id
@@ -821,6 +831,11 @@ components:
         name: name
         description: description
         id: id
+        studyFocus:
+          memorization: 1
+          conceptualUnderstanding: 1
+          problemSolving: 3
+          formalReasoning: 3
       properties:
         id:
           type: string
@@ -830,11 +845,14 @@ components:
           type: string
         difficultyHint:
           type: string
+        studyFocus:
+          $ref: "#/components/schemas/Shared.StudyFocus.StudyFocus"
       required:
       - description
       - difficultyHint
       - id
       - name
+      - studyFocus
       type: object
     Shared.Marketplace.TopicInput:
       properties:
@@ -844,10 +862,13 @@ components:
           type: string
         difficultyHint:
           type: string
+        studyFocus:
+          $ref: "#/components/schemas/Shared.StudyFocus.StudyFocus"
       required:
       - description
       - difficultyHint
       - name
+      - studyFocus
       type: object
     Shared.Marketplace.TutorApplication:
       example:
@@ -1182,6 +1203,44 @@ components:
       - saturday
       - sunday
       type: string
+    Shared.StudyFocus.StudyFocus:
+      description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
+      example:
+        memorization: 1
+        conceptualUnderstanding: 1
+        problemSolving: 3
+        formalReasoning: 3
+      properties:
+        memorization:
+          description: "Recalling definitions, formulas, and terminology."
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        formalReasoning:
+          description: "Proofs, logic, derivations, and symbolic manipulation."
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        conceptualUnderstanding:
+          description: Building mental models and understanding why concepts work.
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        problemSolving:
+          description: Applying theory to exercises and exam-style problems.
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+      required:
+      - conceptualUnderstanding
+      - formalReasoning
+      - memorization
+      - problemSolving
+      type: object
     TutorPage:
       example:
         total: 2

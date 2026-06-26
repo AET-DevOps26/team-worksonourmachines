@@ -32,7 +32,7 @@ paths:
       - application/json
     put:
       description: "Creates or updates the authenticated student's display name, bio,\
-        \ and languages."
+        \ languages, and study focus."
       operationId: updateMyProfile
       parameters: []
       requestBody:
@@ -87,6 +87,7 @@ components:
         - languages
         displayName: displayName
         bio: bio
+        studyFocus: ""
       properties:
         displayName:
           type: string
@@ -96,6 +97,11 @@ components:
           items:
             type: string
           type: array
+        studyFocus:
+          allOf:
+          - $ref: "#/components/schemas/Shared.StudyFocus.StudyFocus"
+          description: "Self-assessed strength in each study skill (1 = needs work,\
+            \ 5 = confident)."
       required:
       - bio
       - displayName
@@ -111,10 +117,48 @@ components:
           items:
             type: string
           type: array
+        studyFocus:
+          allOf:
+          - $ref: "#/components/schemas/Shared.StudyFocus.StudyFocus"
+          description: "Self-assessed strength in each study skill (1 = needs work,\
+            \ 5 = confident)."
       required:
       - bio
       - displayName
       - languages
+      type: object
+    Shared.StudyFocus.StudyFocus:
+      description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
+      properties:
+        memorization:
+          description: "Recalling definitions, formulas, and terminology."
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        formalReasoning:
+          description: "Proofs, logic, derivations, and symbolic manipulation."
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        conceptualUnderstanding:
+          description: Building mental models and understanding why concepts work.
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        problemSolving:
+          description: Applying theory to exercises and exam-style problems.
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+      required:
+      - conceptualUnderstanding
+      - formalReasoning
+      - memorization
+      - problemSolving
       type: object
   securitySchemes:
     KeycloakBearerAuth:

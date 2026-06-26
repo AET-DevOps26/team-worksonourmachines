@@ -25,6 +25,7 @@ docs/SharedMarketplaceTutorProfileInput.md
 docs/SharedMarketplaceTutorSort.md
 docs/SharedMarketplaceTutorSummary.md
 docs/SharedMarketplaceWeekday.md
+docs/SharedStudyFocusStudyFocus.md
 docs/TutorPage.md
 index.ts
 models/ModulePage.ts
@@ -51,6 +52,7 @@ models/SharedMarketplaceTutorProfileInput.ts
 models/SharedMarketplaceTutorSort.ts
 models/SharedMarketplaceTutorSummary.ts
 models/SharedMarketplaceWeekday.ts
+models/SharedStudyFocusStudyFocus.ts
 models/TutorPage.ts
 models/index.ts
 runtime.ts

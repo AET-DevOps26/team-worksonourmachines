@@ -31,6 +31,7 @@ src/main/java/org/openapitools/model/SharedMarketplaceTutorProfileInput.java
 src/main/java/org/openapitools/model/SharedMarketplaceTutorSort.java
 src/main/java/org/openapitools/model/SharedMarketplaceTutorSummary.java
 src/main/java/org/openapitools/model/SharedMarketplaceWeekday.java
+src/main/java/org/openapitools/model/SharedStudyFocusStudyFocus.java
 src/main/java/org/openapitools/model/TutorPage.java
 src/main/resources/application.properties
 src/main/resources/openapi.yaml

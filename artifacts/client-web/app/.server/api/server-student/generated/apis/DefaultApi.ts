@@ -124,7 +124,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates or updates the authenticated student\'s display name, bio, and languages.
+     * Creates or updates the authenticated student\'s display name, bio, languages, and study focus.
      * Update my student profile
      */
     async updateMyProfileRaw(requestParameters: UpdateMyProfileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentStudentProfile>> {
@@ -135,7 +135,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates or updates the authenticated student\'s display name, bio, and languages.
+     * Creates or updates the authenticated student\'s display name, bio, languages, and study focus.
      * Update my student profile
      */
     async updateMyProfile(requestParameters: UpdateMyProfileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentStudentProfile> {

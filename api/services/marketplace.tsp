@@ -1,6 +1,7 @@
 import "../shared/security.tsp";
 import "../shared/errors.tsp";
 import "../shared/pagination.tsp";
+import "../shared/study-focus.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Versioning;
@@ -57,6 +58,7 @@ namespace Shared.Marketplace {
     name: string;
     description: string;
     difficultyHint: string;
+    studyFocus: Shared.StudyFocus.StudyFocus;
   }
 
   model Module {
@@ -156,6 +158,7 @@ namespace Shared.Marketplace {
     name: string;
     description: string;
     difficultyHint: string;
+    studyFocus: Shared.StudyFocus.StudyFocus;
   }
 
   model AdminModuleUpdateInput {

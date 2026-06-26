@@ -1,5 +1,6 @@
 import "../shared/security.tsp";
 import "../shared/errors.tsp";
+import "../shared/study-focus.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Versioning;
@@ -11,6 +12,9 @@ namespace Shared.Student {
     displayName: string;
     bio: string;
     languages: string[];
+
+    @doc("Self-assessed strength in each study skill (1 = needs work, 5 = confident).")
+    studyFocus?: Shared.StudyFocus.StudyFocus;
   }
 
   model StudentProfileInput is StudentProfile;
@@ -33,7 +37,7 @@ namespace Student {
   op getMyProfile(): StudentProfile | UnauthorizedError;
 
   @summary("Update my student profile")
-  @doc("Creates or updates the authenticated student's display name, bio, and languages.")
+  @doc("Creates or updates the authenticated student's display name, bio, languages, and study focus.")
   @put
   @route("/students/me")
   op updateMyProfile(@body body: StudentProfileInput):

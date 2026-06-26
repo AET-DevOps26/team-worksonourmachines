@@ -79,7 +79,7 @@ This endpoint does not need any parameter.
 
 Update my student profile
 
-Creates or updates the authenticated student\&#39;s display name, bio, and languages.
+Creates or updates the authenticated student\&#39;s display name, bio, languages, and study focus.
 
 ### Example
 

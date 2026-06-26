@@ -9,6 +9,7 @@ Name | Type
 `displayName` | string
 `bio` | string
 `languages` | Array&lt;string&gt;
+`studyFocus` | [SharedStudyFocusStudyFocus](SharedStudyFocusStudyFocus.md)
 
 ## Example
 
@@ -20,6 +21,7 @@ const example = {
   "displayName": null,
   "bio": null,
   "languages": null,
+  "studyFocus": null,
 } satisfies SharedStudentStudentProfile
 
 console.log(example)

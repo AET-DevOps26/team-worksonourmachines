@@ -14,6 +14,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { SharedStudyFocusStudyFocus } from './SharedStudyFocusStudyFocus';
+import {
+    SharedStudyFocusStudyFocusFromJSON,
+    SharedStudyFocusStudyFocusFromJSONTyped,
+    SharedStudyFocusStudyFocusToJSON,
+    SharedStudyFocusStudyFocusToJSONTyped,
+} from './SharedStudyFocusStudyFocus';
+
 /**
  * 
  * @export
@@ -44,6 +52,12 @@ export interface SharedMarketplaceTopic {
      * @memberof SharedMarketplaceTopic
      */
     difficultyHint: string;
+    /**
+     * 
+     * @type {SharedStudyFocusStudyFocus}
+     * @memberof SharedMarketplaceTopic
+     */
+    studyFocus: SharedStudyFocusStudyFocus;
 }
 
 /**
@@ -54,6 +68,7 @@ export function instanceOfSharedMarketplaceTopic(value: object): value is Shared
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
     if (!('difficultyHint' in value) || value['difficultyHint'] === undefined) return false;
+    if (!('studyFocus' in value) || value['studyFocus'] === undefined) return false;
     return true;
 }
 
@@ -71,6 +86,7 @@ export function SharedMarketplaceTopicFromJSONTyped(json: any, ignoreDiscriminat
         'name': json['name'],
         'description': json['description'],
         'difficultyHint': json['difficultyHint'],
+        'studyFocus': SharedStudyFocusStudyFocusFromJSON(json['studyFocus']),
     };
 }
 
@@ -89,6 +105,7 @@ export function SharedMarketplaceTopicToJSONTyped(value?: SharedMarketplaceTopic
         'name': value['name'],
         'description': value['description'],
         'difficultyHint': value['difficultyHint'],
+        'studyFocus': SharedStudyFocusStudyFocusToJSON(value['studyFocus']),
     };
 }
 

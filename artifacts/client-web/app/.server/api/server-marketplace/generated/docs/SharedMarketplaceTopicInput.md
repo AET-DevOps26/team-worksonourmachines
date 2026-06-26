@@ -9,6 +9,7 @@ Name | Type
 `name` | string
 `description` | string
 `difficultyHint` | string
+`studyFocus` | [SharedStudyFocusStudyFocus](SharedStudyFocusStudyFocus.md)
 
 ## Example
 
@@ -20,6 +21,7 @@ const example = {
   "name": null,
   "description": null,
   "difficultyHint": null,
+  "studyFocus": null,
 } satisfies SharedMarketplaceTopicInput
 
 console.log(example)

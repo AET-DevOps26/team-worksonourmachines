@@ -662,6 +662,7 @@ components:
         - name
         - description
         - difficultyHint
+        - studyFocus
       properties:
         id:
           type: string
@@ -671,12 +672,15 @@ components:
           type: string
         difficultyHint:
           type: string
+        studyFocus:
+          $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
     Shared.Marketplace.TopicInput:
       type: object
       required:
         - name
         - description
         - difficultyHint
+        - studyFocus
       properties:
         name:
           type: string
@@ -684,6 +688,8 @@ components:
           type: string
         difficultyHint:
           type: string
+        studyFocus:
+          $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
     Shared.Marketplace.TutorApplication:
       type: object
       required:
@@ -900,6 +906,39 @@ components:
         - friday
         - saturday
         - sunday
+    Shared.StudyFocus.StudyFocus:
+      type: object
+      required:
+        - memorization
+        - formalReasoning
+        - conceptualUnderstanding
+        - problemSolving
+      properties:
+        memorization:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Recalling definitions, formulas, and terminology.
+        formalReasoning:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Proofs, logic, derivations, and symbolic manipulation.
+        conceptualUnderstanding:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Building mental models and understanding why concepts work.
+        problemSolving:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Applying theory to exercises and exam-style problems.
+      description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
     TutorPage:
       type: object
       required:

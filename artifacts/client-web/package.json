@@ -10,7 +10,7 @@
         "lint:deps": "depcruise app --config .dependency-cruiser.cjs",
         "lint:deps:test": "node scripts/test-dependency-cruiser.mjs",
         "lint:unused": "knip",
-        "lint:types": "tsc --noEmit",
+        "lint:types": "pnpm run typegen && tsc --noEmit",
         "dev": "react-router dev",
         "build": "react-router build",
         "typegen": "react-router typegen",

@@ -26,7 +26,7 @@ paths:
     put:
       operationId: updateMyProfile
       summary: Update my student profile
-      description: Creates or updates the authenticated student's display name, bio, and languages.
+      description: Creates or updates the authenticated student's display name, bio, languages, and study focus.
       parameters: []
       responses:
         '200':
@@ -82,6 +82,10 @@ components:
           type: array
           items:
             type: string
+        studyFocus:
+          allOf:
+            - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
+          description: Self-assessed strength in each study skill (1 = needs work, 5 = confident).
     Shared.Student.StudentProfileInput:
       type: object
       required:
@@ -97,6 +101,43 @@ components:
           type: array
           items:
             type: string
+        studyFocus:
+          allOf:
+            - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
+          description: Self-assessed strength in each study skill (1 = needs work, 5 = confident).
+    Shared.StudyFocus.StudyFocus:
+      type: object
+      required:
+        - memorization
+        - formalReasoning
+        - conceptualUnderstanding
+        - problemSolving
+      properties:
+        memorization:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Recalling definitions, formulas, and terminology.
+        formalReasoning:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Proofs, logic, derivations, and symbolic manipulation.
+        conceptualUnderstanding:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Building mental models and understanding why concepts work.
+        problemSolving:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Applying theory to exercises and exam-style problems.
+      description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
   securitySchemes:
     KeycloakBearerAuth:
       type: http
