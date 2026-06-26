@@ -8,7 +8,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV PNPM_STORE_DIR="/pnpm/store"
 ENV COREPACK_HOME=/pnpm/corepack
-RUN mkdir -p $COREPACK_HOME && corepack enable && corepack prepare pnpm@10.18.0 --activate && chmod -R a+rwX $COREPACK_HOME
+RUN mkdir -p $COREPACK_HOME && corepack enable && corepack prepare pnpm@10.28.2 --activate && chmod -R a+rwX $COREPACK_HOME
 
 COPY artifacts/client-web/package.json artifacts/client-web/pnpm-lock.yaml ./
 
@@ -69,11 +69,16 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV PNPM_STORE_DIR="/pnpm/store"
 ENV COREPACK_HOME=/pnpm/corepack
-RUN mkdir -p $COREPACK_HOME && corepack enable && corepack prepare pnpm@10.18.0 --activate && chmod -R a+rwX $COREPACK_HOME
+RUN mkdir -p $COREPACK_HOME && corepack enable && corepack prepare pnpm@10.28.2 --activate && chmod -R a+rwX $COREPACK_HOME
 
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./package.json
+
+RUN groupadd -r appuser && useradd -r -g appuser appuser \
+	&& chown -R appuser:appuser /app
+
+USER appuser
 
 EXPOSE 5173
 

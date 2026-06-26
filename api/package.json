@@ -22,12 +22,17 @@
   },
   "keywords": [],
   "author": "worksounourmachine",
-  "packageManager": "pnpm@10.18.0",
+  "packageManager": "pnpm@10.28.2",
   "dependencies": {
-    "@openapitools/openapi-generator-cli": "^2.34.0",
+    "@openapitools/openapi-generator-cli": "^2.39.0",
     "@typespec/compiler": "^1.12.0",
     "@typespec/http": "^1.12.0",
     "@typespec/openapi3": "^1.12.0",
     "@typespec/versioning": "^0.81.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "form-data": ">=4.0.6"
+    }
   }
 }
