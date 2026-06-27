@@ -1,0 +1,31 @@
+namespace: team-worksonourmachines
+
+ingress:
+  host: team-worksonourmachines.stud.k8s.aet.cit.tum.de
+
+ai:
+  image: ghcr.io/aet-devops26/team-worksonourmachines/ai:latest
+  llmProvider: logos
+  llmBaseUrl: https://logos.aet.cit.tum.de
+  llmModel: openai/gpt-oss-120b
+  llmApiKey: ""  # Set via the LLM_API_KEY GitHub Actions secret
+
+clientWeb:
+  image: ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
+  serverCommunicationApiUrl: tbd
+  serverMarketplaceApiUrl: tbd
+  serverStudentApiUrl: tbd
+
+postgres:
+  db: tutormatch
+  user: tutormatch
+  password: tutormatch  # Override in production
+  keycloakDb: keycloak
+  keycloakUser: keycloak
+  keycloakPassword: keycloak  # Override in production
+  storageSize: 1Gi
+
+keycloak:
+  adminUser: admin
+  adminPassword: admin  # Override in production
+  clientWebSecret: client-web-secret  # Override in production

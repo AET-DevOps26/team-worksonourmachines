@@ -15,4 +15,5 @@ dist/
 target/
 .DS_Store
 .react-router/
+k8s/secrets.yml
 tsconfig.tsbuildinfo
