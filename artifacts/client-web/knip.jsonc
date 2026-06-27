@@ -2,11 +2,11 @@
     "$schema": "https://unpkg.com/knip@5/schema.json",
     "entry": ["app/routes/**/*.{ts,tsx}"],
     "project": ["app/**/*.{ts,tsx}"],
-    "ignore": [
-        "app/.server/api/*/generated/**",
-        // todo remove app/.server as soon as apis are used
-        "app/.server/**"
-    ],
-    "ignoreDependencies": ["tailwindcss"],
-    "ignoreUnresolved": ["tslib"]
+    "ignore": ["**/.server/**/*"], // todo remove when api is connected
+    "ignoreDependencies": ["tailwindcss", "@fontsource-variable/inter", "tw-animate-css", "shadcn"],
+    "ignoreUnresolved": ["tslib"],
+    "ignoreIssues": {
+        "app/.server/service/**": ["types"],
+        "app/components/ui/**": ["exports", "types"]
+    }
 }
