@@ -53,7 +53,7 @@ services:
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
       KC_FEATURE_LOGIN: ${KEYCLOAK_LOGIN_FEATURE:-v1}
       KC_HEALTH_ENABLED: "true"
-      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}}
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-https://auth.tutormatch.localhost}
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
       KC_PROXY_HEADERS: xforwarded
@@ -108,13 +108,14 @@ services:
     volumes:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
+      - client-web-vite-cache:/app/.vite
       - caddy_data:/caddy-data:ro
     environment:
       CI: "true"
       LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
       LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
-      APP_BASE_URL: ${APP_BASE_URL:-https://${APP_HOSTNAME:-tutormatch.localhost}}
-      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
+      APP_BASE_URL: ${APP_BASE_URL:-https://tutormatch.localhost}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
       NODE_EXTRA_CA_CERTS: /caddy-data/caddy/pki/authorities/local/root.crt
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
@@ -206,6 +207,7 @@ volumes:
   postgres_data:
   pnpm-store:
   client-web-node-modules:
+  client-web-vite-cache:
   caddy_data:
   caddy_config:
   ollama_data:
