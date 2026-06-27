@@ -10,6 +10,8 @@ enum AiVersions {
 @versioned(AiVersions)
 @route("/v1")
 namespace Ai {
+  @summary("Chat with AI")
+  @doc("Sends a prompt to the AI service and returns a generated response.")
   @post
   @route("/chat")
   op chat(

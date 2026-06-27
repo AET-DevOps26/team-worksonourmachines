@@ -6,7 +6,14 @@ src/main/java/org/openapitools/api/ApiUtil.java
 src/main/java/org/openapitools/api/V1Api.java
 src/main/java/org/openapitools/configuration/HomeController.java
 src/main/java/org/openapitools/configuration/SpringDocConfiguration.java
-src/main/java/org/openapitools/model/Test200Response.java
+src/main/java/org/openapitools/model/MessagePage.java
+src/main/java/org/openapitools/model/SharedCommunicationChatMessage.java
+src/main/java/org/openapitools/model/SharedCommunicationConversationDetail.java
+src/main/java/org/openapitools/model/SharedCommunicationConversationPartner.java
+src/main/java/org/openapitools/model/SharedCommunicationConversationSummary.java
+src/main/java/org/openapitools/model/SharedCommunicationSendMessageRequest.java
+src/main/java/org/openapitools/model/SharedCommunicationStartConversationRequest.java
+src/main/java/org/openapitools/model/SharedErrorsErrorBody.java
 src/main/resources/application.properties
 src/main/resources/openapi.yaml
 src/test/java/org/openapitools/OpenApiGeneratorApplicationTests.java
