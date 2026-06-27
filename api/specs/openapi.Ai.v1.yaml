@@ -7,6 +7,8 @@ paths:
   /v1/chat:
     post:
       operationId: chat
+      summary: Chat with AI
+      description: Sends a prompt to the AI service and returns a generated response.
       parameters: []
       responses:
         '200':

@@ -15,10 +15,154 @@
 
 import * as runtime from '../runtime';
 import {
-    type Test200Response,
-    Test200ResponseFromJSON,
-    Test200ResponseToJSON,
-} from '../models/Test200Response';
+    type ModulePage,
+    ModulePageFromJSON,
+    ModulePageToJSON,
+} from '../models/ModulePage';
+import {
+    type SharedErrorsErrorBody,
+    SharedErrorsErrorBodyFromJSON,
+    SharedErrorsErrorBodyToJSON,
+} from '../models/SharedErrorsErrorBody';
+import {
+    type SharedMarketplaceAdminModuleInput,
+    SharedMarketplaceAdminModuleInputFromJSON,
+    SharedMarketplaceAdminModuleInputToJSON,
+} from '../models/SharedMarketplaceAdminModuleInput';
+import {
+    type SharedMarketplaceAdminModuleUpdateInput,
+    SharedMarketplaceAdminModuleUpdateInputFromJSON,
+    SharedMarketplaceAdminModuleUpdateInputToJSON,
+} from '../models/SharedMarketplaceAdminModuleUpdateInput';
+import {
+    type SharedMarketplaceApplicationStatus,
+    SharedMarketplaceApplicationStatusFromJSON,
+    SharedMarketplaceApplicationStatusToJSON,
+} from '../models/SharedMarketplaceApplicationStatus';
+import {
+    type SharedMarketplaceApproveApplicationResponse,
+    SharedMarketplaceApproveApplicationResponseFromJSON,
+    SharedMarketplaceApproveApplicationResponseToJSON,
+} from '../models/SharedMarketplaceApproveApplicationResponse';
+import {
+    type SharedMarketplaceLocation,
+    SharedMarketplaceLocationFromJSON,
+    SharedMarketplaceLocationToJSON,
+} from '../models/SharedMarketplaceLocation';
+import {
+    type SharedMarketplaceModuleDetail,
+    SharedMarketplaceModuleDetailFromJSON,
+    SharedMarketplaceModuleDetailToJSON,
+} from '../models/SharedMarketplaceModuleDetail';
+import {
+    type SharedMarketplaceRejectApplicationRequest,
+    SharedMarketplaceRejectApplicationRequestFromJSON,
+    SharedMarketplaceRejectApplicationRequestToJSON,
+} from '../models/SharedMarketplaceRejectApplicationRequest';
+import {
+    type SharedMarketplaceSubmitTutorApplicationRequest,
+    SharedMarketplaceSubmitTutorApplicationRequestFromJSON,
+    SharedMarketplaceSubmitTutorApplicationRequestToJSON,
+} from '../models/SharedMarketplaceSubmitTutorApplicationRequest';
+import {
+    type SharedMarketplaceTutorApplication,
+    SharedMarketplaceTutorApplicationFromJSON,
+    SharedMarketplaceTutorApplicationToJSON,
+} from '../models/SharedMarketplaceTutorApplication';
+import {
+    type SharedMarketplaceTutorDetail,
+    SharedMarketplaceTutorDetailFromJSON,
+    SharedMarketplaceTutorDetailToJSON,
+} from '../models/SharedMarketplaceTutorDetail';
+import {
+    type SharedMarketplaceTutorMeResponse,
+    SharedMarketplaceTutorMeResponseFromJSON,
+    SharedMarketplaceTutorMeResponseToJSON,
+} from '../models/SharedMarketplaceTutorMeResponse';
+import {
+    type SharedMarketplaceTutorProfile,
+    SharedMarketplaceTutorProfileFromJSON,
+    SharedMarketplaceTutorProfileToJSON,
+} from '../models/SharedMarketplaceTutorProfile';
+import {
+    type SharedMarketplaceTutorProfileInput,
+    SharedMarketplaceTutorProfileInputFromJSON,
+    SharedMarketplaceTutorProfileInputToJSON,
+} from '../models/SharedMarketplaceTutorProfileInput';
+import {
+    type SharedMarketplaceTutorSort,
+    SharedMarketplaceTutorSortFromJSON,
+    SharedMarketplaceTutorSortToJSON,
+} from '../models/SharedMarketplaceTutorSort';
+import {
+    type SharedMarketplaceWeekday,
+    SharedMarketplaceWeekdayFromJSON,
+    SharedMarketplaceWeekdayToJSON,
+} from '../models/SharedMarketplaceWeekday';
+import {
+    type TutorPage,
+    TutorPageFromJSON,
+    TutorPageToJSON,
+} from '../models/TutorPage';
+
+export interface ApproveTutorApplicationRequest {
+    id: string;
+}
+
+export interface CreateAdminModuleRequest {
+    sharedMarketplaceAdminModuleInput: SharedMarketplaceAdminModuleInput;
+}
+
+export interface GetModuleRequest {
+    code: string;
+}
+
+export interface GetTutorRequest {
+    id: string;
+}
+
+export interface ListAdminTutorApplicationsRequest {
+    status?: SharedMarketplaceApplicationStatus;
+}
+
+export interface ListModulesRequest {
+    page?: number;
+    pageSize?: number;
+    q?: string;
+}
+
+export interface ListTutorsRequest {
+    page?: number;
+    pageSize?: number;
+    q?: string;
+    moduleId?: string;
+    topicId?: string;
+    languages?: Array<string>;
+    locations?: Array<SharedMarketplaceLocation>;
+    minRate?: number;
+    maxRate?: number;
+    minRating?: number;
+    weekdays?: Array<SharedMarketplaceWeekday>;
+    sort?: SharedMarketplaceTutorSort;
+}
+
+export interface RejectTutorApplicationRequest {
+    id: string;
+    sharedMarketplaceRejectApplicationRequest: SharedMarketplaceRejectApplicationRequest;
+}
+
+export interface SubmitTutorApplicationRequest {
+    sharedMarketplaceSubmitTutorApplicationRequest: SharedMarketplaceSubmitTutorApplicationRequest;
+}
+
+export interface UpdateAdminModuleRequest {
+    code: string;
+    sharedMarketplaceAdminModuleUpdateInput: SharedMarketplaceAdminModuleUpdateInput;
+}
+
+export interface UpdateMyTutorProfileRequest {
+    sharedMarketplaceTutorProfileInput: SharedMarketplaceTutorProfileInput;
+}
 
 /**
  * 
@@ -26,9 +170,16 @@ import {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for test without sending the request
+     * Creates request options for approveTutorApplication without sending the request
      */
-    async testRequestOpts(): Promise<runtime.RequestOpts> {
+    async approveTutorApplicationRequestOpts(requestParameters: ApproveTutorApplicationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling approveTutorApplication().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -42,7 +193,120 @@ export class DefaultApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/v1/test`;
+        let urlPath = `/v1/admin/tutor-applications/{id}/approve`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Approves a pending tutor application and grants module coverage.
+     * Approve tutor application (admin)
+     */
+    async approveTutorApplicationRaw(requestParameters: ApproveTutorApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceApproveApplicationResponse>> {
+        const requestOptions = await this.approveTutorApplicationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceApproveApplicationResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Approves a pending tutor application and grants module coverage.
+     * Approve tutor application (admin)
+     */
+    async approveTutorApplication(requestParameters: ApproveTutorApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceApproveApplicationResponse> {
+        const response = await this.approveTutorApplicationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for createAdminModule without sending the request
+     */
+    async createAdminModuleRequestOpts(requestParameters: CreateAdminModuleRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sharedMarketplaceAdminModuleInput'] == null) {
+            throw new runtime.RequiredError(
+                'sharedMarketplaceAdminModuleInput',
+                'Required parameter "sharedMarketplaceAdminModuleInput" was null or undefined when calling createAdminModule().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/admin/modules`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedMarketplaceAdminModuleInputToJSON(requestParameters['sharedMarketplaceAdminModuleInput']),
+        };
+    }
+
+    /**
+     * Creates a new course module.
+     * Create module (admin)
+     */
+    async createAdminModuleRaw(requestParameters: CreateAdminModuleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceModuleDetail>> {
+        const requestOptions = await this.createAdminModuleRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceModuleDetailFromJSON(jsonValue));
+    }
+
+    /**
+     * Creates a new course module.
+     * Create module (admin)
+     */
+    async createAdminModule(requestParameters: CreateAdminModuleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceModuleDetail> {
+        const response = await this.createAdminModuleRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getModule without sending the request
+     */
+    async getModuleRequestOpts(requestParameters: GetModuleRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['code'] == null) {
+            throw new runtime.RequiredError(
+                'code',
+                'Required parameter "code" was null or undefined when calling getModule().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/modules/{code}`;
+        urlPath = urlPath.replace('{code}', encodeURIComponent(String(requestParameters['code'])));
 
         return {
             path: urlPath,
@@ -53,18 +317,667 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns module details including topics for the given module code.
+     * Get module by code
      */
-    async testRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Test200Response>> {
-        const requestOptions = await this.testRequestOpts();
+    async getModuleRaw(requestParameters: GetModuleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceModuleDetail>> {
+        const requestOptions = await this.getModuleRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => Test200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceModuleDetailFromJSON(jsonValue));
     }
 
     /**
+     * Returns module details including topics for the given module code.
+     * Get module by code
      */
-    async test(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Test200Response> {
-        const response = await this.testRaw(initOverrides);
+    async getModule(requestParameters: GetModuleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceModuleDetail> {
+        const response = await this.getModuleRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getMyTutorProfile without sending the request
+     */
+    async getMyTutorProfileRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/tutors/me`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns the authenticated user\'s tutor profile and module applications, if any.
+     * Get my tutor profile
+     */
+    async getMyTutorProfileRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceTutorMeResponse>> {
+        const requestOptions = await this.getMyTutorProfileRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceTutorMeResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns the authenticated user\'s tutor profile and module applications, if any.
+     * Get my tutor profile
+     */
+    async getMyTutorProfile(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceTutorMeResponse> {
+        const response = await this.getMyTutorProfileRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getTutor without sending the request
+     */
+    async getTutorRequestOpts(requestParameters: GetTutorRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getTutor().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/tutors/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns the public profile of a published tutor, including coverage and availability.
+     * Get tutor profile
+     */
+    async getTutorRaw(requestParameters: GetTutorRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceTutorDetail>> {
+        const requestOptions = await this.getTutorRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceTutorDetailFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns the public profile of a published tutor, including coverage and availability.
+     * Get tutor profile
+     */
+    async getTutor(requestParameters: GetTutorRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceTutorDetail> {
+        const response = await this.getTutorRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listAdminModules without sending the request
+     */
+    async listAdminModulesRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/admin/modules`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns all modules with topics for administration.
+     * List modules (admin)
+     */
+    async listAdminModulesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SharedMarketplaceModuleDetail>>> {
+        const requestOptions = await this.listAdminModulesRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SharedMarketplaceModuleDetailFromJSON));
+    }
+
+    /**
+     * Returns all modules with topics for administration.
+     * List modules (admin)
+     */
+    async listAdminModules(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SharedMarketplaceModuleDetail>> {
+        const response = await this.listAdminModulesRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listAdminTutorApplications without sending the request
+     */
+    async listAdminTutorApplicationsRequestOpts(requestParameters: ListAdminTutorApplicationsRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['status'] != null) {
+            queryParameters['status'] = requestParameters['status'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/admin/tutor-applications`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns tutor applications for admin review, optionally filtered by status.
+     * List tutor applications (admin)
+     */
+    async listAdminTutorApplicationsRaw(requestParameters: ListAdminTutorApplicationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SharedMarketplaceTutorApplication>>> {
+        const requestOptions = await this.listAdminTutorApplicationsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SharedMarketplaceTutorApplicationFromJSON));
+    }
+
+    /**
+     * Returns tutor applications for admin review, optionally filtered by status.
+     * List tutor applications (admin)
+     */
+    async listAdminTutorApplications(requestParameters: ListAdminTutorApplicationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SharedMarketplaceTutorApplication>> {
+        const response = await this.listAdminTutorApplicationsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listModules without sending the request
+     */
+    async listModulesRequestOpts(requestParameters: ListModulesRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['page'] != null) {
+            queryParameters['page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['pageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['q'] != null) {
+            queryParameters['q'] = requestParameters['q'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/modules`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns a paginated list of course modules, optionally filtered by search query.
+     * List modules
+     */
+    async listModulesRaw(requestParameters: ListModulesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ModulePage>> {
+        const requestOptions = await this.listModulesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ModulePageFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns a paginated list of course modules, optionally filtered by search query.
+     * List modules
+     */
+    async listModules(requestParameters: ListModulesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ModulePage> {
+        const response = await this.listModulesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listMyTutorApplications without sending the request
+     */
+    async listMyTutorApplicationsRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/tutor-applications/me`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns all module applications submitted by the authenticated user.
+     * List my tutor applications
+     */
+    async listMyTutorApplicationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SharedMarketplaceTutorApplication>>> {
+        const requestOptions = await this.listMyTutorApplicationsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SharedMarketplaceTutorApplicationFromJSON));
+    }
+
+    /**
+     * Returns all module applications submitted by the authenticated user.
+     * List my tutor applications
+     */
+    async listMyTutorApplications(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SharedMarketplaceTutorApplication>> {
+        const response = await this.listMyTutorApplicationsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listTutors without sending the request
+     */
+    async listTutorsRequestOpts(requestParameters: ListTutorsRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['page'] != null) {
+            queryParameters['page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['pageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['q'] != null) {
+            queryParameters['q'] = requestParameters['q'];
+        }
+
+        if (requestParameters['moduleId'] != null) {
+            queryParameters['moduleId'] = requestParameters['moduleId'];
+        }
+
+        if (requestParameters['topicId'] != null) {
+            queryParameters['topicId'] = requestParameters['topicId'];
+        }
+
+        if (requestParameters['languages'] != null) {
+            queryParameters['languages'] = requestParameters['languages']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['locations'] != null) {
+            queryParameters['locations'] = requestParameters['locations']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['minRate'] != null) {
+            queryParameters['minRate'] = requestParameters['minRate'];
+        }
+
+        if (requestParameters['maxRate'] != null) {
+            queryParameters['maxRate'] = requestParameters['maxRate'];
+        }
+
+        if (requestParameters['minRating'] != null) {
+            queryParameters['minRating'] = requestParameters['minRating'];
+        }
+
+        if (requestParameters['weekdays'] != null) {
+            queryParameters['weekdays'] = requestParameters['weekdays']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['sort'] != null) {
+            queryParameters['sort'] = requestParameters['sort'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/tutors`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns a paginated, filterable list of published tutor profiles.
+     * Discover tutors
+     */
+    async listTutorsRaw(requestParameters: ListTutorsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TutorPage>> {
+        const requestOptions = await this.listTutorsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TutorPageFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns a paginated, filterable list of published tutor profiles.
+     * Discover tutors
+     */
+    async listTutors(requestParameters: ListTutorsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TutorPage> {
+        const response = await this.listTutorsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for rejectTutorApplication without sending the request
+     */
+    async rejectTutorApplicationRequestOpts(requestParameters: RejectTutorApplicationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling rejectTutorApplication().'
+            );
+        }
+
+        if (requestParameters['sharedMarketplaceRejectApplicationRequest'] == null) {
+            throw new runtime.RequiredError(
+                'sharedMarketplaceRejectApplicationRequest',
+                'Required parameter "sharedMarketplaceRejectApplicationRequest" was null or undefined when calling rejectTutorApplication().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/admin/tutor-applications/{id}/reject`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedMarketplaceRejectApplicationRequestToJSON(requestParameters['sharedMarketplaceRejectApplicationRequest']),
+        };
+    }
+
+    /**
+     * Rejects a pending tutor application with an optional reason.
+     * Reject tutor application (admin)
+     */
+    async rejectTutorApplicationRaw(requestParameters: RejectTutorApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceTutorApplication>> {
+        const requestOptions = await this.rejectTutorApplicationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceTutorApplicationFromJSON(jsonValue));
+    }
+
+    /**
+     * Rejects a pending tutor application with an optional reason.
+     * Reject tutor application (admin)
+     */
+    async rejectTutorApplication(requestParameters: RejectTutorApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceTutorApplication> {
+        const response = await this.rejectTutorApplicationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for submitTutorApplication without sending the request
+     */
+    async submitTutorApplicationRequestOpts(requestParameters: SubmitTutorApplicationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sharedMarketplaceSubmitTutorApplicationRequest'] == null) {
+            throw new runtime.RequiredError(
+                'sharedMarketplaceSubmitTutorApplicationRequest',
+                'Required parameter "sharedMarketplaceSubmitTutorApplicationRequest" was null or undefined when calling submitTutorApplication().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/tutor-applications`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedMarketplaceSubmitTutorApplicationRequestToJSON(requestParameters['sharedMarketplaceSubmitTutorApplicationRequest']),
+        };
+    }
+
+    /**
+     * Submits a module tutoring application, optionally including an initial tutor profile on first apply.
+     * Submit tutor application
+     */
+    async submitTutorApplicationRaw(requestParameters: SubmitTutorApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceTutorApplication>> {
+        const requestOptions = await this.submitTutorApplicationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceTutorApplicationFromJSON(jsonValue));
+    }
+
+    /**
+     * Submits a module tutoring application, optionally including an initial tutor profile on first apply.
+     * Submit tutor application
+     */
+    async submitTutorApplication(requestParameters: SubmitTutorApplicationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceTutorApplication> {
+        const response = await this.submitTutorApplicationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for updateAdminModule without sending the request
+     */
+    async updateAdminModuleRequestOpts(requestParameters: UpdateAdminModuleRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['code'] == null) {
+            throw new runtime.RequiredError(
+                'code',
+                'Required parameter "code" was null or undefined when calling updateAdminModule().'
+            );
+        }
+
+        if (requestParameters['sharedMarketplaceAdminModuleUpdateInput'] == null) {
+            throw new runtime.RequiredError(
+                'sharedMarketplaceAdminModuleUpdateInput',
+                'Required parameter "sharedMarketplaceAdminModuleUpdateInput" was null or undefined when calling updateAdminModule().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/admin/modules/{code}`;
+        urlPath = urlPath.replace('{code}', encodeURIComponent(String(requestParameters['code'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedMarketplaceAdminModuleUpdateInputToJSON(requestParameters['sharedMarketplaceAdminModuleUpdateInput']),
+        };
+    }
+
+    /**
+     * Updates an existing module identified by code.
+     * Update module (admin)
+     */
+    async updateAdminModuleRaw(requestParameters: UpdateAdminModuleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceModuleDetail>> {
+        const requestOptions = await this.updateAdminModuleRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceModuleDetailFromJSON(jsonValue));
+    }
+
+    /**
+     * Updates an existing module identified by code.
+     * Update module (admin)
+     */
+    async updateAdminModule(requestParameters: UpdateAdminModuleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceModuleDetail> {
+        const response = await this.updateAdminModuleRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for updateMyTutorProfile without sending the request
+     */
+    async updateMyTutorProfileRequestOpts(requestParameters: UpdateMyTutorProfileRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sharedMarketplaceTutorProfileInput'] == null) {
+            throw new runtime.RequiredError(
+                'sharedMarketplaceTutorProfileInput',
+                'Required parameter "sharedMarketplaceTutorProfileInput" was null or undefined when calling updateMyTutorProfile().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/tutors/me`;
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedMarketplaceTutorProfileInputToJSON(requestParameters['sharedMarketplaceTutorProfileInput']),
+        };
+    }
+
+    /**
+     * Updates the authenticated tutor\'s profile fields and publish status.
+     * Update my tutor profile
+     */
+    async updateMyTutorProfileRaw(requestParameters: UpdateMyTutorProfileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedMarketplaceTutorProfile>> {
+        const requestOptions = await this.updateMyTutorProfileRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedMarketplaceTutorProfileFromJSON(jsonValue));
+    }
+
+    /**
+     * Updates the authenticated tutor\'s profile fields and publish status.
+     * Update my tutor profile
+     */
+    async updateMyTutorProfile(requestParameters: UpdateMyTutorProfileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedMarketplaceTutorProfile> {
+        const response = await this.updateMyTutorProfileRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

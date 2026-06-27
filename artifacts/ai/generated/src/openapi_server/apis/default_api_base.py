@@ -16,4 +16,5 @@ class BaseDefaultApi:
         self,
         chat_request: ChatRequest,
     ) -> Chat200Response:
+        """Sends a prompt to the AI service and returns a generated response."""
         ...
