@@ -80,6 +80,6 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser \
 
 USER appuser
 
-EXPOSE 5173
+EXPOSE 3000
 
 CMD ["pnpm", "start"]
