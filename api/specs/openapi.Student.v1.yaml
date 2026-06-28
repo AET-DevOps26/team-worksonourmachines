@@ -4,9 +4,11 @@ info:
   version: v1
 tags: []
 paths:
-  /v1/test:
+  /v1/students/me:
     get:
-      operationId: test
+      operationId: getMyProfile
+      summary: Get my student profile
+      description: Returns the authenticated student's profile. New students receive an empty default profile.
       parameters: []
       responses:
         '200':
@@ -14,15 +16,128 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/Shared.Student.StudentProfile'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+    put:
+      operationId: updateMyProfile
+      summary: Update my student profile
+      description: Creates or updates the authenticated student's display name, bio, languages, and study focus.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.StudentProfile'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shared.Student.StudentProfileInput'
 security:
   - KeycloakBearerAuth: []
 components:
+  schemas:
+    Shared.Errors.ErrorBody:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    Shared.Student.StudentProfile:
+      type: object
+      required:
+        - displayName
+        - bio
+        - languages
+      properties:
+        displayName:
+          type: string
+        bio:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        studyFocus:
+          allOf:
+            - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
+          description: Self-assessed strength in each study skill (1 = needs work, 5 = confident).
+    Shared.Student.StudentProfileInput:
+      type: object
+      required:
+        - displayName
+        - bio
+        - languages
+      properties:
+        displayName:
+          type: string
+        bio:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        studyFocus:
+          allOf:
+            - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
+          description: Self-assessed strength in each study skill (1 = needs work, 5 = confident).
+    Shared.StudyFocus.StudyFocus:
+      type: object
+      required:
+        - memorization
+        - formalReasoning
+        - conceptualUnderstanding
+        - problemSolving
+      properties:
+        memorization:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Recalling definitions, formulas, and terminology.
+        formalReasoning:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Proofs, logic, derivations, and symbolic manipulation.
+        conceptualUnderstanding:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Building mental models and understanding why concepts work.
+        problemSolving:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Applying theory to exercises and exam-style problems.
+      description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
   securitySchemes:
     KeycloakBearerAuth:
       type: http

@@ -8,29 +8,1308 @@ servers:
 security:
 - KeycloakBearerAuth: []
 paths:
-  /v1/test:
+  /v1/admin/modules:
     get:
-      operationId: test
+      description: Returns all modules with topics for administration.
+      operationId: listAdminModules
       parameters: []
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/test_200_response"
+                items:
+                  $ref: "#/components/schemas/Shared.Marketplace.ModuleDetail"
+                type: array
           description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: List modules (admin)
+      x-accepts:
+      - application/json
+    post:
+      description: Creates a new course module.
+      operationId: createAdminModule
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shared.Marketplace.AdminModuleInput"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.ModuleDetail"
+          description: The request has succeeded.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server could not understand the request due to invalid
+            syntax.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: Create module (admin)
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/admin/modules/{code}:
+    put:
+      description: Updates an existing module identified by code.
+      operationId: updateAdminModule
+      parameters:
+      - explode: false
+        in: path
+        name: code
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shared.Marketplace.AdminModuleUpdateInput"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.ModuleDetail"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server cannot find the requested resource.
+      summary: Update module (admin)
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/admin/tutor-applications:
+    get:
+      description: "Returns tutor applications for admin review, optionally filtered\
+        \ by status."
+      operationId: listAdminTutorApplications
+      parameters:
+      - explode: false
+        in: query
+        name: status
+        required: false
+        schema:
+          $ref: "#/components/schemas/Shared.Marketplace.ApplicationStatus"
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Shared.Marketplace.TutorApplication"
+                type: array
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: List tutor applications (admin)
+      x-accepts:
+      - application/json
+  /v1/admin/tutor-applications/{id}/approve:
+    post:
+      description: Approves a pending tutor application and grants module coverage.
+      operationId: approveTutorApplication
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.ApproveApplicationResponse"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server cannot find the requested resource.
+      summary: Approve tutor application (admin)
+      x-accepts:
+      - application/json
+  /v1/admin/tutor-applications/{id}/reject:
+    post:
+      description: Rejects a pending tutor application with an optional reason.
+      operationId: rejectTutorApplication
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shared.Marketplace.RejectApplicationRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.TutorApplication"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server cannot find the requested resource.
+      summary: Reject tutor application (admin)
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/modules:
+    get:
+      description: "Returns a paginated list of course modules, optionally filtered\
+        \ by search query."
+      operationId: listModules
+      parameters:
+      - explode: false
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int32
+          minimum: 1
+          type: integer
+        style: form
+      - explode: false
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 20
+          format: int32
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      - explode: false
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModulePage"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: List modules
+      x-accepts:
+      - application/json
+  /v1/modules/{code}:
+    get:
+      description: Returns module details including topics for the given module code.
+      operationId: getModule
+      parameters:
+      - explode: false
+        in: path
+        name: code
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.ModuleDetail"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server cannot find the requested resource.
+      summary: Get module by code
+      x-accepts:
+      - application/json
+  /v1/tutor-applications:
+    post:
+      description: "Submits a module tutoring application, optionally including an\
+        \ initial tutor profile on first apply."
+      operationId: submitTutorApplication
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shared.Marketplace.SubmitTutorApplicationRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.TutorApplication"
+          description: The request has succeeded.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server could not understand the request due to invalid
+            syntax.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: Submit tutor application
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/tutor-applications/me:
+    get:
+      description: Returns all module applications submitted by the authenticated
+        user.
+      operationId: listMyTutorApplications
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Shared.Marketplace.TutorApplication"
+                type: array
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: List my tutor applications
+      x-accepts:
+      - application/json
+  /v1/tutors:
+    get:
+      description: "Returns a paginated, filterable list of published tutor profiles."
+      operationId: listTutors
+      parameters:
+      - explode: false
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int32
+          minimum: 1
+          type: integer
+        style: form
+      - explode: false
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 20
+          format: int32
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      - explode: false
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: moduleId
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: topicId
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: languages
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - explode: false
+        in: query
+        name: locations
+        required: false
+        schema:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.Location"
+          type: array
+        style: form
+      - explode: false
+        in: query
+        name: minRate
+        required: false
+        schema:
+          format: float
+          type: number
+        style: form
+      - explode: false
+        in: query
+        name: maxRate
+        required: false
+        schema:
+          format: float
+          type: number
+        style: form
+      - explode: false
+        in: query
+        name: minRating
+        required: false
+        schema:
+          format: float
+          type: number
+        style: form
+      - explode: false
+        in: query
+        name: weekdays
+        required: false
+        schema:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.Weekday"
+          type: array
+        style: form
+      - explode: false
+        in: query
+        name: sort
+        required: false
+        schema:
+          $ref: "#/components/schemas/Shared.Marketplace.TutorSort"
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TutorPage"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: Discover tutors
+      x-accepts:
+      - application/json
+  /v1/tutors/me:
+    get:
+      description: "Returns the authenticated user's tutor profile and module applications,\
+        \ if any."
+      operationId: getMyTutorProfile
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.TutorMeResponse"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: Get my tutor profile
+      x-accepts:
+      - application/json
+    put:
+      description: Updates the authenticated tutor's profile fields and publish status.
+      operationId: updateMyTutorProfile
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shared.Marketplace.TutorProfileInput"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.TutorProfile"
+          description: The request has succeeded.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server could not understand the request due to invalid
+            syntax.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+      summary: Update my tutor profile
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/tutors/{id}:
+    get:
+      description: "Returns the public profile of a published tutor, including coverage\
+        \ and availability."
+      operationId: getTutor
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Marketplace.TutorDetail"
+          description: The request has succeeded.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: Access is unauthorized.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shared.Errors.ErrorBody"
+          description: The server cannot find the requested resource.
+      summary: Get tutor profile
       x-accepts:
       - application/json
 components:
+  parameters:
+    Shared.Pagination.PageParams.page:
+      explode: false
+      in: query
+      name: page
+      required: false
+      schema:
+        default: 1
+        format: int32
+        minimum: 1
+        type: integer
+      style: form
+    Shared.Pagination.PageParams.pageSize:
+      explode: false
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        default: 20
+        format: int32
+        maximum: 100
+        minimum: 1
+        type: integer
+      style: form
   schemas:
-    test_200_response:
+    ModulePage:
       example:
+        total: 1
+        pageSize: 6
+        page: 0
+        items:
+        - code: code
+          difficultyHint: difficultyHint
+          description: description
+          id: id
+          title: title
+        - code: code
+          difficultyHint: difficultyHint
+          description: description
+          id: id
+          title: title
+      properties:
+        items:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.ModuleListItem"
+          type: array
+        page:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        total:
+          format: int32
+          type: integer
+      required:
+      - items
+      - page
+      - pageSize
+      - total
+      type: object
+    Shared.Errors.ErrorBody:
+      example:
+        code: code
         message: message
       properties:
+        code:
+          type: string
         message:
           type: string
       required:
+      - code
       - message
+      type: object
+    Shared.Marketplace.AdminModuleInput:
+      properties:
+        code:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        difficultyHint:
+          type: string
+        topics:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TopicInput"
+          type: array
+      required:
+      - code
+      - description
+      - difficultyHint
+      - title
+      - topics
+      type: object
+    Shared.Marketplace.AdminModuleUpdateInput:
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        difficultyHint:
+          type: string
+        topics:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TopicInput"
+          type: array
+      required:
+      - description
+      - difficultyHint
+      - title
+      - topics
+      type: object
+    Shared.Marketplace.ApplicationStatus:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+    Shared.Marketplace.ApproveApplicationResponse:
+      example:
+        isFirstApproval: true
+        application:
+          moduleCode: moduleCode
+          moduleTitle: moduleTitle
+          id: id
+          moduleId: moduleId
+          submittedAt: 2000-01-23T04:56:07.000+00:00
+          rejectionReason: rejectionReason
+          userId: userId
+          status: pending
+          certificateRef: certificateRef
+      properties:
+        application:
+          $ref: "#/components/schemas/Shared.Marketplace.TutorApplication"
+        isFirstApproval:
+          type: boolean
+      required:
+      - application
+      - isFirstApproval
+      type: object
+    Shared.Marketplace.Location:
+      enum:
+      - online
+      - garching
+      - munich
+      - weihenstephan
+      - staubing
+      - ottobrun
+      type: string
+    Shared.Marketplace.ModuleDetail:
+      example:
+        code: code
+        topics:
+        - difficultyHint: difficultyHint
+          name: name
+          description: description
+          id: id
+          studyFocus:
+            memorization: 1
+            conceptualUnderstanding: 1
+            problemSolving: 3
+            formalReasoning: 3
+        - difficultyHint: difficultyHint
+          name: name
+          description: description
+          id: id
+          studyFocus:
+            memorization: 1
+            conceptualUnderstanding: 1
+            problemSolving: 3
+            formalReasoning: 3
+        difficultyHint: difficultyHint
+        description: description
+        id: id
+        title: title
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        difficultyHint:
+          type: string
+        topics:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.Topic"
+          type: array
+      required:
+      - code
+      - description
+      - difficultyHint
+      - id
+      - title
+      - topics
+      type: object
+    Shared.Marketplace.ModuleListItem:
+      example:
+        code: code
+        difficultyHint: difficultyHint
+        description: description
+        id: id
+        title: title
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        difficultyHint:
+          type: string
+      required:
+      - code
+      - description
+      - difficultyHint
+      - id
+      - title
+      type: object
+    Shared.Marketplace.RatingSummary:
+      example:
+        average: 6.0274563
+        count: 1
+      properties:
+        average:
+          format: float
+          type: number
+        count:
+          format: int32
+          type: integer
+      required:
+      - average
+      - count
+      type: object
+    Shared.Marketplace.RejectApplicationRequest:
+      properties:
+        reason:
+          type: string
+      type: object
+    Shared.Marketplace.SubmitTutorApplicationRequest:
+      properties:
+        moduleId:
+          type: string
+        certificateRef:
+          type: string
+        profile:
+          $ref: "#/components/schemas/Shared.Marketplace.TutorProfileInput"
+      required:
+      - certificateRef
+      - moduleId
+      type: object
+    Shared.Marketplace.Topic:
+      example:
+        difficultyHint: difficultyHint
+        name: name
+        description: description
+        id: id
+        studyFocus:
+          memorization: 1
+          conceptualUnderstanding: 1
+          problemSolving: 3
+          formalReasoning: 3
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        difficultyHint:
+          type: string
+        studyFocus:
+          $ref: "#/components/schemas/Shared.StudyFocus.StudyFocus"
+      required:
+      - description
+      - difficultyHint
+      - id
+      - name
+      - studyFocus
+      type: object
+    Shared.Marketplace.TopicInput:
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        difficultyHint:
+          type: string
+        studyFocus:
+          $ref: "#/components/schemas/Shared.StudyFocus.StudyFocus"
+      required:
+      - description
+      - difficultyHint
+      - name
+      - studyFocus
+      type: object
+    Shared.Marketplace.TutorApplication:
+      example:
+        moduleCode: moduleCode
+        moduleTitle: moduleTitle
+        id: id
+        moduleId: moduleId
+        submittedAt: 2000-01-23T04:56:07.000+00:00
+        rejectionReason: rejectionReason
+        userId: userId
+        status: pending
+        certificateRef: certificateRef
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        moduleId:
+          type: string
+        moduleCode:
+          type: string
+        moduleTitle:
+          type: string
+        status:
+          $ref: "#/components/schemas/Shared.Marketplace.ApplicationStatus"
+        certificateRef:
+          type: string
+        submittedAt:
+          format: date-time
+          type: string
+        rejectionReason:
+          type: string
+      required:
+      - certificateRef
+      - id
+      - moduleCode
+      - moduleId
+      - moduleTitle
+      - status
+      - submittedAt
+      - userId
+      type: object
+    Shared.Marketplace.TutorAvailability:
+      example:
+        note: note
+        weekday: monday
+        available: true
+      properties:
+        weekday:
+          $ref: "#/components/schemas/Shared.Marketplace.Weekday"
+        available:
+          type: boolean
+        note:
+          type: string
+      required:
+      - available
+      - weekday
+      type: object
+    Shared.Marketplace.TutorCoverage:
+      example:
+        moduleCode: moduleCode
+        moduleTitle: moduleTitle
+        proficiencyLevel: proficiencyLevel
+        moduleId: moduleId
+      properties:
+        moduleId:
+          type: string
+        moduleCode:
+          type: string
+        moduleTitle:
+          type: string
+        proficiencyLevel:
+          type: string
+      required:
+      - moduleCode
+      - moduleId
+      - moduleTitle
+      - proficiencyLevel
+      type: object
+    Shared.Marketplace.TutorDetail:
+      example:
+        ratingSummary:
+          average: 6.0274563
+          count: 1
+        languages:
+        - languages
+        - languages
+        displayName: displayName
+        bio: bio
+        locations:
+        - online
+        - online
+        id: id
+        availability:
+        - note: note
+          weekday: monday
+          available: true
+        - note: note
+          weekday: monday
+          available: true
+        published: true
+        hourlyRate: 0.8008282
+        userId: userId
+        coverages:
+        - moduleCode: moduleCode
+          moduleTitle: moduleTitle
+          proficiencyLevel: proficiencyLevel
+          moduleId: moduleId
+        - moduleCode: moduleCode
+          moduleTitle: moduleTitle
+          proficiencyLevel: proficiencyLevel
+          moduleId: moduleId
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        displayName:
+          type: string
+        hourlyRate:
+          format: float
+          type: number
+        languages:
+          items:
+            type: string
+          type: array
+        locations:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.Location"
+          type: array
+        ratingSummary:
+          $ref: "#/components/schemas/Shared.Marketplace.RatingSummary"
+        coverages:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TutorCoverage"
+          type: array
+        bio:
+          type: string
+        availability:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TutorAvailability"
+          type: array
+        published:
+          type: boolean
+      required:
+      - availability
+      - bio
+      - coverages
+      - displayName
+      - hourlyRate
+      - id
+      - languages
+      - locations
+      - published
+      - ratingSummary
+      - userId
+      type: object
+    Shared.Marketplace.TutorMeResponse:
+      example:
+        profile: "{}"
+        applications:
+        - moduleCode: moduleCode
+          moduleTitle: moduleTitle
+          id: id
+          moduleId: moduleId
+          submittedAt: 2000-01-23T04:56:07.000+00:00
+          rejectionReason: rejectionReason
+          userId: userId
+          status: pending
+          certificateRef: certificateRef
+        - moduleCode: moduleCode
+          moduleTitle: moduleTitle
+          id: id
+          moduleId: moduleId
+          submittedAt: 2000-01-23T04:56:07.000+00:00
+          rejectionReason: rejectionReason
+          userId: userId
+          status: pending
+          certificateRef: certificateRef
+      properties:
+        profile:
+          allOf:
+          - $ref: "#/components/schemas/Shared.Marketplace.TutorProfile"
+          nullable: true
+          type: object
+        applications:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TutorApplication"
+          type: array
+      required:
+      - applications
+      - profile
+      type: object
+    Shared.Marketplace.TutorProfile:
+      allOf:
+      - $ref: "#/components/schemas/Shared.Marketplace.TutorProfileInput"
+      - properties:
+          id:
+            type: string
+          userId:
+            type: string
+        required:
+        - id
+        - userId
+        type: object
+        example: null
+      example:
+        languages:
+        - languages
+        - languages
+        displayName: displayName
+        bio: bio
+        locations:
+        - online
+        - online
+        availability:
+        - note: note
+          weekday: monday
+          available: true
+        - note: note
+          weekday: monday
+          available: true
+        published: false
+        id: id
+        hourlyRate: 0.8008282
+        userId: userId
+      type: object
+    Shared.Marketplace.TutorProfileInput:
+      properties:
+        displayName:
+          type: string
+        bio:
+          type: string
+        languages:
+          items:
+            type: string
+          type: array
+        locations:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.Location"
+          type: array
+        hourlyRate:
+          format: float
+          type: number
+        availability:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TutorAvailability"
+          type: array
+        published:
+          default: false
+          type: boolean
+      required:
+      - availability
+      - bio
+      - displayName
+      - hourlyRate
+      - languages
+      - locations
+      type: object
+    Shared.Marketplace.TutorSort:
+      enum:
+      - rating
+      - rate_asc
+      - rate_desc
+      - name
+      type: string
+    Shared.Marketplace.TutorSummary:
+      example:
+        ratingSummary:
+          average: 6.0274563
+          count: 1
+        languages:
+        - languages
+        - languages
+        displayName: displayName
+        locations:
+        - online
+        - online
+        id: id
+        hourlyRate: 0.8008282
+        userId: userId
+        coverages:
+        - moduleCode: moduleCode
+          moduleTitle: moduleTitle
+          proficiencyLevel: proficiencyLevel
+          moduleId: moduleId
+        - moduleCode: moduleCode
+          moduleTitle: moduleTitle
+          proficiencyLevel: proficiencyLevel
+          moduleId: moduleId
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        displayName:
+          type: string
+        hourlyRate:
+          format: float
+          type: number
+        languages:
+          items:
+            type: string
+          type: array
+        locations:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.Location"
+          type: array
+        ratingSummary:
+          $ref: "#/components/schemas/Shared.Marketplace.RatingSummary"
+        coverages:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TutorCoverage"
+          type: array
+      required:
+      - coverages
+      - displayName
+      - hourlyRate
+      - id
+      - languages
+      - locations
+      - ratingSummary
+      - userId
+      type: object
+    Shared.Marketplace.Weekday:
+      enum:
+      - monday
+      - tuesday
+      - wednesday
+      - thursday
+      - friday
+      - saturday
+      - sunday
+      type: string
+    Shared.StudyFocus.StudyFocus:
+      description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
+      example:
+        memorization: 1
+        conceptualUnderstanding: 1
+        problemSolving: 3
+        formalReasoning: 3
+      properties:
+        memorization:
+          description: "Recalling definitions, formulas, and terminology."
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        formalReasoning:
+          description: "Proofs, logic, derivations, and symbolic manipulation."
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        conceptualUnderstanding:
+          description: Building mental models and understanding why concepts work.
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+        problemSolving:
+          description: Applying theory to exercises and exam-style problems.
+          format: int32
+          maximum: 5
+          minimum: 1
+          type: integer
+      required:
+      - conceptualUnderstanding
+      - formalReasoning
+      - memorization
+      - problemSolving
+      type: object
+    TutorPage:
+      example:
+        total: 2
+        pageSize: 5
+        page: 5
+        items:
+        - ratingSummary:
+            average: 6.0274563
+            count: 1
+          languages:
+          - languages
+          - languages
+          displayName: displayName
+          locations:
+          - online
+          - online
+          id: id
+          hourlyRate: 0.8008282
+          userId: userId
+          coverages:
+          - moduleCode: moduleCode
+            moduleTitle: moduleTitle
+            proficiencyLevel: proficiencyLevel
+            moduleId: moduleId
+          - moduleCode: moduleCode
+            moduleTitle: moduleTitle
+            proficiencyLevel: proficiencyLevel
+            moduleId: moduleId
+        - ratingSummary:
+            average: 6.0274563
+            count: 1
+          languages:
+          - languages
+          - languages
+          displayName: displayName
+          locations:
+          - online
+          - online
+          id: id
+          hourlyRate: 0.8008282
+          userId: userId
+          coverages:
+          - moduleCode: moduleCode
+            moduleTitle: moduleTitle
+            proficiencyLevel: proficiencyLevel
+            moduleId: moduleId
+          - moduleCode: moduleCode
+            moduleTitle: moduleTitle
+            proficiencyLevel: proficiencyLevel
+            moduleId: moduleId
+      properties:
+        items:
+          items:
+            $ref: "#/components/schemas/Shared.Marketplace.TutorSummary"
+          type: array
+        page:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        total:
+          format: int32
+          type: integer
+      required:
+      - items
+      - page
+      - pageSize
+      - total
       type: object
   securitySchemes:
     KeycloakBearerAuth:

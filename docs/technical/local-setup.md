@@ -226,6 +226,7 @@ Hooks are stored under `git/hooks/` in the repository so they are version contro
 | Permission errors on files created by tooling | Check you are not mixing root-owned files with host UID tooling. Re-run init tooling steps after fixing ownership. |
 | Lint fails in pre-commit but you thought you were done | Run `make lint` locally; same command as the hook |
 | Keycloak rejects login / invalid redirect URI after hostname change | Re-run `docker compose up -d --force-recreate keycloak-config-cli client-web gateway` |
+| `client-web` exits on startup with `Failed to discover OIDC configuration` / `fetch failed` | Caddy's internal TLS cert for `auth.tutormatch.localhost` is missing, expired, or not yet ready. Run `docker compose restart gateway`, then `docker compose up -d client-web`. If it persists, remove the `caddy_data` volume (`docker compose down` then `docker volume rm tutormatch_caddy_data`) and start again. |
 
 `make clean` removes api and client-web `node_modules`, client-web build artifacts, and AI `.venv`, `__pycache__`, and ruff cache.
 

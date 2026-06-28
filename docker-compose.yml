@@ -136,6 +136,7 @@ services:
     volumes:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
+      - client-web-vite-cache:/app/.vite
       - caddy_data:/caddy-data:ro
     environment:
       CI: "true"
@@ -251,6 +252,7 @@ volumes:
   postgres_data:
   pnpm-store:
   client-web-node-modules:
+  client-web-vite-cache:
   caddy_data:
   caddy_config:
   ollama_data:

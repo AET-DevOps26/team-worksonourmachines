@@ -5,7 +5,25 @@
  */
 package org.openapitools.api;
 
-import org.openapitools.model.Test200Response;
+import org.openapitools.model.ModulePage;
+import org.springframework.lang.Nullable;
+import org.openapitools.model.SharedErrorsErrorBody;
+import org.openapitools.model.SharedMarketplaceAdminModuleInput;
+import org.openapitools.model.SharedMarketplaceAdminModuleUpdateInput;
+import org.openapitools.model.SharedMarketplaceApplicationStatus;
+import org.openapitools.model.SharedMarketplaceApproveApplicationResponse;
+import org.openapitools.model.SharedMarketplaceLocation;
+import org.openapitools.model.SharedMarketplaceModuleDetail;
+import org.openapitools.model.SharedMarketplaceRejectApplicationRequest;
+import org.openapitools.model.SharedMarketplaceSubmitTutorApplicationRequest;
+import org.openapitools.model.SharedMarketplaceTutorApplication;
+import org.openapitools.model.SharedMarketplaceTutorDetail;
+import org.openapitools.model.SharedMarketplaceTutorMeResponse;
+import org.openapitools.model.SharedMarketplaceTutorProfile;
+import org.openapitools.model.SharedMarketplaceTutorProfileInput;
+import org.openapitools.model.SharedMarketplaceTutorSort;
+import org.openapitools.model.SharedMarketplaceWeekday;
+import org.openapitools.model.TutorPage;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,17 +60,152 @@ public interface V1Api {
         return Optional.empty();
     }
 
-    String PATH_TEST = "/v1/test";
+    String PATH_APPROVE_TUTOR_APPLICATION = "/v1/admin/tutor-applications/{id}/approve";
     /**
-     * GET /v1/test
+     * POST /v1/admin/tutor-applications/{id}/approve : Approve tutor application (admin)
+     * Approves a pending tutor application and grants module coverage.
      *
+     * @param id  (required)
      * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
      */
     @Operation(
-        operationId = "test",
+        operationId = "approveTutorApplication",
+        summary = "Approve tutor application (admin)",
+        description = "Approves a pending tutor application and grants module coverage.",
         responses = {
             @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Test200Response.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceApproveApplicationResponse.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = V1Api.PATH_APPROVE_TUTOR_APPLICATION,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceApproveApplicationResponse> approveTutorApplication(
+        @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"isFirstApproval\" : true, \"application\" : { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" } }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_CREATE_ADMIN_MODULE = "/v1/admin/modules";
+    /**
+     * POST /v1/admin/modules : Create module (admin)
+     * Creates a new course module.
+     *
+     * @param sharedMarketplaceAdminModuleInput  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "createAdminModule",
+        summary = "Create module (admin)",
+        description = "Creates a new course module.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceModuleDetail.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The server could not understand the request due to invalid syntax.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = V1Api.PATH_CREATE_ADMIN_MODULE,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceModuleDetail> createAdminModule(
+        @Parameter(name = "SharedMarketplaceAdminModuleInput", description = "", required = true) @Valid @RequestBody SharedMarketplaceAdminModuleInput sharedMarketplaceAdminModuleInput
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"topics\" : [ { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } }, { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } } ], \"difficultyHint\" : \"difficultyHint\", \"description\" : \"description\", \"id\" : \"id\", \"title\" : \"title\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_MODULE = "/v1/modules/{code}";
+    /**
+     * GET /v1/modules/{code} : Get module by code
+     * Returns module details including topics for the given module code.
+     *
+     * @param code  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @Operation(
+        operationId = "getModule",
+        summary = "Get module by code",
+        description = "Returns module details including topics for the given module code.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceModuleDetail.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
             })
         },
         security = {
@@ -61,16 +214,674 @@ public interface V1Api {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_TEST,
+        value = V1Api.PATH_GET_MODULE,
         produces = { "application/json" }
     )
-    default ResponseEntity<Test200Response> test(
+    default ResponseEntity<SharedMarketplaceModuleDetail> getModule(
+        @Parameter(name = "code", description = "", required = true, in = ParameterIn.PATH) @PathVariable("code") String code
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"topics\" : [ { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } }, { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } } ], \"difficultyHint\" : \"difficultyHint\", \"description\" : \"description\", \"id\" : \"id\", \"title\" : \"title\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_MY_TUTOR_PROFILE = "/v1/tutors/me";
+    /**
+     * GET /v1/tutors/me : Get my tutor profile
+     * Returns the authenticated user&#39;s tutor profile and module applications, if any.
+     *
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "getMyTutorProfile",
+        summary = "Get my tutor profile",
+        description = "Returns the authenticated user's tutor profile and module applications, if any.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceTutorMeResponse.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_GET_MY_TUTOR_PROFILE,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceTutorMeResponse> getMyTutorProfile(
         
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"message\" : \"message\" }";
+                    String exampleString = "{ \"profile\" : \"{}\", \"applications\" : [ { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" }, { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_TUTOR = "/v1/tutors/{id}";
+    /**
+     * GET /v1/tutors/{id} : Get tutor profile
+     * Returns the public profile of a published tutor, including coverage and availability.
+     *
+     * @param id  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @Operation(
+        operationId = "getTutor",
+        summary = "Get tutor profile",
+        description = "Returns the public profile of a published tutor, including coverage and availability.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceTutorDetail.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_GET_TUTOR,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceTutorDetail> getTutor(
+        @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"ratingSummary\" : { \"average\" : 6.0274563, \"count\" : 1 }, \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\", \"locations\" : [ \"online\", \"online\" ], \"id\" : \"id\", \"availability\" : [ { \"note\" : \"note\", \"weekday\" : \"monday\", \"available\" : true }, { \"note\" : \"note\", \"weekday\" : \"monday\", \"available\" : true } ], \"published\" : true, \"hourlyRate\" : 0.8008282, \"userId\" : \"userId\", \"coverages\" : [ { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"proficiencyLevel\" : \"proficiencyLevel\", \"moduleId\" : \"moduleId\" }, { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"proficiencyLevel\" : \"proficiencyLevel\", \"moduleId\" : \"moduleId\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_LIST_ADMIN_MODULES = "/v1/admin/modules";
+    /**
+     * GET /v1/admin/modules : List modules (admin)
+     * Returns all modules with topics for administration.
+     *
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "listAdminModules",
+        summary = "List modules (admin)",
+        description = "Returns all modules with topics for administration.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SharedMarketplaceModuleDetail.class)))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_LIST_ADMIN_MODULES,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<SharedMarketplaceModuleDetail>> listAdminModules(
+        
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"code\" : \"code\", \"topics\" : [ { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } }, { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } } ], \"difficultyHint\" : \"difficultyHint\", \"description\" : \"description\", \"id\" : \"id\", \"title\" : \"title\" }, { \"code\" : \"code\", \"topics\" : [ { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } }, { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } } ], \"difficultyHint\" : \"difficultyHint\", \"description\" : \"description\", \"id\" : \"id\", \"title\" : \"title\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_LIST_ADMIN_TUTOR_APPLICATIONS = "/v1/admin/tutor-applications";
+    /**
+     * GET /v1/admin/tutor-applications : List tutor applications (admin)
+     * Returns tutor applications for admin review, optionally filtered by status.
+     *
+     * @param status  (optional)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "listAdminTutorApplications",
+        summary = "List tutor applications (admin)",
+        description = "Returns tutor applications for admin review, optionally filtered by status.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SharedMarketplaceTutorApplication.class)))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_LIST_ADMIN_TUTOR_APPLICATIONS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<SharedMarketplaceTutorApplication>> listAdminTutorApplications(
+        @Parameter(name = "status", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "status", required = false) @Nullable SharedMarketplaceApplicationStatus status
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" }, { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_LIST_MODULES = "/v1/modules";
+    /**
+     * GET /v1/modules : List modules
+     * Returns a paginated list of course modules, optionally filtered by search query.
+     *
+     * @param page  (optional, default to 1)
+     * @param pageSize  (optional, default to 20)
+     * @param q  (optional)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "listModules",
+        summary = "List modules",
+        description = "Returns a paginated list of course modules, optionally filtered by search query.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ModulePage.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_LIST_MODULES,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<ModulePage> listModules(
+        @Min(value = 1) @Parameter(name = "page", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @Min(value = 1) @Max(value = 100) @Parameter(name = "pageSize", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize,
+        @Parameter(name = "q", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "q", required = false) @Nullable String q
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"total\" : 1, \"pageSize\" : 6, \"page\" : 0, \"items\" : [ { \"code\" : \"code\", \"difficultyHint\" : \"difficultyHint\", \"description\" : \"description\", \"id\" : \"id\", \"title\" : \"title\" }, { \"code\" : \"code\", \"difficultyHint\" : \"difficultyHint\", \"description\" : \"description\", \"id\" : \"id\", \"title\" : \"title\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_LIST_MY_TUTOR_APPLICATIONS = "/v1/tutor-applications/me";
+    /**
+     * GET /v1/tutor-applications/me : List my tutor applications
+     * Returns all module applications submitted by the authenticated user.
+     *
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "listMyTutorApplications",
+        summary = "List my tutor applications",
+        description = "Returns all module applications submitted by the authenticated user.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SharedMarketplaceTutorApplication.class)))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_LIST_MY_TUTOR_APPLICATIONS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<SharedMarketplaceTutorApplication>> listMyTutorApplications(
+        
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" }, { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_LIST_TUTORS = "/v1/tutors";
+    /**
+     * GET /v1/tutors : Discover tutors
+     * Returns a paginated, filterable list of published tutor profiles.
+     *
+     * @param page  (optional, default to 1)
+     * @param pageSize  (optional, default to 20)
+     * @param q  (optional)
+     * @param moduleId  (optional)
+     * @param topicId  (optional)
+     * @param languages  (optional)
+     * @param locations  (optional)
+     * @param minRate  (optional)
+     * @param maxRate  (optional)
+     * @param minRating  (optional)
+     * @param weekdays  (optional)
+     * @param sort  (optional)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "listTutors",
+        summary = "Discover tutors",
+        description = "Returns a paginated, filterable list of published tutor profiles.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = TutorPage.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_LIST_TUTORS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<TutorPage> listTutors(
+        @Min(value = 1) @Parameter(name = "page", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @Min(value = 1) @Max(value = 100) @Parameter(name = "pageSize", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize,
+        @Parameter(name = "q", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "q", required = false) @Nullable String q,
+        @Parameter(name = "moduleId", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "moduleId", required = false) @Nullable String moduleId,
+        @Parameter(name = "topicId", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "topicId", required = false) @Nullable String topicId,
+        @Parameter(name = "languages", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "languages", required = false) @Nullable List<String> languages,
+        @Parameter(name = "locations", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "locations", required = false) @Nullable List<SharedMarketplaceLocation> locations,
+        @Parameter(name = "minRate", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "minRate", required = false) @Nullable Float minRate,
+        @Parameter(name = "maxRate", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "maxRate", required = false) @Nullable Float maxRate,
+        @Parameter(name = "minRating", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "minRating", required = false) @Nullable Float minRating,
+        @Parameter(name = "weekdays", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "weekdays", required = false) @Nullable List<SharedMarketplaceWeekday> weekdays,
+        @Parameter(name = "sort", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "sort", required = false) @Nullable SharedMarketplaceTutorSort sort
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"total\" : 2, \"pageSize\" : 5, \"page\" : 5, \"items\" : [ { \"ratingSummary\" : { \"average\" : 6.0274563, \"count\" : 1 }, \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"locations\" : [ \"online\", \"online\" ], \"id\" : \"id\", \"hourlyRate\" : 0.8008282, \"userId\" : \"userId\", \"coverages\" : [ { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"proficiencyLevel\" : \"proficiencyLevel\", \"moduleId\" : \"moduleId\" }, { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"proficiencyLevel\" : \"proficiencyLevel\", \"moduleId\" : \"moduleId\" } ] }, { \"ratingSummary\" : { \"average\" : 6.0274563, \"count\" : 1 }, \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"locations\" : [ \"online\", \"online\" ], \"id\" : \"id\", \"hourlyRate\" : 0.8008282, \"userId\" : \"userId\", \"coverages\" : [ { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"proficiencyLevel\" : \"proficiencyLevel\", \"moduleId\" : \"moduleId\" }, { \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"proficiencyLevel\" : \"proficiencyLevel\", \"moduleId\" : \"moduleId\" } ] } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_REJECT_TUTOR_APPLICATION = "/v1/admin/tutor-applications/{id}/reject";
+    /**
+     * POST /v1/admin/tutor-applications/{id}/reject : Reject tutor application (admin)
+     * Rejects a pending tutor application with an optional reason.
+     *
+     * @param id  (required)
+     * @param sharedMarketplaceRejectApplicationRequest  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @Operation(
+        operationId = "rejectTutorApplication",
+        summary = "Reject tutor application (admin)",
+        description = "Rejects a pending tutor application with an optional reason.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceTutorApplication.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = V1Api.PATH_REJECT_TUTOR_APPLICATION,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceTutorApplication> rejectTutorApplication(
+        @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "SharedMarketplaceRejectApplicationRequest", description = "", required = true) @Valid @RequestBody SharedMarketplaceRejectApplicationRequest sharedMarketplaceRejectApplicationRequest
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_SUBMIT_TUTOR_APPLICATION = "/v1/tutor-applications";
+    /**
+     * POST /v1/tutor-applications : Submit tutor application
+     * Submits a module tutoring application, optionally including an initial tutor profile on first apply.
+     *
+     * @param sharedMarketplaceSubmitTutorApplicationRequest  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "submitTutorApplication",
+        summary = "Submit tutor application",
+        description = "Submits a module tutoring application, optionally including an initial tutor profile on first apply.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceTutorApplication.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The server could not understand the request due to invalid syntax.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = V1Api.PATH_SUBMIT_TUTOR_APPLICATION,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceTutorApplication> submitTutorApplication(
+        @Parameter(name = "SharedMarketplaceSubmitTutorApplicationRequest", description = "", required = true) @Valid @RequestBody SharedMarketplaceSubmitTutorApplicationRequest sharedMarketplaceSubmitTutorApplicationRequest
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"moduleCode\" : \"moduleCode\", \"moduleTitle\" : \"moduleTitle\", \"id\" : \"id\", \"moduleId\" : \"moduleId\", \"submittedAt\" : \"2000-01-23T04:56:07.000+00:00\", \"rejectionReason\" : \"rejectionReason\", \"userId\" : \"userId\", \"status\" : \"pending\", \"certificateRef\" : \"certificateRef\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPDATE_ADMIN_MODULE = "/v1/admin/modules/{code}";
+    /**
+     * PUT /v1/admin/modules/{code} : Update module (admin)
+     * Updates an existing module identified by code.
+     *
+     * @param code  (required)
+     * @param sharedMarketplaceAdminModuleUpdateInput  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @Operation(
+        operationId = "updateAdminModule",
+        summary = "Update module (admin)",
+        description = "Updates an existing module identified by code.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceModuleDetail.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = V1Api.PATH_UPDATE_ADMIN_MODULE,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceModuleDetail> updateAdminModule(
+        @Parameter(name = "code", description = "", required = true, in = ParameterIn.PATH) @PathVariable("code") String code,
+        @Parameter(name = "SharedMarketplaceAdminModuleUpdateInput", description = "", required = true) @Valid @RequestBody SharedMarketplaceAdminModuleUpdateInput sharedMarketplaceAdminModuleUpdateInput
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"topics\" : [ { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } }, { \"difficultyHint\" : \"difficultyHint\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"studyFocus\" : { \"memorization\" : 1, \"conceptualUnderstanding\" : 1, \"problemSolving\" : 3, \"formalReasoning\" : 3 } } ], \"difficultyHint\" : \"difficultyHint\", \"description\" : \"description\", \"id\" : \"id\", \"title\" : \"title\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPDATE_MY_TUTOR_PROFILE = "/v1/tutors/me";
+    /**
+     * PUT /v1/tutors/me : Update my tutor profile
+     * Updates the authenticated tutor&#39;s profile fields and publish status.
+     *
+     * @param sharedMarketplaceTutorProfileInput  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "updateMyTutorProfile",
+        summary = "Update my tutor profile",
+        description = "Updates the authenticated tutor's profile fields and publish status.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedMarketplaceTutorProfile.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The server could not understand the request due to invalid syntax.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = V1Api.PATH_UPDATE_MY_TUTOR_PROFILE,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedMarketplaceTutorProfile> updateMyTutorProfile(
+        @Parameter(name = "SharedMarketplaceTutorProfileInput", description = "", required = true) @Valid @RequestBody SharedMarketplaceTutorProfileInput sharedMarketplaceTutorProfileInput
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\", \"locations\" : [ \"online\", \"online\" ], \"availability\" : [ { \"note\" : \"note\", \"weekday\" : \"monday\", \"available\" : true }, { \"note\" : \"note\", \"weekday\" : \"monday\", \"available\" : true } ], \"published\" : false, \"id\" : \"id\", \"hourlyRate\" : 0.8008282, \"userId\" : \"userId\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

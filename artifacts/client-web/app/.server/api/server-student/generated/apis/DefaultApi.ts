@@ -15,10 +15,24 @@
 
 import * as runtime from '../runtime';
 import {
-    type Test200Response,
-    Test200ResponseFromJSON,
-    Test200ResponseToJSON,
-} from '../models/Test200Response';
+    type SharedErrorsErrorBody,
+    SharedErrorsErrorBodyFromJSON,
+    SharedErrorsErrorBodyToJSON,
+} from '../models/SharedErrorsErrorBody';
+import {
+    type SharedStudentStudentProfile,
+    SharedStudentStudentProfileFromJSON,
+    SharedStudentStudentProfileToJSON,
+} from '../models/SharedStudentStudentProfile';
+import {
+    type SharedStudentStudentProfileInput,
+    SharedStudentStudentProfileInputFromJSON,
+    SharedStudentStudentProfileInputToJSON,
+} from '../models/SharedStudentStudentProfileInput';
+
+export interface UpdateMyProfileRequest {
+    sharedStudentStudentProfileInput: SharedStudentStudentProfileInput;
+}
 
 /**
  * 
@@ -26,9 +40,9 @@ import {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for test without sending the request
+     * Creates request options for getMyProfile without sending the request
      */
-    async testRequestOpts(): Promise<runtime.RequestOpts> {
+    async getMyProfileRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -42,7 +56,7 @@ export class DefaultApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/v1/test`;
+        let urlPath = `/v1/students/me`;
 
         return {
             path: urlPath,
@@ -53,18 +67,79 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns the authenticated student\'s profile. New students receive an empty default profile.
+     * Get my student profile
      */
-    async testRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Test200Response>> {
-        const requestOptions = await this.testRequestOpts();
+    async getMyProfileRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentStudentProfile>> {
+        const requestOptions = await this.getMyProfileRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => Test200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedStudentStudentProfileFromJSON(jsonValue));
     }
 
     /**
+     * Returns the authenticated student\'s profile. New students receive an empty default profile.
+     * Get my student profile
      */
-    async test(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Test200Response> {
-        const response = await this.testRaw(initOverrides);
+    async getMyProfile(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentStudentProfile> {
+        const response = await this.getMyProfileRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for updateMyProfile without sending the request
+     */
+    async updateMyProfileRequestOpts(requestParameters: UpdateMyProfileRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sharedStudentStudentProfileInput'] == null) {
+            throw new runtime.RequiredError(
+                'sharedStudentStudentProfileInput',
+                'Required parameter "sharedStudentStudentProfileInput" was null or undefined when calling updateMyProfile().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/students/me`;
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedStudentStudentProfileInputToJSON(requestParameters['sharedStudentStudentProfileInput']),
+        };
+    }
+
+    /**
+     * Creates or updates the authenticated student\'s display name, bio, languages, and study focus.
+     * Update my student profile
+     */
+    async updateMyProfileRaw(requestParameters: UpdateMyProfileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentStudentProfile>> {
+        const requestOptions = await this.updateMyProfileRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedStudentStudentProfileFromJSON(jsonValue));
+    }
+
+    /**
+     * Creates or updates the authenticated student\'s display name, bio, languages, and study focus.
+     * Update my student profile
+     */
+    async updateMyProfile(requestParameters: UpdateMyProfileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentStudentProfile> {
+        const response = await this.updateMyProfileRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
