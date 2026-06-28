@@ -13,7 +13,7 @@ The AI component is a FastAPI service that wraps a configurable LLM (Ollama, LM 
 | `mode` | `"standard" \| "cost_optimized"` | Controls overall optimisation strategy |
 | `student.id` | string | Unique student identifier |
 | `student.name` | string | Display name |
-| `student.preferredLanguages` | string[] | e.g. `["en", "de"]` — used to filter tutors |
+| `student.preferredLanguages` | string[] | e.g. `["en", "de"]` — **primary filter for tutor selection**; only tutors who teach in at least one of these languages are considered. Falls back to all tutors if none match. |
 | `course.id` | string | Course / module identifier |
 | `course.name` | string | Human-readable course name (e.g. "Linear Algebra") |
 | `course.topics` | `Topic[]` | Ordered list of topics with difficulty levels |

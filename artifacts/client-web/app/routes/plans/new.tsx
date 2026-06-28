@@ -91,10 +91,16 @@ function buildPlan(
     strategy: 'cheapest' | 'within_budget' | 'best_quality',
     budgetEur: number,
     selectedTopicIds: string[],
+    preferredLanguage: string,
 ): SuggestedPlan {
     const targetTopics = topics.filter((t) => selectedTopicIds.includes(t.id));
 
-    const sorted = [...tutors].sort((a, b) => {
+    // language filter: keep tutors who speak the preferred language (or all if "any")
+    const langFiltered =
+        preferredLanguage === 'any' ? tutors : tutors.filter((t) => t.languages.includes(preferredLanguage));
+    const pool = langFiltered.length > 0 ? langFiltered : tutors;
+
+    const sorted = [...pool].sort((a, b) => {
         if (strategy === 'cheapest') return a.hourlyRate - b.hourlyRate;
         if (strategy === 'best_quality') return b.rating - a.rating || b.sessions - a.sessions;
         // within_budget: prefer best rating while staying cheap enough
@@ -245,8 +251,8 @@ function PlanCard({ plan }: { plan: SuggestedPlan }) {
                 </table>
             )}
 
-            <Button className="mt-1 w-full" size="sm">
-                Use this plan
+            <Button className="mt-1 w-full" size="sm" variant="outline">
+                Browse tutors in this plan
             </Button>
         </div>
     );
@@ -259,6 +265,7 @@ function PlanCard({ plan }: { plan: SuggestedPlan }) {
 export default function NewPlanRoute() {
     const [courseTopic, setCourseTopic] = useState('Linear Algebra (MA0901)');
     const [budget, setBudget] = useState('80');
+    const [preferredLanguage, setPreferredLanguage] = useState('any');
     const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>(MOCK_TOPICS.map((t) => t.id));
     const [selectedTutorIds, setSelectedTutorIds] = useState<string[]>(MOCK_TUTORS.map((t) => t.id));
     const [plans, setPlans] = useState<SuggestedPlan[] | null>(null);
@@ -285,9 +292,9 @@ export default function NewPlanRoute() {
         // Simulate async latency
         setTimeout(() => {
             setPlans([
-                buildPlan(topics, eligibleTutors, 'cheapest', budgetNum, selectedTopicIds),
-                buildPlan(topics, eligibleTutors, 'within_budget', budgetNum, selectedTopicIds),
-                buildPlan(topics, eligibleTutors, 'best_quality', budgetNum, selectedTopicIds),
+                buildPlan(topics, eligibleTutors, 'cheapest', budgetNum, selectedTopicIds, preferredLanguage),
+                buildPlan(topics, eligibleTutors, 'within_budget', budgetNum, selectedTopicIds, preferredLanguage),
+                buildPlan(topics, eligibleTutors, 'best_quality', budgetNum, selectedTopicIds, preferredLanguage),
             ]);
             setGenerating(false);
         }, 900);
@@ -338,6 +345,37 @@ export default function NewPlanRoute() {
                         />
                         <p className="text-xs text-muted-foreground">
                             Used for the "within budget" plan tier. The cheapest and best-quality tiers ignore this.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <span className="text-sm font-medium text-foreground">Preferred language</span>
+                        <div className="flex flex-wrap gap-2">
+                            {[
+                                { code: 'any', label: 'Any' },
+                                { code: 'en', label: 'English' },
+                                { code: 'de', label: 'German' },
+                                { code: 'es', label: 'Spanish' },
+                                { code: 'zh', label: 'Chinese' },
+                            ].map((lang) => (
+                                <button
+                                    className={cn(
+                                        'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                                        preferredLanguage === lang.code
+                                            ? 'border-primary bg-primary text-primary-foreground'
+                                            : 'border-border bg-card/50 text-muted-foreground hover:border-primary/50 hover:text-foreground',
+                                    )}
+                                    key={lang.code}
+                                    onClick={() => setPreferredLanguage(lang.code)}
+                                    type="button"
+                                >
+                                    {lang.label}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Only tutors who teach in this language are considered. Falls back to all tutors if none
+                            match.
                         </p>
                     </div>
 
