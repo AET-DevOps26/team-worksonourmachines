@@ -16,6 +16,9 @@ clientWeb:
   serverMarketplaceApiUrl: tbd
   serverStudentApiUrl: tbd
 
+apiUi:
+  image: ghcr.io/aet-devops26/team-worksonourmachines/api-ui:latest
+
 postgres:
   db: tutormatch
   user: tutormatch
