@@ -11,3 +11,8 @@ auth.{$APP_HOSTNAME} {
 	tls internal
 	reverse_proxy keycloak:8080
 }
+
+api.{$APP_HOSTNAME} {
+	tls internal
+	reverse_proxy api-ui:8080
+}
