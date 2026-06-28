@@ -43,7 +43,8 @@ Each service mounts host source code. Runtime dependencies are either baked into
 - **keycloak** uses the upstream Keycloak image in development mode and stores state in Postgres. It is not published to the host; reach it through the gateway at `https://auth.tutormatch.localhost`.
 - **keycloak-config-cli** applies the committed realm config from `artifacts/keycloak/import/` after Keycloak is healthy (see Local Keycloak below).
 - **redis** stores BFF session data and short-lived OIDC login transactions. The web app connects at `redis://redis:6379`.
-- **gateway** runs Caddy and is the only service that publishes ports `80` and `443`. It terminates TLS and routes traffic to `client-web` and `keycloak`.
+- **api-ui** serves the generated OpenAPI specs via Scalar. It mounts `api/specs/` read-only; restart is not required after `make api-generate`, only a browser refresh.
+- **gateway** runs Caddy and is the only service that publishes ports `80` and `443`. It terminates TLS and routes traffic to `client-web`, `keycloak`, and `api-ui`.
 
 Rebuild dev images when you change a `Dockerfile` or `requirements.txt` / lockfiles that affect the image build:
 
@@ -101,12 +102,13 @@ The stack exposes a single HTTPS entry point through Caddy (`gateway` service). 
 |---------|-----|
 | Web app (BFF + frontend) | <https://tutormatch.localhost> |
 | Keycloak (login + admin console) | <https://auth.tutormatch.localhost> |
+| API reference (OpenAPI specs) | <https://api.tutormatch.localhost> |
 
 Browsers resolve `*.localhost` to `127.0.0.1` (RFC 6761), so no `/etc/hosts` entries are needed.
 
 Caddy uses an internal CA for local HTTPS (`tls internal`). Your browser may warn on the first visit — accept the certificate or trust Caddy's local root to continue.
 
-Configuration lives under `artifacts/gateway/`. Both Caddyfiles route `{$APP_HOSTNAME}` to the web app and `auth.{$APP_HOSTNAME}` to Keycloak. Default `APP_HOSTNAME` is `tutormatch.localhost`.
+Configuration lives under `artifacts/gateway/`. Both Caddyfiles route `{$APP_HOSTNAME}` to the web app, `auth.{$APP_HOSTNAME}` to Keycloak, and `api.{$APP_HOSTNAME}` to the API reference UI. Default `APP_HOSTNAME` is `tutormatch.localhost`.
 
 - `Caddyfile.dev` — local development with `tls internal` (default)
 - `Caddyfile.prod` — VPS deployment with nip.io hostnames and automatic Let's Encrypt certificates
