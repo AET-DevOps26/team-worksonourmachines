@@ -1,11 +1,20 @@
 name: tutormatch
 
+x-hardening: &hardening
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
 services:
   gateway:
+    <<: *hardening
     image: caddy:2-alpine
+    cap_add:
+      - NET_BIND_SERVICE
     ports:
-      - 80:80
-      - 443:443
+      - 127.0.0.1:80:80
+      - 127.0.0.1:443:443
     environment:
       APP_HOSTNAME: ${APP_HOSTNAME:-tutormatch.localhost}
     volumes:
@@ -15,13 +24,25 @@ services:
     depends_on:
       - client-web
       - keycloak
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:2019/config/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       default:
         aliases:
           - auth.${APP_HOSTNAME:-tutormatch.localhost}
 
   postgres:
+    <<: *hardening
     image: postgres:17-alpine
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-tutormatch}
       POSTGRES_USER: ${POSTGRES_USER:-tutormatch}
@@ -33,7 +54,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./artifacts/postgres/init:/docker-entrypoint-initdb.d:Z
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -41,6 +62,7 @@ services:
       retries: 10
 
   keycloak:
+    <<: *hardening
     image: quay.io/keycloak/keycloak:26.6.1
     command: ["start"]
     environment:
@@ -53,7 +75,7 @@ services:
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
       KC_FEATURE_LOGIN: ${KEYCLOAK_LOGIN_FEATURE:-v1}
       KC_HEALTH_ENABLED: "true"
-      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}}
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-https://auth.tutormatch.localhost}
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
       KC_PROXY_HEADERS: xforwarded
@@ -68,7 +90,11 @@ services:
       start_period: 60s
 
   redis:
+    <<: *hardening
     image: redis:7-alpine
+    cap_add:
+      - SETUID
+      - SETGID
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -76,6 +102,7 @@ services:
       retries: 10
 
   keycloak-config-cli:
+    <<: *hardening
     image: adorsys/keycloak-config-cli:latest
     command:
       - "--import.var-substitution.enabled=true"
@@ -101,6 +128,7 @@ services:
     restart: "no"
 
   client-web:
+    <<: *hardening
     build:
       context: .
       dockerfile: artifacts/client-web/docker/Dockerfile
@@ -113,8 +141,8 @@ services:
       CI: "true"
       LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
       LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
-      APP_BASE_URL: ${APP_BASE_URL:-https://${APP_HOSTNAME:-tutormatch.localhost}}
-      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
+      APP_BASE_URL: ${APP_BASE_URL:-https://tutormatch.localhost}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
       NODE_EXTRA_CA_CERTS: /caddy-data/caddy/pki/authorities/local/root.crt
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
@@ -127,8 +155,15 @@ services:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:5173/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
 
   ollama:
+    <<: *hardening
     image: ollama/ollama
     volumes:
       - ollama_data:/root/.ollama
@@ -141,6 +176,7 @@ services:
       start_period: 120s
 
   ai:
+    <<: *hardening
     build:
       context: .
       dockerfile: artifacts/ai/docker/Dockerfile
@@ -148,7 +184,7 @@ services:
     volumes:
       - ./artifacts/ai:/app:Z
     ports:
-      - 8000:8000
+      - 127.0.0.1:8000:8000
     environment:
       LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
       LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
@@ -158,10 +194,17 @@ services:
     depends_on:
       ollama:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # ----------------------------- tooling -----------------------------
 
   api-tooling:
+    <<: *hardening
     profiles: ["tooling"]
     build:
       context: .
@@ -175,6 +218,7 @@ services:
       - pnpm-store:/pnpm/store
 
   client-web-tooling:
+    <<: *hardening
     profiles: ["tooling"]
     build:
       context: .
@@ -191,6 +235,7 @@ services:
       - pnpm-store:/pnpm/store
 
   ai-tooling:
+    <<: *hardening
     profiles: ["tooling"]
     build:
       context: .
