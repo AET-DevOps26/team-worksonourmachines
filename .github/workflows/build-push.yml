@@ -39,6 +39,7 @@ jobs:
           file: artifacts/ai/docker/Dockerfile
           target: prod
           push: true
+          provenance: false
           tags: |
             ${{ env.IMAGE_PREFIX }}/ai:latest
             ${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }}
@@ -52,6 +53,7 @@ jobs:
           file: artifacts/client-web/docker/Dockerfile
           target: prod
           push: true
+          provenance: false
           tags: |
             ${{ env.IMAGE_PREFIX }}/client-web:latest
             ${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }}
