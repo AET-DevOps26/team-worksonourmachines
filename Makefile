@@ -9,6 +9,7 @@ SERVER_STUDENT_DIR := $(ROOT_DIR)/artifacts/server-student
 
 CONTAINER ?= docker
 COMPOSE := $(CONTAINER) compose
+COMPOSE_APP := $(COMPOSE) --profile dev
 COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) --profile tooling
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
 
@@ -25,7 +26,7 @@ help: ## Show this help message
 
 .PHONY: up
 up: ## Start all services
-	@$(COMPOSE) up -d
+	@$(COMPOSE_APP) up -d
 
 .PHONY: down
 down: ## Stop all services

@@ -27,7 +27,7 @@ Run the command `make init` to setup a local development environment including t
 
 ### Running the Application
 
-To start the project without initializing the full development environment, run `make setup-env` and then `make up` (or `docker compose up`). Stop services with `make down`.
+To start the project without initializing the full development environment, run `make setup-env` and then `make up` (or `docker compose --profile dev up`). Stop services with `make down`.
 
 ### Cleaning up
 
