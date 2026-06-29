@@ -2,7 +2,7 @@
   "realm": "tutormatch",
   "displayName": "TUtorMatch",
   "enabled": true,
-  "registrationAllowed": false,
+  "registrationAllowed": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
@@ -118,6 +118,7 @@
       ]
     },
     {
+      "id": "11111111-1111-1111-1111-111111111101",
       "username": "lukas.student@example.com",
       "email": "lukas.student@example.com",
       "firstName": "Lukas",

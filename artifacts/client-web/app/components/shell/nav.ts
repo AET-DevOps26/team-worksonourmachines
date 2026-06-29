@@ -58,10 +58,7 @@ function hasRole(roles: readonly string[], role: string) {
 export function getProfileMenuGroups(roles: readonly string[]): ProfileMenuGroup[] {
     const groups: ProfileMenuGroup[] = [
         {
-            links: [
-                { href: '/me/profile', label: 'My profile' },
-                { href: '/onboarding', label: 'Complete setup' },
-            ],
+            links: [{ href: '/me/profile', label: 'My profile' }],
         },
     ];
 
