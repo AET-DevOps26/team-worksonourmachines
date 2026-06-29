@@ -85,7 +85,7 @@ export default function HomeRoute() {
     const isTutor = user ? hasRole(user.roles, 'tutor') : false;
 
     return (
-        <div className="flex flex-col">
+        <div className="-mx-6 flex flex-col">
             <section className="border-b border-border bg-muted/30">
                 <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-16 md:py-24">
                     <div className="flex max-w-3xl flex-col gap-4">

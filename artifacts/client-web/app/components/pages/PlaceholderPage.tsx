@@ -10,7 +10,7 @@ export function PlaceholderPage({ title, description, paragraphCount = 2 }: Plac
     const paragraphs = LOREM_PARAGRAPHS.slice(0, paragraphCount);
 
     return (
-        <div className="mx-auto w-full max-w-3xl px-6 py-12">
+        <div className="mx-auto w-full max-w-3xl">
             <header className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm">
                 <p className="w-fit rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
                     Placeholder
