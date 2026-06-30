@@ -18,48 +18,74 @@ const MOCK_TOPICS = [
 
 const MOCK_TUTORS = [
     {
+        availability: [
+            { available: true, weekday: 'monday' },
+            { available: true, weekday: 'wednesday' },
+            { available: true, weekday: 'friday' },
+        ],
+        displayName: 'Anna Schmidt',
         hourlyRate: 15,
         id: 'u1',
         languages: ['de', 'en'],
-        name: 'Anna Schmidt',
-        rating: 4.8,
-        sessions: 42,
+        locations: ['garching', 'weihenstephan', 'online'],
+        ratingSummary: { average: 4.8, count: 42 },
         topicIds: ['t1', 't2', 't4'],
     },
     {
+        availability: [
+            { available: true, weekday: 'tuesday' },
+            { available: true, weekday: 'thursday' },
+            { available: true, weekday: 'saturday' },
+        ],
+        displayName: 'Carlos Fernández',
         hourlyRate: 20,
         id: 'u2',
         languages: ['en', 'es'],
-        name: 'Carlos Fernández',
-        rating: 4.9,
-        sessions: 67,
+        locations: ['munich', 'olympia_park', 'online'],
+        ratingSummary: { average: 4.9, count: 67 },
         topicIds: ['t2', 't3', 't5', 't6'],
     },
     {
+        availability: [
+            { available: true, weekday: 'monday' },
+            { available: true, weekday: 'thursday' },
+        ],
+        displayName: 'Mei Lin',
         hourlyRate: 12,
         id: 'u3',
         languages: ['en', 'zh'],
-        name: 'Mei Lin',
-        rating: 4.6,
-        sessions: 29,
+        locations: ['garching'],
+        ratingSummary: { average: 4.6, count: 29 },
         topicIds: ['t1', 't3', 't4'],
     },
     {
+        availability: [
+            { available: true, weekday: 'monday' },
+            { available: true, weekday: 'tuesday' },
+            { available: true, weekday: 'wednesday' },
+            { available: true, weekday: 'thursday' },
+            { available: true, weekday: 'friday' },
+        ],
+        displayName: 'Jonas Weber',
         hourlyRate: 25,
         id: 'u4',
         languages: ['de', 'en'],
-        name: 'Jonas Weber',
-        rating: 5.0,
-        sessions: 110,
+        locations: ['garching', 'munich', 'weihenstephan', 'olympia_park', 'online'],
+        ratingSummary: { average: 5.0, count: 110 },
         topicIds: ['t1', 't2', 't3', 't4', 't5', 't6'],
     },
     {
+        availability: [
+            { available: true, weekday: 'wednesday' },
+            { available: true, weekday: 'friday' },
+            { available: true, weekday: 'sunday' },
+        ],
+        displayName: 'Priya Nair',
         hourlyRate: 18,
         id: 'u5',
         languages: ['en'],
-        name: 'Priya Nair',
-        rating: 4.7,
-        sessions: 55,
+        locations: ['munich', 'olympia_park'],
+        ratingSummary: { average: 4.7, count: 55 },
         topicIds: ['t3', 't5', 't6'],
     },
 ];
@@ -92,19 +118,28 @@ function buildPlan(
     budgetEur: number,
     selectedTopicIds: string[],
     preferredLanguage: string,
+    preferredLocations: string[],
 ): SuggestedPlan {
     const targetTopics = topics.filter((t) => selectedTopicIds.includes(t.id));
 
     // language filter: keep tutors who speak the preferred language (or all if "any")
     const langFiltered =
         preferredLanguage === 'any' ? tutors : tutors.filter((t) => t.languages.includes(preferredLanguage));
-    const pool = langFiltered.length > 0 ? langFiltered : tutors;
+    const afterLang = langFiltered.length > 0 ? langFiltered : tutors;
+
+    // location filter: keep tutors who cover at least one preferred location (or all if none selected)
+    const locFiltered =
+        preferredLocations.length === 0
+            ? afterLang
+            : afterLang.filter((t) => t.locations.some((l) => preferredLocations.includes(l)));
+    const pool = locFiltered.length > 0 ? locFiltered : afterLang;
 
     const sorted = [...pool].sort((a, b) => {
         if (strategy === 'cheapest') return a.hourlyRate - b.hourlyRate;
-        if (strategy === 'best_quality') return b.rating - a.rating || b.sessions - a.sessions;
+        if (strategy === 'best_quality')
+            return b.ratingSummary.average - a.ratingSummary.average || b.ratingSummary.count - a.ratingSummary.count;
         // within_budget: prefer best rating while staying cheap enough
-        return a.hourlyRate - b.hourlyRate || b.rating - a.rating;
+        return a.hourlyRate - b.hourlyRate || b.ratingSummary.average - a.ratingSummary.average;
     });
 
     const schedule: ScheduleEntry[] = [];
@@ -121,7 +156,7 @@ function buildPlan(
             // pick the highest-rated tutor whose cost still fits within the remaining budget
             const fits = eligible.filter((t) => totalCost + t.hourlyRate <= budgetEur);
             const bestFit = fits.reduce<(typeof MOCK_TUTORS)[number] | undefined>(
-                (best, t) => (!best || t.rating > best.rating ? t : best),
+                (best, t) => (!best || t.ratingSummary.average > best.ratingSummary.average ? t : best),
                 undefined,
             );
             if (bestFit) chosen = bestFit;
@@ -132,7 +167,7 @@ function buildPlan(
             topicId: topic.id,
             topicName: topic.name,
             tutorId: chosen.id,
-            tutorName: chosen.name,
+            tutorName: chosen.displayName,
         });
         totalCost += chosen.hourlyRate;
     }
@@ -265,12 +300,18 @@ function PlanCard({ plan }: { plan: SuggestedPlan }) {
 export default function NewPlanRoute() {
     const [courseTopic, setCourseTopic] = useState('Linear Algebra (MA0901)');
     const [budget, setBudget] = useState('80');
+    const [context, setContext] = useState('');
+    const [studyGoal, setStudyGoal] = useState<'pass' | 'good_grade' | 'top_grade'>('pass');
+    const [milestoneDate, setMilestoneDate] = useState('');
     const [preferredLanguage, setPreferredLanguage] = useState('any');
+    const [preferredLocations, setPreferredLocations] = useState<string[]>([]);
     const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>(MOCK_TOPICS.map((t) => t.id));
     const [selectedTutorIds, setSelectedTutorIds] = useState<string[]>(MOCK_TUTORS.map((t) => t.id));
     const [plans, setPlans] = useState<SuggestedPlan[] | null>(null);
     const courseTopicId = useId();
     const budgetId = useId();
+    const contextId = useId();
+    const milestoneDateId = useId();
     const [generating, setGenerating] = useState(false);
 
     function toggleTopic(id: string) {
@@ -291,10 +332,11 @@ export default function NewPlanRoute() {
 
         // Simulate async latency
         setTimeout(() => {
+            const sharedArgs = [budgetNum, selectedTopicIds, preferredLanguage, preferredLocations] as const;
             setPlans([
-                buildPlan(topics, eligibleTutors, 'cheapest', budgetNum, selectedTopicIds, preferredLanguage),
-                buildPlan(topics, eligibleTutors, 'within_budget', budgetNum, selectedTopicIds, preferredLanguage),
-                buildPlan(topics, eligibleTutors, 'best_quality', budgetNum, selectedTopicIds, preferredLanguage),
+                buildPlan(topics, eligibleTutors, 'cheapest', ...sharedArgs),
+                buildPlan(topics, eligibleTutors, 'within_budget', ...sharedArgs),
+                buildPlan(topics, eligibleTutors, 'best_quality', ...sharedArgs),
             ]);
             setGenerating(false);
         }, 900);
@@ -349,6 +391,67 @@ export default function NewPlanRoute() {
                     </div>
 
                     <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-foreground" htmlFor={milestoneDateId}>
+                            Exam / milestone date
+                        </label>
+                        <Input
+                            id={milestoneDateId}
+                            onChange={(e) => setMilestoneDate(e.target.value)}
+                            type="date"
+                            value={milestoneDate}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            The AI schedules sessions to fit before this deadline.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <span className="text-sm font-medium text-foreground">Study goal</span>
+                        <div className="flex gap-2">
+                            {(
+                                [
+                                    { label: 'Pass', value: 'pass' },
+                                    { label: 'Good grade', value: 'good_grade' },
+                                    { label: 'Top grade', value: 'top_grade' },
+                                ] as const
+                            ).map((g) => (
+                                <button
+                                    className={cn(
+                                        'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                                        studyGoal === g.value
+                                            ? 'border-primary bg-primary text-primary-foreground'
+                                            : 'border-border bg-card/50 text-muted-foreground hover:border-primary/50 hover:text-foreground',
+                                    )}
+                                    key={g.value}
+                                    onClick={() => setStudyGoal(g.value)}
+                                    type="button"
+                                >
+                                    {g.label}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Influences how intensively the AI schedules sessions.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-foreground" htmlFor={contextId}>
+                            Additional context
+                        </label>
+                        <textarea
+                            className="min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            id={contextId}
+                            onChange={(e) => setContext(e.target.value)}
+                            placeholder="e.g. I struggle with proofs but my exam is in 3 weeks"
+                            value={context}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Passed directly to the AI for richer personalisation.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
                         <span className="text-sm font-medium text-foreground">Preferred language</span>
                         <div className="flex flex-wrap gap-2">
                             {[
@@ -376,6 +479,42 @@ export default function NewPlanRoute() {
                         <p className="text-xs text-muted-foreground">
                             Only tutors who teach in this language are considered. Falls back to all tutors if none
                             match.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <span className="text-sm font-medium text-foreground">Preferred location</span>
+                        <div className="flex flex-wrap gap-2">
+                            {[
+                                { code: 'garching', label: 'Garching' },
+                                { code: 'munich', label: 'City Center' },
+                                { code: 'weihenstephan', label: 'Freising' },
+                                { code: 'olympia_park', label: 'Olympia Park' },
+                                { code: 'online', label: 'Online' },
+                            ].map((loc) => (
+                                <button
+                                    className={cn(
+                                        'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                                        preferredLocations.includes(loc.code)
+                                            ? 'border-primary bg-primary text-primary-foreground'
+                                            : 'border-border bg-card/50 text-muted-foreground hover:border-primary/50 hover:text-foreground',
+                                    )}
+                                    key={loc.code}
+                                    onClick={() =>
+                                        setPreferredLocations((prev) =>
+                                            prev.includes(loc.code)
+                                                ? prev.filter((x) => x !== loc.code)
+                                                : [...prev, loc.code],
+                                        )
+                                    }
+                                    type="button"
+                                >
+                                    {loc.label}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Select one or more locations. Leave empty to include all.
                         </p>
                     </div>
 
@@ -467,29 +606,28 @@ export default function NewPlanRoute() {
                                 />
                                 <div className="flex flex-1 flex-col gap-1">
                                     <div className="flex items-center justify-between gap-2">
-                                        <span className="text-sm font-medium text-foreground">{tutor.name}</span>
+                                        <span className="text-sm font-medium text-foreground">{tutor.displayName}</span>
                                         <span className="text-sm font-semibold text-foreground">
                                             €{tutor.hourlyRate}/h
                                         </span>
                                     </div>
                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                                         <span>
-                                            ⭐ {tutor.rating} · {tutor.sessions} sessions
+                                            ⭐ {tutor.ratingSummary.average} · {tutor.ratingSummary.count} sessions
                                         </span>
                                         <span>{tutor.languages.join(', ').toUpperCase()}</span>
                                     </div>
                                     <div className="mt-1 flex flex-wrap gap-1">
-                                        {tutor.topicIds.map((tid) => {
-                                            const topic = MOCK_TOPICS.find((t) => t.id === tid);
-                                            return topic ? (
+                                        {tutor.availability
+                                            .filter((a) => a.available)
+                                            .map((a) => (
                                                 <span
-                                                    className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground"
-                                                    key={tid}
+                                                    className="rounded bg-muted px-1.5 py-0.5 text-xs capitalize text-muted-foreground"
+                                                    key={a.weekday}
                                                 >
-                                                    {topic.name.split(' ')[0]}
+                                                    {a.weekday.slice(0, 3)}
                                                 </span>
-                                            ) : null;
-                                        })}
+                                            ))}
                                     </div>
                                 </div>
                             </label>
