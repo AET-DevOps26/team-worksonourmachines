@@ -205,7 +205,8 @@ Get the VM IP and open an SSH session:
 
 ```bash
 vm_ip="$(terraform -chdir=artifacts/terraform/azure-vm output -raw public_ip_address)"
-ssh azureadmin@"${vm_ip}"
+vm_user="$(terraform -chdir=artifacts/terraform/azure-vm output -raw admin_username)"
+ssh "${vm_user}@${vm_ip}"
 ```
 
 Then run these commands on the VM:
@@ -260,7 +261,8 @@ The script runs the equivalent VM-local Compose stop:
 
 ```bash
 vm_ip="$(terraform -chdir=artifacts/terraform/azure-vm output -raw public_ip_address)"
-ssh azureadmin@"${vm_ip}" \
+vm_user="$(terraform -chdir=artifacts/terraform/azure-vm output -raw admin_username)"
+ssh "${vm_user}@${vm_ip}" \
   'sudo -iu tutormatch sh -lc "cd /opt/tutormatch && docker compose --env-file .env.azure --profile prod down"'
 ```
 
