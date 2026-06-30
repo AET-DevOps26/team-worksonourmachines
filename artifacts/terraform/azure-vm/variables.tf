@@ -5,9 +5,13 @@ variable "name_prefix" {
 }
 
 variable "subscription_id" {
-  description = "Azure subscription id. Leave null to use ARM_SUBSCRIPTION_ID or Azure CLI context if supported by the provider."
+  description = "Azure subscription id used by the AzureRM provider."
   type        = string
-  default     = null
+
+  validation {
+    condition     = can(regex("^[0-9a-fA-F-]{36}$", var.subscription_id)) && var.subscription_id != "00000000-0000-0000-0000-000000000000"
+    error_message = "subscription_id must be a real Azure subscription UUID."
+  }
 }
 
 variable "location" {

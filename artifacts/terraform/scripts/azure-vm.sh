@@ -20,6 +20,7 @@ Environment variables:
   INVENTORY_FILE         Generated Ansible inventory path.
   PLAN_FILE              Terraform plan path for deploy.
   DESTROY_PLAN_FILE      Terraform destroy plan path.
+  TF_VAR_subscription_id Azure subscription id. Defaults to ARM_SUBSCRIPTION_ID or the active Azure CLI account.
   TF_VAR_*               Any Terraform variable supported by the Azure VM module.
 
 Common examples:
@@ -95,9 +96,29 @@ resolve_image_tag() {
 
 ensure_azure_login() {
   require_command az
-  if ! az account show >/dev/null 2>&1; then
+  local cli_subscription_id
+  if ! cli_subscription_id="$(az account show --query id -o tsv 2>/dev/null)"; then
     printf 'Azure CLI is not authenticated. Run: az login\n' >&2
     exit 1
+  fi
+  if [[ -z "$cli_subscription_id" ]]; then
+    printf 'Could not resolve an Azure subscription id from the active Azure CLI account.\n' >&2
+    printf 'Run: az account set --subscription "<subscription-id-or-name>"\n' >&2
+    exit 1
+  fi
+
+  if [[ -z "${TF_VAR_subscription_id:-}" ]]; then
+    if [[ -n "${ARM_SUBSCRIPTION_ID:-}" ]]; then
+      export TF_VAR_subscription_id="$ARM_SUBSCRIPTION_ID"
+      log "Using Azure subscription from ARM_SUBSCRIPTION_ID"
+    else
+      export TF_VAR_subscription_id="$cli_subscription_id"
+      log "Using Azure subscription from active Azure CLI account: ${TF_VAR_subscription_id}"
+    fi
+  fi
+
+  if [[ -z "${ARM_SUBSCRIPTION_ID:-}" ]]; then
+    export ARM_SUBSCRIPTION_ID="$TF_VAR_subscription_id"
   fi
 }
 
@@ -106,6 +127,12 @@ ensure_terraform_inputs() {
   if [[ -f "$tfvars_file" ]] && grep -q '<your_azure_admin_username>' "$tfvars_file"; then
     printf 'terraform.tfvars still contains the placeholder <your_azure_admin_username>.\n' >&2
     printf 'Either fix %s or remove it to use Terraform defaults.\n' "$tfvars_file" >&2
+    exit 1
+  fi
+
+  if [[ -f "$tfvars_file" ]] && grep -q '00000000-0000-0000-0000-000000000000' "$tfvars_file"; then
+    printf 'terraform.tfvars still contains the placeholder Azure subscription id.\n' >&2
+    printf 'Either fix %s or remove subscription_id to use the automation default.\n' "$tfvars_file" >&2
     exit 1
   fi
 
