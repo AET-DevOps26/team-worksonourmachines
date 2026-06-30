@@ -8,5 +8,5 @@ admin_user="$(terraform -chdir="${terraform_dir}" output -raw admin_username)"
 
 cat <<EOF
 [tutormatch]
-${public_ip} ansible_user=${admin_user}
+${public_ip} ansible_user=${admin_user} ansible_ssh_common_args='-o StrictHostKeyChecking=accept-new'
 EOF
