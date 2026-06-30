@@ -69,7 +69,13 @@ Copy the example variables and adjust at least the source CIDR before using this
 cp artifacts/terraform/azure-vm/terraform.tfvars.example artifacts/terraform/azure-vm/terraform.tfvars
 ```
 
-If needed, set `subscription_id` in `terraform.tfvars`. Otherwise Terraform uses the Azure provider's normal environment or CLI authentication context.
+Set `subscription_id` in `terraform.tfvars` or export it before running Terraform:
+
+```bash
+export TF_VAR_subscription_id="$(az account show --query id -o tsv)"
+```
+
+The `artifacts/terraform/scripts/azure-vm.sh` automation does this automatically from `ARM_SUBSCRIPTION_ID` or the active Azure CLI account. Raw Terraform commands need the variable set explicitly because the AzureRM provider requires a subscription id for plan and apply.
 
 Then create the infrastructure:
 
