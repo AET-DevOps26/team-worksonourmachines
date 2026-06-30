@@ -20,6 +20,8 @@ az account set --subscription "<subscription-id-or-name>"
 
 Use the automation script for normal VM deployment. It runs Terraform, generates the Ansible inventory, waits for SSH, installs Docker on the VM, deploys the Docker Compose `prod` profile, and verifies that the VM is running GHCR images.
 
+The script loads unset environment variables from the repository root `.env` file before running Terraform and Ansible. Put production values such as `POSTGRES_PASSWORD`, `KEYCLOAK_DB_PASSWORD`, `KEYCLOAK_ADMIN_PASSWORD`, and `KEYCLOAK_CLIENT_SECRET` there, or export them in the shell before invoking the script.
+
 ```bash
 GHCR_USERNAME="<github-user>" \
 GHCR_TOKEN="<github-token-with-read-packages>" \
