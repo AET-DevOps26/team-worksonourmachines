@@ -21,6 +21,8 @@ Environment variables:
   PLAN_FILE              Terraform plan path for deploy.
   DESTROY_PLAN_FILE      Terraform destroy plan path.
   TF_VAR_subscription_id Azure subscription id. Defaults to ARM_SUBSCRIPTION_ID or the active Azure CLI account.
+  TF_VAR_allowed_inbound_tcp_ports
+                         Terraform list of public TCP ports. Defaults to [22,80,443]; terraform.tfvars can override it.
   TF_VAR_*               Any Terraform variable supported by the Azure VM module.
 
 Common examples:
@@ -54,10 +56,6 @@ plan_file="${PLAN_FILE:-${tmp_dir}/main.tfplan}"
 destroy_plan_file="${DESTROY_PLAN_FILE:-${tmp_dir}/main.destroy.tfplan}"
 ssh_private_key="${SSH_PRIVATE_KEY:-${HOME}/.ssh/id_ed25519}"
 image_tag="${IMAGE_TAG:-}"
-
-terraform_args=(
-  "-var=allowed_inbound_tcp_ports=[22,80,443]"
-)
 
 ensure_common_tools() {
   require_command terraform
@@ -122,8 +120,16 @@ ensure_azure_login() {
   fi
 }
 
+set_terraform_defaults() {
+  if [[ -z "${TF_VAR_allowed_inbound_tcp_ports:-}" ]]; then
+    export TF_VAR_allowed_inbound_tcp_ports='[22,80,443]'
+  fi
+}
+
 ensure_terraform_inputs() {
   local tfvars_file="${terraform_dir}/terraform.tfvars"
+  set_terraform_defaults
+
   if [[ -f "$tfvars_file" ]] && grep -q '<your_azure_admin_username>' "$tfvars_file"; then
     printf 'terraform.tfvars still contains the placeholder <your_azure_admin_username>.\n' >&2
     printf 'Either fix %s or remove it to use Terraform defaults.\n' "$tfvars_file" >&2
@@ -151,7 +157,7 @@ terraform_init() {
 
 terraform_apply_vm() {
   log "Planning Azure VM infrastructure"
-  terraform -chdir="$terraform_dir" plan "${terraform_args[@]}" -out "$plan_file"
+  terraform -chdir="$terraform_dir" plan -out "$plan_file"
 
   log "Applying Azure VM infrastructure"
   terraform -chdir="$terraform_dir" apply "$plan_file"
@@ -252,10 +258,11 @@ stop_deployment() {
 destroy_deployment() {
   ensure_common_tools
   ensure_azure_login
+  set_terraform_defaults
   terraform_init
 
   log "Planning destruction of all Terraform-managed Azure resources"
-  terraform -chdir="$terraform_dir" plan -destroy "${terraform_args[@]}" -out "$destroy_plan_file"
+  terraform -chdir="$terraform_dir" plan -destroy -out "$destroy_plan_file"
 
   log "Destroying all Terraform-managed Azure resources"
   terraform -chdir="$terraform_dir" apply "$destroy_plan_file"
