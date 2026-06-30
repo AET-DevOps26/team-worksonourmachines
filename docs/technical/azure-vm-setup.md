@@ -23,7 +23,7 @@ Use the automation script for normal VM deployment. It runs Terraform, generates
 ```bash
 GHCR_USERNAME="<github-user>" \
 GHCR_TOKEN="<github-token-with-read-packages>" \
-artifacts/terraform/scripts/azure-vm.sh deploy
+infrastructure/terraform/scripts/azure-vm.sh deploy
 ```
 
 When `IMAGE_TAG` is omitted, the script uses GitHub CLI to fetch the `headSha` of the latest successful `Build and Push Images` workflow run on `main`. Pass `IMAGE_TAG` explicitly only when you want to deploy a specific image tag:
@@ -32,7 +32,7 @@ When `IMAGE_TAG` is omitted, the script uses GitHub CLI to fetch the `headSha` o
 IMAGE_TAG="<git-sha>" \
 GHCR_USERNAME="<github-user>" \
 GHCR_TOKEN="<github-token-with-read-packages>" \
-artifacts/terraform/scripts/azure-vm.sh deploy
+infrastructure/terraform/scripts/azure-vm.sh deploy
 ```
 
 When the LLM provider requires an API key, pass it through the environment:
@@ -41,22 +41,22 @@ When the LLM provider requires an API key, pass it through the environment:
 GHCR_USERNAME="<github-user>" \
 GHCR_TOKEN="<github-token-with-read-packages>" \
 LLM_API_KEY="<provider-token>" \
-artifacts/terraform/scripts/azure-vm.sh deploy
+infrastructure/terraform/scripts/azure-vm.sh deploy
 ```
 
 To use a real hostname instead of the default `<vm-ip>.nip.io`:
 
 ```bash
 APP_HOSTNAME="tutormatch.example.org" \
-artifacts/terraform/scripts/azure-vm.sh deploy
+infrastructure/terraform/scripts/azure-vm.sh deploy
 ```
 
 Useful follow-up commands:
 
 ```bash
-artifacts/terraform/scripts/azure-vm.sh verify
-artifacts/terraform/scripts/azure-vm.sh stop
-artifacts/terraform/scripts/azure-vm.sh destroy
+infrastructure/terraform/scripts/azure-vm.sh verify
+infrastructure/terraform/scripts/azure-vm.sh stop
+infrastructure/terraform/scripts/azure-vm.sh destroy
 ```
 
 The rest of this document explains the individual steps the script automates.
@@ -66,7 +66,7 @@ The rest of this document explains the individual steps the script automates.
 Copy the example variables and adjust at least the source CIDR before using this outside a quick demo:
 
 ```bash
-cp artifacts/terraform/azure-vm/terraform.tfvars.example artifacts/terraform/azure-vm/terraform.tfvars
+cp infrastructure/terraform/azure-vm/terraform.tfvars.example infrastructure/terraform/azure-vm/terraform.tfvars
 ```
 
 Set `subscription_id` in `terraform.tfvars` or export it before running Terraform:
@@ -75,14 +75,14 @@ Set `subscription_id` in `terraform.tfvars` or export it before running Terrafor
 export TF_VAR_subscription_id="$(az account show --query id -o tsv)"
 ```
 
-The `artifacts/terraform/scripts/azure-vm.sh` automation does this automatically from `ARM_SUBSCRIPTION_ID` or the active Azure CLI account. Raw Terraform commands need the variable set explicitly because the AzureRM provider requires a subscription id for plan and apply.
+The `infrastructure/terraform/scripts/azure-vm.sh` automation does this automatically from `ARM_SUBSCRIPTION_ID` or the active Azure CLI account. Raw Terraform commands need the variable set explicitly because the AzureRM provider requires a subscription id for plan and apply.
 
 Then create the infrastructure:
 
 ```bash
-terraform -chdir=artifacts/terraform/azure-vm init
-terraform -chdir=artifacts/terraform/azure-vm plan -out main.tfplan
-terraform -chdir=artifacts/terraform/azure-vm apply main.tfplan
+terraform -chdir=infrastructure/terraform/azure-vm init
+terraform -chdir=infrastructure/terraform/azure-vm plan -out main.tfplan
+terraform -chdir=infrastructure/terraform/azure-vm apply main.tfplan
 ```
 
 Terraform creates:
@@ -107,13 +107,13 @@ Ports such as `5173`, `8000`, `8080`, `11434`, or `5432` are not required for th
 Generate a small inventory file from Terraform outputs:
 
 ```bash
-artifacts/terraform/scripts/azure-vm-inventory.sh > artifacts/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini
+infrastructure/terraform/scripts/azure-vm-inventory.sh > infrastructure/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini
 ```
 
 Check SSH connectivity:
 
 ```bash
-ansible all -i artifacts/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini -m ping --private-key ~/.ssh/id_ed25519
+ansible all -i infrastructure/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini -m ping --private-key ~/.ssh/id_ed25519
 ```
 
 ## Install Docker and create the application user
@@ -122,9 +122,9 @@ Run the provisioning playbook:
 
 ```bash
 ansible-playbook \
-  -i artifacts/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
+  -i infrastructure/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
   --private-key ~/.ssh/id_ed25519 \
-  artifacts/ansible/playbooks/setup-docker.yml
+  infrastructure/ansible/playbooks/setup-docker.yml
 ```
 
 The playbook:
@@ -148,9 +148,9 @@ For reproducible deployment, pass the Git commit SHA tag produced by the image w
 
 ```bash
 ansible-playbook \
-  -i artifacts/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
+  -i infrastructure/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
   --private-key ~/.ssh/id_ed25519 \
-  artifacts/ansible/playbooks/run-compose.yml \
+  infrastructure/ansible/playbooks/run-compose.yml \
   -e image_tag="<git-sha>"
 ```
 
@@ -161,9 +161,9 @@ export GHCR_USERNAME="<github-user>"
 export GHCR_TOKEN="<github-token>"
 
 ansible-playbook \
-  -i artifacts/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
+  -i infrastructure/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
   --private-key ~/.ssh/id_ed25519 \
-  artifacts/ansible/playbooks/run-compose.yml \
+  infrastructure/ansible/playbooks/run-compose.yml \
   -e image_tag="<git-sha>"
 ```
 
@@ -171,9 +171,9 @@ The default hostname is `<vm-ip>.nip.io`, derived from the inventory host addres
 
 ```bash
 ansible-playbook \
-  -i artifacts/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
+  -i infrastructure/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
   --private-key ~/.ssh/id_ed25519 \
-  artifacts/ansible/playbooks/run-compose.yml \
+  infrastructure/ansible/playbooks/run-compose.yml \
   -e image_tag="<git-sha>" \
   -e app_hostname="tutormatch.example.org"
 ```
@@ -193,9 +193,9 @@ The AI service uses the same hosted LLM defaults as the Helm deployment. Export 
 export LLM_API_KEY="<provider-token>"
 
 ansible-playbook \
-  -i artifacts/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
+  -i infrastructure/terraform/azure-vm/.terraform/tmp/tutormatch-azure.ini \
   --private-key ~/.ssh/id_ed25519 \
-  artifacts/ansible/playbooks/run-compose.yml \
+  infrastructure/ansible/playbooks/run-compose.yml \
   -e image_tag="<git-sha>"
 ```
 
@@ -204,8 +204,8 @@ ansible-playbook \
 Get the VM IP and open an SSH session:
 
 ```bash
-vm_ip="$(terraform -chdir=artifacts/terraform/azure-vm output -raw public_ip_address)"
-vm_user="$(terraform -chdir=artifacts/terraform/azure-vm output -raw admin_username)"
+vm_ip="$(terraform -chdir=infrastructure/terraform/azure-vm output -raw public_ip_address)"
+vm_user="$(terraform -chdir=infrastructure/terraform/azure-vm output -raw admin_username)"
 ssh "${vm_user}@${vm_ip}"
 ```
 
@@ -239,14 +239,14 @@ Use Terraform when the Azure resources should be deleted. Ansible is not needed 
 To preview and then delete all Terraform-managed Azure resources:
 
 ```bash
-artifacts/terraform/scripts/azure-vm.sh destroy
+infrastructure/terraform/scripts/azure-vm.sh destroy
 ```
 
 The script runs the equivalent Terraform destroy flow:
 
 ```bash
-terraform -chdir=artifacts/terraform/azure-vm plan -destroy -out main.destroy.tfplan
-terraform -chdir=artifacts/terraform/azure-vm apply main.destroy.tfplan
+terraform -chdir=infrastructure/terraform/azure-vm plan -destroy -out main.destroy.tfplan
+terraform -chdir=infrastructure/terraform/azure-vm apply main.destroy.tfplan
 ```
 
 This removes the VM and its managed Azure infrastructure. Docker containers, volumes, files under `/opt/tutormatch`, and VM-local state disappear with the VM disk.
@@ -254,14 +254,14 @@ This removes the VM and its managed Azure infrastructure. Docker containers, vol
 If you only want to stop the application while keeping the Azure VM running, use SSH instead:
 
 ```bash
-artifacts/terraform/scripts/azure-vm.sh stop
+infrastructure/terraform/scripts/azure-vm.sh stop
 ```
 
 The script runs the equivalent VM-local Compose stop:
 
 ```bash
-vm_ip="$(terraform -chdir=artifacts/terraform/azure-vm output -raw public_ip_address)"
-vm_user="$(terraform -chdir=artifacts/terraform/azure-vm output -raw admin_username)"
+vm_ip="$(terraform -chdir=infrastructure/terraform/azure-vm output -raw public_ip_address)"
+vm_user="$(terraform -chdir=infrastructure/terraform/azure-vm output -raw admin_username)"
 ssh "${vm_user}@${vm_ip}" \
   'sudo -iu tutormatch sh -lc "cd /opt/tutormatch && docker compose --env-file .env.azure --profile prod down"'
 ```

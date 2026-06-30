@@ -4,10 +4,10 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage:
-  artifacts/terraform/scripts/azure-vm.sh deploy
-  artifacts/terraform/scripts/azure-vm.sh verify
-  artifacts/terraform/scripts/azure-vm.sh stop
-  artifacts/terraform/scripts/azure-vm.sh destroy
+  infrastructure/terraform/scripts/azure-vm.sh deploy
+  infrastructure/terraform/scripts/azure-vm.sh verify
+  infrastructure/terraform/scripts/azure-vm.sh stop
+  infrastructure/terraform/scripts/azure-vm.sh destroy
 
 Environment variables:
   IMAGE_TAG              GHCR image tag to deploy. Defaults to the latest successful Build and Push Images run on main.
@@ -16,7 +16,7 @@ Environment variables:
   LLM_API_KEY            Optional LLM provider API key passed to the AI service.
   APP_HOSTNAME           Optional public hostname. Defaults to <vm-public-ip>.nip.io.
   SSH_PRIVATE_KEY        SSH private key for the Azure admin user. Defaults to ~/.ssh/id_ed25519.
-  TERRAFORM_DIR          Terraform directory. Defaults to artifacts/terraform/azure-vm.
+  TERRAFORM_DIR          Terraform directory. Defaults to infrastructure/terraform/azure-vm.
   INVENTORY_FILE         Generated Ansible inventory path.
   PLAN_FILE              Terraform plan path for deploy.
   DESTROY_PLAN_FILE      Terraform destroy plan path.
@@ -26,11 +26,11 @@ Environment variables:
   TF_VAR_*               Any Terraform variable supported by the Azure VM module.
 
 Common examples:
-  GHCR_USERNAME=<user> GHCR_TOKEN=<token> artifacts/terraform/scripts/azure-vm.sh deploy
-  IMAGE_TAG=<git-sha> GHCR_USERNAME=<user> GHCR_TOKEN=<token> artifacts/terraform/scripts/azure-vm.sh deploy
-  artifacts/terraform/scripts/azure-vm.sh verify
-  artifacts/terraform/scripts/azure-vm.sh stop
-  artifacts/terraform/scripts/azure-vm.sh destroy
+  GHCR_USERNAME=<user> GHCR_TOKEN=<token> infrastructure/terraform/scripts/azure-vm.sh deploy
+  IMAGE_TAG=<git-sha> GHCR_USERNAME=<user> GHCR_TOKEN=<token> infrastructure/terraform/scripts/azure-vm.sh deploy
+  infrastructure/terraform/scripts/azure-vm.sh verify
+  infrastructure/terraform/scripts/azure-vm.sh stop
+  infrastructure/terraform/scripts/azure-vm.sh destroy
 EOF
 }
 
@@ -49,7 +49,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "${script_dir}/../../.." && pwd)"
 
 action="${1:-deploy}"
-terraform_dir="${TERRAFORM_DIR:-${repo_root}/artifacts/terraform/azure-vm}"
+terraform_dir="${TERRAFORM_DIR:-${repo_root}/infrastructure/terraform/azure-vm}"
 tmp_dir="${terraform_dir}/.terraform/tmp"
 inventory_file="${INVENTORY_FILE:-${tmp_dir}/tutormatch-azure.ini}"
 plan_file="${PLAN_FILE:-${tmp_dir}/main.tfplan}"
@@ -166,7 +166,7 @@ terraform_apply_vm() {
 write_inventory() {
   log "Writing Ansible inventory to ${inventory_file}"
   mkdir -p "$(dirname "$inventory_file")"
-  "${repo_root}/artifacts/terraform/scripts/azure-vm-inventory.sh" "$terraform_dir" > "$inventory_file"
+  "${repo_root}/infrastructure/terraform/scripts/azure-vm-inventory.sh" "$terraform_dir" > "$inventory_file"
 }
 
 wait_for_ssh() {
@@ -190,7 +190,7 @@ run_setup_playbook() {
   ansible-playbook \
     -i "$inventory_file" \
     --private-key "$ssh_private_key" \
-    "${repo_root}/artifacts/ansible/playbooks/setup-docker.yml"
+    "${repo_root}/infrastructure/ansible/playbooks/setup-docker.yml"
 }
 
 run_compose_playbook() {
@@ -204,7 +204,7 @@ run_compose_playbook() {
   ansible-playbook \
     -i "$inventory_file" \
     --private-key "$ssh_private_key" \
-    "${repo_root}/artifacts/ansible/playbooks/run-compose.yml" \
+    "${repo_root}/infrastructure/ansible/playbooks/run-compose.yml" \
     "${extra_vars[@]}"
 }
 
