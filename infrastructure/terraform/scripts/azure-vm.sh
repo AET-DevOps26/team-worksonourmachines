@@ -25,6 +25,8 @@ Environment variables:
                          Terraform list of public TCP ports. Defaults to [22,80,443]; terraform.tfvars can override it.
   TF_VAR_*               Any Terraform variable supported by the Azure VM module.
 
+The script loads unset variables from the repository root .env file when it exists.
+
 Common examples:
   GHCR_USERNAME=<user> GHCR_TOKEN=<token> infrastructure/terraform/scripts/azure-vm.sh deploy
   IMAGE_TAG=<git-sha> GHCR_USERNAME=<user> GHCR_TOKEN=<token> infrastructure/terraform/scripts/azure-vm.sh deploy
@@ -49,6 +51,49 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "${script_dir}/../../.." && pwd)"
 
 action="${1:-deploy}"
+
+load_env_file() {
+  local env_file="${repo_root}/.env"
+  [[ -f "$env_file" ]] || return 0
+
+  log "Loading unset environment variables from ${env_file}"
+
+  local line name value
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+
+    [[ -z "$line" || "${line:0:1}" == "#" ]] && continue
+
+    if [[ "$line" == export\ * ]]; then
+      line="${line#export }"
+    fi
+
+    [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]] || continue
+
+    name="${line%%=*}"
+    value="${line#*=}"
+
+    if [[ -n "${!name+x}" ]]; then
+      continue
+    fi
+
+    if [[ "$value" == \"*\" && "$value" == *\" ]] || [[ "$value" == \'*\' && "$value" == *\' ]]; then
+      value="${value:1:${#value}-2}"
+    fi
+
+    export "$name=$value"
+  done < "$env_file"
+}
+
+case "$action" in
+  -h|--help|help)
+    ;;
+  *)
+    load_env_file
+    ;;
+esac
+
 terraform_dir="${TERRAFORM_DIR:-${repo_root}/infrastructure/terraform/azure-vm}"
 tmp_dir="${terraform_dir}/.terraform/tmp"
 inventory_file="${INVENTORY_FILE:-${tmp_dir}/tutormatch-azure.ini}"
