@@ -14,17 +14,17 @@ Run `make` or `make help` to list available targets. The descriptions come from 
 
 Rough grouping by purpose:
 
-| When | Targets |
-|------|---------|
-| First clone | `init` |
-| Run apps locally | `up`, `down` |
-| Code quality | `lint`, `format` (or `fmt`), `test` |
-| API specs and generated clients | `api-generate` |
-| One off pnpm in a project | `api-pnpm`, `client-web-pnpm` (pass `ARGS="..."`) |
-| Env and hooks only | `setup-env`, `setup-git-hooks` |
-| IDE Python venv | `ai-host-install` |
-| Rebuild tooling images | `build-tooling-images` |
-| Reset local state | `clean`, `deep-clean` |
+| When                            | Targets                                           |
+| ------------------------------- | ------------------------------------------------- |
+| First clone                     | `init`                                            |
+| Run apps locally                | `up`, `down`                                      |
+| Code quality                    | `lint`, `format` (or `fmt`), `test`               |
+| API specs and generated clients | `api-generate`                                    |
+| One off pnpm in a project       | `api-pnpm`, `client-web-pnpm` (pass `ARGS="..."`) |
+| Env and hooks only              | `setup-env`, `setup-git-hooks`                    |
+| IDE Python venv                 | `ai-host-install`                                 |
+| Rebuild tooling images          | `build-tooling-images`                            |
+| Reset local state               | `clean`, `deep-clean`                             |
 
 ## Dev containers and tooling containers
 
@@ -39,7 +39,7 @@ Each service mounts host source code. Runtime dependencies are either baked into
 - **client-web-dev** binds `./artifacts/client-web` to `/app` and uses a named volume `client-web-node-modules` for `/app/node_modules`. On start, `docker/entrypoint.sh` runs `pnpm install --frozen-lockfile`, then the dev server. The container does not use host `node_modules`. `make init` installs `artifacts/client-web/node_modules` on the host for IDE support only. The service waits for Redis and for `keycloak-config-cli` to finish before starting.
 - **ai-dev** binds `./artifacts/ai` to `/app`. Python packages are installed in the image when the image is built. Uvicorn runs with reload on file changes.
 - **ollama** uses the upstream image. Model data persists in the `ollama_data` volume. The local `ai-dev` service depends on it.
-- **postgres** uses the upstream Postgres image. Database files persist in the `postgres_data` volume. Initialization scripts under `docker/postgres/init/` run only when this volume is first created.
+  +- **postgres** uses the upstream Postgres image. Database files persist in the `postgres_data` volume. Initialization scripts under `artifacts/postgres/init/` run only when this volume is first created.
 - **keycloak** uses the upstream Keycloak image in development mode and stores state in Postgres. It is not published to the host; reach it through the gateway at `https://auth.tutormatch.localhost`.
 - **keycloak-config-cli** applies the committed realm config from `artifacts/keycloak/import/` after Keycloak is healthy (see Local Keycloak below).
 - **redis** stores BFF session data and short-lived OIDC login transactions. The web app connects at `redis://redis:6379`.
@@ -75,13 +75,13 @@ Host Python is only for IDE support, not for running the AI service in Docker.
 
 `make init` prepares a full local dev environment. It runs these steps in order:
 
-| Step | Target | What it does |
-|------|--------|----------------|
-| Env | `setup-env` | Copies `.env.dist` to `.env`. If `.env` already exists, you are prompted before overwriting. |
-| Hooks | `setup-git-hooks` | Symlinks `git/hooks/pre-commit.sh` into `.git/hooks/pre-commit`. |
-| Images | `build-tooling-images` | Builds `api-tooling`, `client-web-tooling`, and `ai-tooling`. |
-| AI IDE | `ai-host-install` | Host venv for IDE support when Python is available. |
-| Deps | tooling install | Runs `pnpm install` on the host for `api/` and `artifacts/client-web/` via tooling containers. |
+| Step   | Target                 | What it does                                                                                   |
+| ------ | ---------------------- | ---------------------------------------------------------------------------------------------- |
+| Env    | `setup-env`            | Copies `.env.dist` to `.env`. If `.env` already exists, you are prompted before overwriting.   |
+| Hooks  | `setup-git-hooks`      | Symlinks `git/hooks/pre-commit.sh` into `.git/hooks/pre-commit`.                               |
+| Images | `build-tooling-images` | Builds `api-tooling`, `client-web-tooling`, and `ai-tooling`.                                  |
+| AI IDE | `ai-host-install`      | Host venv for IDE support when Python is available.                                            |
+| Deps   | tooling install        | Runs `pnpm install` on the host for `api/` and `artifacts/client-web/` via tooling containers. |
 
 Run init again after `make deep-clean` or when tooling images or lockfiles change enough that a fresh install helps.
 
@@ -97,9 +97,9 @@ Run init again after `make deep-clean` or when tooling images or lockfiles chang
 
 The stack exposes a single HTTPS entry point through Caddy (`gateway` service). Use these URLs in the browser:
 
-| Service | URL |
-|---------|-----|
-| Web app (BFF + frontend) | <https://tutormatch.localhost> |
+| Service                          | URL                                 |
+| -------------------------------- | ----------------------------------- |
+| Web app (BFF + frontend)         | <https://tutormatch.localhost>      |
 | Keycloak (login + admin console) | <https://auth.tutormatch.localhost> |
 
 Browsers resolve `*.localhost` to `127.0.0.1` (RFC 6761), so no `/etc/hosts` entries are needed.
@@ -181,11 +181,11 @@ make client-web-pnpm ARGS="run dev"
 
 We keep `.env.dist` small on purpose. Only put variables there that someone needs to run the dev containers on a fresh clone. Everything else belongs in `docker-compose.yml` with a default.
 
-| Location | Role | Examples today |
-|----------|------|----------------|
-| `.env.dist` copied to `.env` | Required secrets or values every developer must provide | `OPENAI_API_KEY` |
-| `docker-compose.yml` | Defaults for tuning, internal URLs, log levels, gateway hostnames, and deployment images | `APP_HOSTNAME`, `GATEWAY_CADDYFILE`, `CLIENT_WEB_IMAGE`, `AI_IMAGE`, `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `LLM_PROVIDER`, `LLM_BASE_URL`, `KEYCLOAK_ADMIN`, `KEYCLOAK_DEV_CLI_ENABLED`, `KEYCLOAK_ISSUER`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`, `REDIS_URL`, placeholder server API URLs |
-| `.env` optional overrides | Override any variable referenced as `${VAR:-default}` in compose without editing compose | e.g. `AI_LOG_LEVEL=DEBUG` |
+| Location                     | Role                                                                                     | Examples today                                                                                                                                                                                                                                                                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.env.dist` copied to `.env` | Required secrets or values every developer must provide                                  | `OPENAI_API_KEY`                                                                                                                                                                                                                                                                                                                |
+| `docker-compose.yml`         | Defaults for tuning, internal URLs, log levels, gateway hostnames, and deployment images | `APP_HOSTNAME`, `GATEWAY_CADDYFILE`, `CLIENT_WEB_IMAGE`, `AI_IMAGE`, `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `LLM_PROVIDER`, `LLM_BASE_URL`, `KEYCLOAK_ADMIN`, `KEYCLOAK_DEV_CLI_ENABLED`, `KEYCLOAK_ISSUER`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`, `REDIS_URL`, placeholder server API URLs |
+| `.env` optional overrides    | Override any variable referenced as `${VAR:-default}` in compose without editing compose | e.g. `AI_LOG_LEVEL=DEBUG`                                                                                                                                                                                                                                                                                                       |
 
 When adding new configuration:
 
@@ -216,16 +216,16 @@ Hooks are stored under `git/hooks/` in the repository so they are version contro
 
 ## Troubleshooting
 
-| Problem | What to try |
-|---------|-------------|
-| Stale `node_modules`, build output, or AI caches on the host | `make clean` |
-| Broken compose state, old images, pnpm store issues | `make deep-clean`, then `make init` |
-| Tooling container fails after Dockerfile or entrypoint changes | `make build-tooling-images` |
-| Dependency or lockfile changes not picked up in the dev container | `docker compose --profile dev restart client-web-dev` (entrypoint reinstalls into the named volume) |
-| Dependency or lockfile changes not picked up in the IDE | `make init` or run tooling install again |
-| Permission errors on files created by tooling | Check you are not mixing root-owned files with host UID tooling. Re-run init tooling steps after fixing ownership. |
-| Lint fails in pre-commit but you thought you were done | Run `make lint` locally; same command as the hook |
-| Keycloak rejects login / invalid redirect URI after hostname change | Re-run `docker compose --profile dev up -d --force-recreate keycloak-config-cli client-web-dev gateway` |
+| Problem                                                                                         | What to try                                                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stale `node_modules`, build output, or AI caches on the host                                    | `make clean`                                                                                                                                                                                                                                                                                                                                         |
+| Broken compose state, old images, pnpm store issues                                             | `make deep-clean`, then `make init`                                                                                                                                                                                                                                                                                                                  |
+| Tooling container fails after Dockerfile or entrypoint changes                                  | `make build-tooling-images`                                                                                                                                                                                                                                                                                                                          |
+| Dependency or lockfile changes not picked up in the dev container                               | `docker compose --profile dev restart client-web-dev` (entrypoint reinstalls into the named volume)                                                                                                                                                                                                                                                  |
+| Dependency or lockfile changes not picked up in the IDE                                         | `make init` or run tooling install again                                                                                                                                                                                                                                                                                                             |
+| Permission errors on files created by tooling                                                   | Check you are not mixing root-owned files with host UID tooling. Re-run init tooling steps after fixing ownership.                                                                                                                                                                                                                                   |
+| Lint fails in pre-commit but you thought you were done                                          | Run `make lint` locally; same command as the hook                                                                                                                                                                                                                                                                                                    |
+| Keycloak rejects login / invalid redirect URI after hostname change                             | Re-run `docker compose --profile dev up -d --force-recreate keycloak-config-cli client-web-dev gateway`                                                                                                                                                                                                                                              |
 | `client-web-dev` exits on startup with `Failed to discover OIDC configuration` / `fetch failed` | Caddy's internal TLS cert for `auth.tutormatch.localhost` is missing, expired, or not yet ready. Run `docker compose --profile dev restart gateway`, then `docker compose --profile dev up -d client-web-dev`. If it persists, remove the `caddy_data` volume (`docker compose down` then `docker volume rm tutormatch_caddy_data`) and start again. |
 
 `make clean` removes api and client-web `node_modules`, client-web build artifacts, and AI `.venv`, `__pycache__`, and ruff cache.
