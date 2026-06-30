@@ -86,7 +86,7 @@ jobs:
         run: kubectl get pods -n ${{ env.NAMESPACE }} || true
 
       - name: Lint chart
-        run: helm lint ./helm/tutormatch
+        run: helm lint ./infrastructure/helm/tutormatch
 
       - name: Unlock stuck Helm release
         run: |
@@ -99,7 +99,7 @@ jobs:
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
         run: |
-          helm upgrade --install ${{ env.RELEASE_NAME }} ./helm/tutormatch \
+          helm upgrade --install ${{ env.RELEASE_NAME }} ./infrastructure/helm/tutormatch \
             --namespace ${{ env.NAMESPACE }} \
             --create-namespace \
             --set ai.image=${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }} \
