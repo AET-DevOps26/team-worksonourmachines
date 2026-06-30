@@ -24,7 +24,7 @@ def _build_llm():
     return ChatOpenAI(
         base_url=os.environ["LLM_BASE_URL"],
         # LM Studio/OpenWebUI don't require a real key but reject an empty value.
-        api_key=os.getenv("LLM_API_KEY", "not-required"),
+        api_key=os.getenv("LLM_API_KEY") or "not-required",
         model=_model,
     )
 
