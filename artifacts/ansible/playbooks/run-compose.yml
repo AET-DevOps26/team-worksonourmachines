@@ -15,14 +15,14 @@
     keycloak_issuer: "{{ keycloak_hostname }}/realms/tutormatch"
     postgres_db: tutormatch
     postgres_user: tutormatch
-    postgres_password: tutormatch
+    postgres_password: "{{ lookup('env', 'POSTGRES_PASSWORD') | default('', true) }}"
     keycloak_db: keycloak
     keycloak_db_user: keycloak
-    keycloak_db_password: keycloak
+    keycloak_db_password: "{{ lookup('env', 'KEYCLOAK_DB_PASSWORD') | default('', true) }}"
     keycloak_admin: admin
-    keycloak_admin_password: admin
+    keycloak_admin_password: "{{ lookup('env', 'KEYCLOAK_ADMIN_PASSWORD') | default('', true) }}"
     keycloak_client_id: client-web
-    keycloak_client_secret: client-web-secret
+    keycloak_client_secret: "{{ lookup('env', 'KEYCLOAK_CLIENT_SECRET') | default('', true) }}"
     llm_provider: logos
     llm_base_url: https://logos.aet.cit.tum.de
     llm_model: openai/gpt-oss-120b
@@ -40,6 +40,16 @@
       - keycloak-config-cli
       - client-web
       - ai
+
+  pre_tasks:
+    - name: Validate required production secrets
+      ansible.builtin.assert:
+        that:
+          - postgres_password | length > 0
+          - keycloak_db_password | length > 0
+          - keycloak_admin_password | length > 0
+          - keycloak_client_secret | length > 0
+        fail_msg: "Set the production secrets via environment variables or Ansible Vault before deployment."
 
   tasks:
     - name: Ensure application directories exist
