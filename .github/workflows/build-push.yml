@@ -66,6 +66,7 @@ jobs:
           context: .
           file: artifacts/api-ui/docker/Dockerfile
           push: true
+          provenance: false
           tags: |
             ${{ env.IMAGE_PREFIX }}/api-ui:latest
             ${{ env.IMAGE_PREFIX }}/api-ui:${{ github.sha }}
