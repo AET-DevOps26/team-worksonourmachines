@@ -100,6 +100,7 @@ export function getProfileMenuGroups(roles: readonly string[]): ProfileMenuGroup
         groups.push({
             label: 'Administration',
             links: [
+                { href: '/admin', label: 'Admin dashboard' },
                 { href: '/admin/tutor-approvals', label: 'Tutor approvals' },
                 { href: '/admin/modules', label: 'Manage modules' },
             ],

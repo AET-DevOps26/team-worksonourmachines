@@ -27,6 +27,7 @@ export default [
         ]),
         ...prefix('chat', [index('routes/chat/index.tsx'), route(':id', 'routes/chat/$id.tsx')]),
         ...prefix('admin', [
+            index('routes/admin/index.tsx'),
             route('tutor-approvals', 'routes/admin/tutor-approvals.tsx'),
             ...prefix('modules', [
                 index('routes/admin/modules.tsx'),
