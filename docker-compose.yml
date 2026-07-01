@@ -1,5 +1,11 @@
 name: tutormatch
 
+x-hardening: &hardening
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
 services:
   gateway:
     image: caddy:2-alpine
@@ -13,6 +19,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
+      - api-ui
       - client-web
       - keycloak
     networks:
@@ -152,6 +159,27 @@ services:
       timeout: 10s
       retries: 10
       start_period: 120s
+
+  api-ui:
+    <<: *hardening
+    image: scalarapi/api-reference:latest
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /config/caddy
+      - /data/caddy
+    entrypoint: ["/bin/sh", "/config/entrypoint.sh"]
+    volumes:
+      - ./api/specs:/docs:ro,Z
+      - ./artifacts/api-ui/scalar.config.json:/config/scalar.config.json:ro,Z
+      - ./artifacts/api-ui/docker/entrypoint.sh:/config/entrypoint.sh:ro,Z
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ai:
     build:

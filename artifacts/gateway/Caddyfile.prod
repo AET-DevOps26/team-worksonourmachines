@@ -5,3 +5,7 @@
 auth.{$APP_HOSTNAME} {
 	reverse_proxy keycloak:8080
 }
+
+api.{$APP_HOSTNAME} {
+	reverse_proxy api-ui:8080
+}
