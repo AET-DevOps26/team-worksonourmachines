@@ -17,7 +17,7 @@ For architecture, container roles, environment variables, VS Code workspace, git
 
 ### Prerequisites
 
-- You need to have a container runtime installed with a docker compose complient command.
+- You need to have a container runtime installed with a docker compose compliant command.
 - You need to have `make` installed.
 
 ### Setup

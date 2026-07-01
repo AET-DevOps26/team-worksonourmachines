@@ -12,7 +12,7 @@ The current options for finding tutoring at TUM are fragmented: students search 
 
 - **Discovery and matching**: Search and filter tutors by course/module, price, language, location (e.g. campus vs online), and available capacity.
 - **Trust and fit**: Ratings and structured signals so students can compare tutors for a given module.
-- **Content awareness**: For each module, big content topics are presented with information about them and which ones are especially hard/easy to guide tutors and students where to put the most ressources.
+- **Content awareness**: For each module, big content topics are presented with information about them and which ones are especially hard/easy to guide tutors and students where to put the most resources.
 
 Additionally refer to [GenAI](#genai).
 
@@ -26,12 +26,12 @@ Additionally refer to [GenAI](#genai).
 
 Use cases, which highlight the use of GenAI as part of our main features:
 
-1. **Late start, exam pressure**: A student is behind in *Diskrete Strukturen* before the exam. They enter their module, exam date, and weekly budget. The app suggests tutors matching language and location, and GenAI proposes a **short catch-up plan** (topics ordered by impact) with optional slots linked to those tutors’ capacity.
+1. **Late start, exam pressure**: A student is behind in *GBS* before the exam. They enter their module, exam date, and weekly budget. The app suggests tutors matching language and location, and GenAI proposes a **short catch-up plan** (topics ordered by impact) with optional slots linked to those tutors’ capacity.
 2. **Structured semester planning**: A student wants a well-organized approach to their semester with tutoring support at the right moments but isn’t sure how to set this up. They input their modules, exam dates, target grades, and budget. GenAI generates a **cost-optimized semester plan**: this includes when to schedule sessions with tutors (and for which topics), suggestions to mix live and async learning (to save both tutor capacity and student budget), and a timeline aligning study intensity to module difficulty and exam schedule. The plan connects to specific tutors’ availability and the content-awareness within the system, making it actionable and budget-friendly.
 
 ## Example scenarios
 
-1. **Earning side income**: Anna, a computer science student, wants to earn extra money by tutoring others in modules she excels at. She signs up as a tutor for *Diskrete Strukturen* and *GDB*, sets her availability and rate. Students who need tutoring in those areas can easily find and book Anna through the platform.
+1. **Earning side income**: Anna, a computer science student, wants to earn extra money by tutoring others in modules she excels at. She signs up as a tutor for *GBS* and *GDB*, sets her availability and rate. Students who need tutoring in those areas can easily find and book Anna through the platform.
 2. **Finding subject-specific help**: Lukas, who recently switched majors, is struggling with *DWT* but is confident in *THEO*. He looks for a tutor for *DWT* and notices the tutor matching engine can also suggest swapping help: Lukas offers sessions in *THEO* while getting help in *DWT*.
 3. **Language-specific tutoring**: Maria does not speak German fluently but needs assistance in *DWT*. She filters tutors by language and finds an English-speaking tutor experienced in helping non-German speakers with this module.
 4. **Budget-friendly learning**: Jonas needs at least a 1.7 in *GDB* to qualify for his program but is on a tight budget. The platform helps him find affordable tutors, filter for async or group sessions, and suggests swapping tutoring as lower-cost options.
