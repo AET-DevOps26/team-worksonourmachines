@@ -78,7 +78,7 @@ export const action = protectedAction(async ({ request }) => {
     return redirect('/me/profile');
 });
 
-const profilePageClassName = 'mx-auto flex w-full max-w-2xl flex-col gap-6 py-8';
+const profilePageClassName = 'mx-auto flex w-full max-w-2xl flex-col gap-6';
 
 export default function MyProfileRoute() {
     const { edit, profile } = useLoaderData<typeof loader>();

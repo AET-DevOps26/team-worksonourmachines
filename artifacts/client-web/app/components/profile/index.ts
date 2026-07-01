@@ -6,4 +6,4 @@ export {
     STUDY_FOCUS_FIELDS,
     StudentProfileForm,
 } from './StudentProfileForm';
-export { StudyFocusStarsDisplay } from './StudyFocusRating';
+export { StudyFocusRating, StudyFocusStarsDisplay } from './StudyFocusRating';

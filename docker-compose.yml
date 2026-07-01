@@ -118,6 +118,7 @@ services:
     volumes:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
+      - client-web-react-router-cache:/app/.react-router
       - client-web-vite-cache:/app/.vite
       - caddy_data:/caddy-data:ro
     environment:
@@ -131,7 +132,7 @@ services:
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       SERVER_COMMUNICATION_API_URL: tbd
-      SERVER_MARKETPLACE_API_URL: tbd
+      SERVER_MARKETPLACE_API_URL: ${SERVER_MARKETPLACE_API_URL:-http://server-mock:3000}
       SERVER_STUDENT_API_URL: ${SERVER_STUDENT_API_URL:-http://server-mock:3000}
     depends_on:
       keycloak-config-cli:
@@ -220,6 +221,7 @@ volumes:
   pnpm-store:
   server-mock-node-modules:
   client-web-node-modules:
+  client-web-react-router-cache:
   client-web-vite-cache:
   caddy_data:
   caddy_config:
