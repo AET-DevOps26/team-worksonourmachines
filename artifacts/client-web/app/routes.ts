@@ -7,7 +7,6 @@ export default [
         route('become-a-tutor', 'routes/become-a-tutor.tsx'),
         route('terms', 'routes/terms.tsx'),
         route('privacy', 'routes/privacy.tsx'),
-        route('onboarding', 'routes/onboarding.tsx'),
         route('discover', 'routes/discover.tsx'),
         route('notifications', 'routes/notifications.tsx'),
         ...prefix('modules', [index('routes/modules/index.tsx'), route(':code', 'routes/modules/$code.tsx')]),
@@ -29,12 +28,17 @@ export default [
         ...prefix('chat', [index('routes/chat/index.tsx'), route(':id', 'routes/chat/$id.tsx')]),
         ...prefix('admin', [
             route('tutor-approvals', 'routes/admin/tutor-approvals.tsx'),
-            route('modules', 'routes/admin/modules.tsx'),
+            ...prefix('modules', [
+                index('routes/admin/modules.tsx'),
+                route('new', 'routes/admin/modules/new.tsx'),
+                route(':code', 'routes/admin/modules/$code.tsx'),
+            ]),
         ]),
     ]),
     route('login', 'routes/login.tsx'),
     ...prefix('auth', [
         route('login', 'routes/auth/login.tsx'),
+        route('register', 'routes/auth/register.tsx'),
         route('callback', 'routes/auth/callback.tsx'),
         route('logout', 'routes/auth/logout.tsx'),
     ]),

@@ -180,6 +180,19 @@ export async function getAccessToken(request: Request): Promise<string | null> {
 export async function login(
     redirectTo?: string | null,
 ): AsyncResult<{ readonly sidTxnCookie: string; readonly url: string }> {
+    return startAuthorizationFlow(redirectTo);
+}
+
+export async function register(
+    redirectTo?: string | null,
+): AsyncResult<{ readonly sidTxnCookie: string; readonly url: string }> {
+    return startAuthorizationFlow(redirectTo, 'register');
+}
+
+async function startAuthorizationFlow(
+    redirectTo?: string | null,
+    kcAction?: 'register',
+): AsyncResult<{ readonly sidTxnCookie: string; readonly url: string }> {
     const codeVerifier = client.randomPKCECodeVerifier();
     const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
     const state = crypto.randomUUID();
@@ -199,6 +212,7 @@ export async function login(
         redirect_uri: buildCallbackUrl(),
         scope: OIDC_SCOPE,
         state,
+        ...(kcAction ? { kc_action: kcAction } : {}),
     });
 
     return ok({

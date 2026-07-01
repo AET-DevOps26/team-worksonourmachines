@@ -127,6 +127,16 @@ services:
         condition: service_healthy
     restart: "no"
 
+  server-mock:
+    build:
+      context: .
+      dockerfile: artifacts/server-mock/docker/Dockerfile
+    volumes:
+      - ./artifacts/server-mock:/app:Z
+      - server-mock-node-modules:/app/node_modules
+    environment:
+      PORT: "3000"
+
   client-web:
     <<: *hardening
     build:
@@ -136,6 +146,7 @@ services:
     volumes:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
+      - client-web-react-router-cache:/app/.react-router
       - client-web-vite-cache:/app/.vite
       - caddy_data:/caddy-data:ro
     environment:
@@ -149,13 +160,15 @@ services:
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       SERVER_COMMUNICATION_API_URL: tbd
-      SERVER_MARKETPLACE_API_URL: tbd
-      SERVER_STUDENT_API_URL: tbd
+      SERVER_MARKETPLACE_API_URL: ${SERVER_MARKETPLACE_API_URL:-http://server-mock:3000}
+      SERVER_STUDENT_API_URL: ${SERVER_STUDENT_API_URL:-http://server-mock:3000}
     depends_on:
       keycloak-config-cli:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+      server-mock:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:5173/ || exit 1"]
       interval: 10s
@@ -251,7 +264,9 @@ services:
 volumes:
   postgres_data:
   pnpm-store:
+  server-mock-node-modules:
   client-web-node-modules:
+  client-web-react-router-cache:
   client-web-vite-cache:
   caddy_data:
   caddy_config:

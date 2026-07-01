@@ -47,6 +47,10 @@ export function errorMiddlewareConfiguration(): Middleware {
                 throw new ErrorResponse('notFound');
             }
 
+            if (context.response.status === HttpStatusCode.BadRequest) {
+                throw new ErrorResponse('badRequest');
+            }
+
             if (context.response.status === HttpStatusCode.ServiceUnavailable) {
                 throw new ErrorResponse('serviceUnavailable');
             }

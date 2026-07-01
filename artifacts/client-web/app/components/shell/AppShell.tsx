@@ -13,7 +13,7 @@ export function AppShell({ children, user }: AppShellProps) {
     return (
         <div className="flex min-h-svh flex-col bg-background text-foreground">
             <SiteHeader user={user} />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 px-6 py-8">{children}</main>
             <SiteFooter />
         </div>
     );
