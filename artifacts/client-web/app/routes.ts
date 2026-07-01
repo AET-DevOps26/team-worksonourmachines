@@ -11,7 +11,7 @@ export default [
         route('notifications', 'routes/notifications.tsx'),
         ...prefix('modules', [index('routes/modules/index.tsx'), route(':code', 'routes/modules/$code.tsx')]),
         ...prefix('tutors', [route(':id', 'routes/tutors/$id.tsx')]),
-        ...prefix('plans', [route(':id', 'routes/plans/$id.tsx')]),
+        ...prefix('plans', [route('new', 'routes/plans/new.tsx'), route(':id', 'routes/plans/$id.tsx')]),
         ...prefix('me', [
             route('profile', 'routes/me/profile.tsx'),
             ...prefix('goals', [
