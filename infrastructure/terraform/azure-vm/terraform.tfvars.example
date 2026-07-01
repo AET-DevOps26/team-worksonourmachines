@@ -1,0 +1,16 @@
+name_prefix = "tutormatch-dev"
+location    = "swedencentral"
+
+subscription_id = "00000000-0000-0000-0000-000000000000"
+
+admin_username      = "<your_azure_admin_username>"
+ssh_public_key_path = "~/.ssh/id_ed25519.pub"
+
+# Keep this small for the DevOps course demo unless more capacity is needed.
+vm_size = "Standard_B2s_v2"
+
+# Start with SSH only. Add 5173/8080 temporarily if the demo must be reachable from a browser.
+allowed_inbound_tcp_ports = [22, 80, 443]
+
+# Replace this with your own public IP range before applying in a real subscription.
+allowed_source_cidrs = ["0.0.0.0/0"]

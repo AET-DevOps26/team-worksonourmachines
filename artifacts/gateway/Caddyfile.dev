@@ -4,7 +4,7 @@
 
 {$APP_HOSTNAME} {
 	tls internal
-	reverse_proxy client-web:5173
+	reverse_proxy client-web-dev:5173
 }
 
 auth.{$APP_HOSTNAME} {

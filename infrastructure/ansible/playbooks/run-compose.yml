@@ -1,0 +1,153 @@
+---
+- name: Run TUtorMatch Docker Compose project
+  hosts: all
+  become: true
+  vars:
+    application_user: tutormatch
+    application_group: tutormatch
+    application_dir: /opt/tutormatch
+    repo_root: "{{ playbook_dir }}/../../.."
+    image_prefix: ghcr.io/aet-devops26/team-worksonourmachines
+    image_tag: latest
+    app_hostname: "{{ (ansible_host | default(inventory_hostname)) ~ '.nip.io' }}"
+    app_base_url: "https://{{ app_hostname }}"
+    keycloak_hostname: "https://auth.{{ app_hostname }}"
+    keycloak_issuer: "{{ keycloak_hostname }}/realms/tutormatch"
+    postgres_db: tutormatch
+    postgres_user: tutormatch
+    postgres_password: "{{ lookup('env', 'POSTGRES_PASSWORD') | default('', true) }}"
+    keycloak_db: keycloak
+    keycloak_db_user: keycloak
+    keycloak_db_password: "{{ lookup('env', 'KEYCLOAK_DB_PASSWORD') | default('', true) }}"
+    keycloak_admin: admin
+    keycloak_admin_password: "{{ lookup('env', 'KEYCLOAK_ADMIN_PASSWORD') | default('', true) }}"
+    keycloak_client_id: client-web
+    keycloak_client_secret: "{{ lookup('env', 'KEYCLOAK_CLIENT_SECRET') | default('', true) }}"
+    llm_provider: logos
+    llm_base_url: https://logos.aet.cit.tum.de
+    llm_model: openai/gpt-oss-120b
+    llm_api_key: "{{ lookup('env', 'LLM_API_KEY') | default('', true) }}"
+    server_communication_api_url: tbd
+    server_marketplace_api_url: tbd
+    server_student_api_url: tbd
+    ghcr_username: "{{ lookup('env', 'GHCR_USERNAME') | default('', true) }}"
+    ghcr_token: "{{ lookup('env', 'GHCR_TOKEN') | default('', true) }}"
+    compose_services:
+      - gateway
+      - postgres
+      - keycloak
+      - redis
+      - keycloak-config-cli
+      - client-web
+      - ai
+
+  pre_tasks:
+    - name: Validate required production secrets
+      ansible.builtin.assert:
+        that:
+          - postgres_password | length > 0
+          - keycloak_db_password | length > 0
+          - keycloak_admin_password | length > 0
+          - keycloak_client_secret | length > 0
+        fail_msg: "Set the production secrets via environment variables or Ansible Vault before deployment."
+
+  tasks:
+    - name: Ensure application directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ application_dir }}"
+        - "{{ application_dir }}/artifacts/gateway"
+        - "{{ application_dir }}/artifacts/keycloak/import"
+        - "{{ application_dir }}/artifacts/postgres/init"
+
+    - name: Copy Docker Compose file
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/docker-compose.yml"
+        dest: "{{ application_dir }}/docker-compose.yml"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy production Caddyfile
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/gateway/Caddyfile.prod"
+        dest: "{{ application_dir }}/artifacts/gateway/Caddyfile.prod"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Keycloak realm import
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/keycloak/import/tutormatch-realm.json"
+        dest: "{{ application_dir }}/artifacts/keycloak/import/tutormatch-realm.json"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Postgres initialization scripts
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/postgres/init/"
+        dest: "{{ application_dir }}/artifacts/postgres/init/"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0755"
+
+    - name: Write deployment environment file
+      ansible.builtin.copy:
+        dest: "{{ application_dir }}/.env.azure"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0600"
+        content: |
+          APP_HOSTNAME={{ app_hostname }}
+          APP_BASE_URL={{ app_base_url }}
+          GATEWAY_CADDYFILE=./artifacts/gateway/Caddyfile.prod
+          KEYCLOAK_HOSTNAME={{ keycloak_hostname }}
+          KEYCLOAK_ISSUER={{ keycloak_issuer }}
+          CLIENT_WEB_IMAGE={{ image_prefix }}/client-web:{{ image_tag }}
+          AI_IMAGE={{ image_prefix }}/ai:{{ image_tag }}
+          POSTGRES_DB={{ postgres_db }}
+          POSTGRES_USER={{ postgres_user }}
+          POSTGRES_PASSWORD={{ postgres_password }}
+          KEYCLOAK_DB={{ keycloak_db }}
+          KEYCLOAK_DB_USER={{ keycloak_db_user }}
+          KEYCLOAK_DB_PASSWORD={{ keycloak_db_password }}
+          KEYCLOAK_ADMIN={{ keycloak_admin }}
+          KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}
+          KEYCLOAK_CLIENT_ID={{ keycloak_client_id }}
+          KEYCLOAK_CLIENT_SECRET={{ keycloak_client_secret }}
+          LLM_PROVIDER={{ llm_provider }}
+          LLM_BASE_URL={{ llm_base_url }}
+          LLM_MODEL={{ llm_model }}
+          LLM_API_KEY={{ llm_api_key }}
+          SERVER_COMMUNICATION_API_URL={{ server_communication_api_url }}
+          SERVER_MARKETPLACE_API_URL={{ server_marketplace_api_url }}
+          SERVER_STUDENT_API_URL={{ server_student_api_url }}
+      no_log: true
+
+    - name: Log in to GHCR for private images
+      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker login ghcr.io --username "{{ ghcr_username }}" --password-stdin
+      args:
+        stdin: "{{ ghcr_token }}"
+      no_log: true
+      changed_when: true
+      when:
+        - ghcr_username | length > 0
+        - ghcr_token | length > 0
+
+    - name: Pull deployment images
+      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure --profile prod pull {{ compose_services | join(' ') }}
+      args:
+        chdir: "{{ application_dir }}"
+      changed_when: true
+
+    - name: Start Docker Compose project
+      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure --profile prod up -d --remove-orphans {{ compose_services | join(' ') }}
+      args:
+        chdir: "{{ application_dir }}"
+      changed_when: true
