@@ -18,9 +18,9 @@ az account set --subscription "<subscription-id-or-name>"
 
 ## One-command deployment
 
-Use the automation script for normal VM deployment. It runs Terraform, generates the Ansible inventory, waits for SSH, installs Docker on the VM, deploys the Docker Compose `prod` profile, and verifies that the VM is running GHCR images.
+Use the automation script for normal VM deployment. It runs Terraform, generates the Ansible inventory, waits for SSH, installs Docker on the VM, deploys the base Compose file plus the Azure override, and verifies that the VM is running GHCR images.
 
-The script loads unset environment variables from the repository root `.env` file before running Terraform and Ansible. Put production values such as `POSTGRES_PASSWORD`, `KEYCLOAK_DB_PASSWORD`, `KEYCLOAK_ADMIN_PASSWORD`, and `KEYCLOAK_CLIENT_SECRET` there, or export them in the shell before invoking the script.
+The script loads unset deployment variables from the repository root `.env` file before running Terraform and Ansible. Put production values such as `POSTGRES_PASSWORD`, `KEYCLOAK_DB_PASSWORD`, `KEYCLOAK_ADMIN_PASSWORD`, and `KEYCLOAK_CLIENT_SECRET` there, or export them in the shell before invoking the script. Local-only `.env` values are ignored unless they are on the script's deployment allowlist; use `AZURE_APP_HOSTNAME` in `.env` for Azure hostnames because local development may use `APP_HOSTNAME=tutormatch.localhost`.
 
 ```bash
 GHCR_USERNAME="<github-user>" \
@@ -49,7 +49,7 @@ infrastructure/terraform/scripts/azure-vm.sh deploy
 To use a real hostname instead of the default `<vm-ip>.nip.io`:
 
 ```bash
-APP_HOSTNAME="tutormatch.example.org" \
+AZURE_APP_HOSTNAME="tutormatch.example.org" \
 infrastructure/terraform/scripts/azure-vm.sh deploy
 ```
 
@@ -139,7 +139,7 @@ The playbook:
 
 ## Run Docker Compose on the VM
 
-The setup playbook prepares the VM. The run playbook deploys the single root `docker-compose.yml` plus runtime configuration files, then runs its `prod` profile to pull the published GHCR images. It does not copy the application source code to the VM and does not build images on the VM.
+The setup playbook prepares the VM. The run playbook deploys `docker-compose.yml`, `docker-compose.azure.yml`, and runtime configuration files. Docker Compose merges the base file with the Azure override, then pulls the published GHCR images. It does not copy the application source code to the VM and does not build images on the VM.
 
 By default, the VM deployment uses these image tags:
 
@@ -183,13 +183,13 @@ ansible-playbook \
 The playbook runs:
 
 ```bash
-docker compose --env-file .env.azure --profile prod pull gateway postgres keycloak redis keycloak-config-cli client-web ai
-docker compose --env-file .env.azure --profile prod up -d --remove-orphans gateway postgres keycloak redis keycloak-config-cli client-web ai
+docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml pull
+docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml up -d --remove-orphans
 ```
 
 from `/opt/tutormatch` as the `tutormatch` user. The playbook invokes this through `runuser` instead of Ansible's `become_user` to avoid temporary-file ACL issues when Ansible connects as one unprivileged SSH user and then switches to another unprivileged application user.
 
-The AI service uses the same hosted LLM defaults as the Helm deployment. Export `LLM_API_KEY` when the selected provider requires a token:
+The playbook writes `.env.azure` with mode `0600`. `docker-compose.azure.yml` requires production secrets instead of using development defaults. The AI service uses the same hosted LLM defaults as the Helm deployment; `LLM_API_KEY` is only included in `.env.azure` when it is non-empty, so the container keeps the AI code's safe fallback when no provider token is configured. Export `LLM_API_KEY` when the selected provider requires a token:
 
 ```bash
 export LLM_API_KEY="<provider-token>"
@@ -217,12 +217,12 @@ Then run these commands on the VM:
 sudo -iu tutormatch
 cd /opt/tutormatch
 
-docker compose --env-file .env.azure --profile prod ps
-docker compose --env-file .env.azure --profile prod images
-docker compose --env-file .env.azure --profile prod config | grep "build:" || echo "No build sections in prod profile"
+docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps
+docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml images
+docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml config | grep "build:" || echo "No build sections in Azure Compose config"
 
-docker inspect "$(docker compose --env-file .env.azure --profile prod ps -q client-web)" --format '{{ .Config.Image }}'
-docker inspect "$(docker compose --env-file .env.azure --profile prod ps -q ai)" --format '{{ .Config.Image }}'
+docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q client-web)" --format '{{ .Config.Image }}'
+docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q ai)" --format '{{ .Config.Image }}'
 ```
 
 The last two commands should print GHCR image references such as:
@@ -232,7 +232,7 @@ ghcr.io/aet-devops26/team-worksonourmachines/client-web:<git-sha>
 ghcr.io/aet-devops26/team-worksonourmachines/ai:<git-sha>
 ```
 
-If `docker compose ... config | grep "build:"` prints a `build:` entry, the VM is not using the intended `prod` profile.
+If `docker compose ... config | grep "build:"` prints a `build:` entry, the VM is not using the intended Azure Compose override.
 
 ## Stop or destroy the VM deployment
 
@@ -265,7 +265,7 @@ The script runs the equivalent VM-local Compose stop:
 vm_ip="$(terraform -chdir=infrastructure/terraform/azure-vm output -raw public_ip_address)"
 vm_user="$(terraform -chdir=infrastructure/terraform/azure-vm output -raw admin_username)"
 ssh "${vm_user}@${vm_ip}" \
-  'sudo -iu tutormatch sh -lc "cd /opt/tutormatch && docker compose --env-file .env.azure --profile prod down"'
+  'sudo -iu tutormatch sh -lc "cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml down"'
 ```
 
 That Ansible/SSH-style stop does not delete Azure resources. Run the Terraform destroy commands above when the goal is to remove the created Azure infrastructure.

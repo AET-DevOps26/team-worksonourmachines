@@ -10,8 +10,8 @@ AZURE_VM_SCRIPT := $(ROOT_DIR)/infrastructure/terraform/scripts/azure-vm.sh
 
 CONTAINER ?= docker
 COMPOSE := $(CONTAINER) compose
-COMPOSE_APP := $(COMPOSE) --profile dev
-COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) --profile tooling
+COMPOSE_APP := $(COMPOSE) -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docker-compose.dev.yml
+COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) -f $(ROOT_DIR)/docker-compose.tooling.yml
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
 
 
@@ -31,7 +31,7 @@ up: ## Start all services
 
 .PHONY: down
 down: ## Stop all services
-	@$(COMPOSE) down
+	@$(COMPOSE_APP) down
 
 # ----------------------------- Azure VM -----------------------------
 
@@ -169,7 +169,7 @@ clean: ## Clean all node_modules and build artifacts
 .PHONY: deep-clean
 deep-clean: clean ## Same as clean but also remove container items and pnpm stores
 	@$(COMPOSE_TOOLING) down -v --rmi all --remove-orphans
-	@$(COMPOSE) down -v --rmi all --remove-orphans
+	@$(COMPOSE_APP) down -v --rmi all --remove-orphans
 	@rm -rf $(API_DIR)/.pnpm-store
 	@rm -rf $(CLIENT_WEB_DIR)/.pnpm-store
 	@env_file=".env"; \

@@ -6,6 +6,8 @@
     application_user: tutormatch
     application_group: tutormatch
     application_dir: /opt/tutormatch
+    compose_base_file: docker-compose.yml
+    compose_azure_file: docker-compose.azure.yml
     repo_root: "{{ playbook_dir }}/../../.."
     image_prefix: ghcr.io/aet-devops26/team-worksonourmachines
     image_tag: latest
@@ -32,14 +34,6 @@
     server_student_api_url: tbd
     ghcr_username: "{{ lookup('env', 'GHCR_USERNAME') | default('', true) }}"
     ghcr_token: "{{ lookup('env', 'GHCR_TOKEN') | default('', true) }}"
-    compose_services:
-      - gateway
-      - postgres
-      - keycloak
-      - redis
-      - keycloak-config-cli
-      - client-web
-      - ai
 
   pre_tasks:
     - name: Validate required production secrets
@@ -65,10 +59,18 @@
         - "{{ application_dir }}/artifacts/keycloak/import"
         - "{{ application_dir }}/artifacts/postgres/init"
 
-    - name: Copy Docker Compose file
+    - name: Copy base Docker Compose file
       ansible.builtin.copy:
         src: "{{ repo_root }}/docker-compose.yml"
-        dest: "{{ application_dir }}/docker-compose.yml"
+        dest: "{{ application_dir }}/{{ compose_base_file }}"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Azure Docker Compose override
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/docker-compose.azure.yml"
+        dest: "{{ application_dir }}/{{ compose_azure_file }}"
         owner: "{{ application_user }}"
         group: "{{ application_group }}"
         mode: "0644"
@@ -124,7 +126,9 @@
           LLM_PROVIDER={{ llm_provider }}
           LLM_BASE_URL={{ llm_base_url }}
           LLM_MODEL={{ llm_model }}
+          {% if llm_api_key | length > 0 %}
           LLM_API_KEY={{ llm_api_key }}
+          {% endif %}
           SERVER_COMMUNICATION_API_URL={{ server_communication_api_url }}
           SERVER_MARKETPLACE_API_URL={{ server_marketplace_api_url }}
           SERVER_STUDENT_API_URL={{ server_student_api_url }}
@@ -141,13 +145,13 @@
         - ghcr_token | length > 0
 
     - name: Pull deployment images
-      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure --profile prod pull {{ compose_services | join(' ') }}
+      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure -f {{ compose_base_file }} -f {{ compose_azure_file }} pull
       args:
         chdir: "{{ application_dir }}"
       changed_when: true
 
     - name: Start Docker Compose project
-      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure --profile prod up -d --remove-orphans {{ compose_services | join(' ') }}
+      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure -f {{ compose_base_file }} -f {{ compose_azure_file }} up -d --remove-orphans
       args:
         chdir: "{{ application_dir }}"
       changed_when: true

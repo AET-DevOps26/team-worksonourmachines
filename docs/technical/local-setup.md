@@ -32,36 +32,36 @@ The repo uses two kinds of Compose services. They share the same source trees on
 
 ### Dev app containers
 
-Started with `make up`, stopped with `make down`. Defined in `docker-compose.yml` under the `dev` profile.
+Started with `make up`, stopped with `make down`. The local runtime is rendered from the base `docker-compose.yml` plus the local override `docker-compose.dev.yml`.
 
 Each service mounts host source code. Runtime dependencies are either baked into the image at build time or stored in a Compose volume, not in your home directory node_modules (except where tooling also installs on the host, see below).
 
-- **client-web-dev** binds `./artifacts/client-web` to `/app` and uses a named volume `client-web-node-modules` for `/app/node_modules`. On start, `docker/entrypoint.sh` runs `pnpm install --frozen-lockfile`, then the dev server. The container does not use host `node_modules`. `make init` installs `artifacts/client-web/node_modules` on the host for IDE support only. The service waits for Redis and for `keycloak-config-cli` to finish before starting.
-- **ai-dev** binds `./artifacts/ai` to `/app`. Python packages are installed in the image when the image is built. Uvicorn runs with reload on file changes.
-- **ollama** uses the upstream image. Model data persists in the `ollama_data` volume. The local `ai-dev` service depends on it.
-  +- **postgres** uses the upstream Postgres image. Database files persist in the `postgres_data` volume. Initialization scripts under `artifacts/postgres/init/` run only when this volume is first created.
+- **client-web** binds `./artifacts/client-web` to `/app` and uses named volumes for `/app/node_modules`, React Router cache, and Vite cache. On start, `docker/entrypoint.sh` runs `pnpm install --frozen-lockfile`, then the dev server. The container does not use host `node_modules`. `make init` installs `artifacts/client-web/node_modules` on the host for IDE support only. The service waits for Redis, `server-mock`, and for `keycloak-config-cli` to finish before starting.
+- **ai** binds `./artifacts/ai` to `/app`. Python packages are installed in the image when the image is built. Uvicorn runs with reload on file changes.
+- **ollama** uses the upstream image. Model data persists in the `ollama_data` volume. The local `ai` service depends on it.
+- **postgres** uses the upstream Postgres image. Database files persist in the `postgres_data` volume. Initialization scripts under `artifacts/postgres/init/` run only when this volume is first created.
 - **keycloak** uses the upstream Keycloak image in development mode and stores state in Postgres. It is not published to the host; reach it through the gateway at `https://auth.tutormatch.localhost`.
 - **keycloak-config-cli** applies the committed realm config from `artifacts/keycloak/import/` after Keycloak is healthy (see Local Keycloak below).
 - **redis** stores BFF session data and short-lived OIDC login transactions. The web app connects at `redis://redis:6379`.
-- **gateway** runs Caddy and is the only service that publishes ports `80` and `443`. It terminates TLS and routes traffic to `client-web-dev` and `keycloak`.
+- **gateway** runs Caddy and is the only service that publishes ports `80` and `443`. It terminates TLS and routes traffic to `client-web` and `keycloak`.
 
 Rebuild dev images when you change a `Dockerfile` or `requirements.txt` / lockfiles that affect the image build:
 
 ```bash
-docker compose --profile dev build
-# or rebuild a single service, e.g. docker compose --profile dev build ai-dev
+docker compose -f docker-compose.yml -f docker-compose.dev.yml build
+# or rebuild a single service, e.g. docker compose -f docker-compose.yml -f docker-compose.dev.yml build ai
 ```
 
 ### Tooling containers
 
-Used for `make lint`, `make format`, `make test`, `make api-generate`, and install steps during `make init`. They use the Compose profile `tooling` and are not started by `make up`.
+Used for `make lint`, `make format`, `make test`, `make api-generate`, and install steps during `make init`. They live in `docker-compose.tooling.yml` and are not started by `make up`.
 
 Tooling containers bind mount the artifact directory. They run as your user via `HOST_UID` and `HOST_GID` so generated or formatted files are not owned by root.
 
 - **api-tooling** and **client-web-tooling** run `pnpm install --frozen-lockfile` in their entrypoint, then the requested command. That installs into `api/node_modules` and `artifacts/client-web/node_modules` on the host.
 - **ai-tooling** uses Python and ruff inside the container. An anonymous volume is mounted on `/workspace/artifacts/ai/.venv` so the container does not overwrite the host `.venv` used by the IDE.
 
-Docker files for each artifact live under that artifact's `docker/` directory. Compose at the repo root references them with the repo root as build context.
+Docker files for each artifact live under that artifact's `docker/` directory. The local and tooling Compose overrides reference them with the repo root as build context.
 
 ### Python exception
 
@@ -137,10 +137,10 @@ Manual changes in the Keycloak admin UI to resources **outside** the JSON (for e
 Re-run config after changing `APP_HOSTNAME` or the realm file:
 
 ```bash
-docker compose --profile dev up -d --force-recreate keycloak-config-cli
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate keycloak-config-cli
 ```
 
-To reset Keycloak entirely, remove Compose volumes with `docker compose down -v` or run `make deep-clean`.
+To reset Keycloak entirely, remove Compose volumes with `make deep-clean`.
 
 Authentication on <https://tutormatch.localhost> uses a backend-for-frontend flow:
 
@@ -154,7 +154,7 @@ Protected routes use `protectedLoader` / `protectedAction`; unauthenticated requ
 
 Use one of the imported dummy users, for example `lukas.student@example.com` / `Tutormatch123!`.
 
-Keycloak's issuer is `https://auth.tutormatch.localhost/realms/tutormatch`, configured through `KEYCLOAK_ISSUER` and `KEYCLOAK_HOSTNAME`. Browser and BFF both use that URL; inside Docker, `auth.${APP_HOSTNAME}` resolves to the Caddy gateway, which proxies to Keycloak. Compose mounts Caddy's local root certificate into `client-web-dev` through `NODE_EXTRA_CA_CERTS` and sets `KEYCLOAK_LOGIN_FEATURE=v1` on Keycloak.
+Keycloak's issuer is `https://auth.tutormatch.localhost/realms/tutormatch`, configured through `KEYCLOAK_ISSUER` and `KEYCLOAK_HOSTNAME`. Browser and BFF both use that URL; inside Docker, `auth.${APP_HOSTNAME}` resolves to the Caddy gateway, which proxies to Keycloak. Compose mounts Caddy's local root certificate into `client-web` through `NODE_EXTRA_CA_CERTS` and sets `KEYCLOAK_LOGIN_FEATURE=v1` on Keycloak.
 
 ## Code quality commands
 
@@ -179,14 +179,16 @@ make client-web-pnpm ARGS="run dev"
 
 ## Environment variables
 
-We keep `.env.dist` small on purpose. Only put variables there that someone needs to run the dev containers on a fresh clone. Everything else belongs in `docker-compose.yml` with a default.
+We keep `.env.dist` small on purpose. Only put variables there that someone needs to run the dev containers on a fresh clone. The base `docker-compose.yml` defines shared image-first topology, `docker-compose.dev.yml` contains local build and hardcoded development values, and `docker-compose.azure.yml` contains production overrides consumed by the Azure automation.
 
 <!-- prettier-ignore -->
 | Location | Role | Examples today |
 | -------- | ---- | -------------- |
-| `.env.dist` copied to `.env` | Required secrets or values every developer must provide                                  | `LLM_API_KEY` |
-| `docker-compose.yml`         | Defaults for tuning, internal URLs, log levels, gateway hostnames, and deployment images | `APP_HOSTNAME`, `GATEWAY_CADDYFILE`, `CLIENT_WEB_IMAGE`, `AI_IMAGE`, `CLIENT_WEB_LOG_FORMAT`, `CLIENT_WEB_LOG_LEVEL`, `AI_LOG_LEVEL`, `LLM_PROVIDER`, `LLM_BASE_URL`, `KEYCLOAK_ADMIN`, `KEYCLOAK_DEV_CLI_ENABLED`, `KEYCLOAK_ISSUER`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`, `REDIS_URL`, placeholder server API URLs |
-| `.env` optional overrides | Override any variable referenced as `${VAR:-default}` in compose without editing compose | e.g. `AI_LOG_LEVEL=DEBUG` |
+| `.env.dist` copied to `.env` | Optional local or deployment overrides; local Compose has hardcoded development defaults | `KEYCLOAK_DEV_CLI_ENABLED`, optional `LLM_API_KEY`, Azure deployment secrets |
+| `docker-compose.yml`         | Shared image-first service topology, with no build directives or source bind mounts    | `CLIENT_WEB_IMAGE`, `AI_IMAGE`, shared service names and dependencies |
+| `docker-compose.dev.yml`     | Local build directives, source bind mounts, local URLs, and development defaults       | `APP_HOSTNAME`, local Keycloak values, Ollama defaults, server-mock URLs |
+| `docker-compose.azure.yml`   | Azure VM production overrides and required production values                           | `APP_HOSTNAME`, `APP_BASE_URL`, `KEYCLOAK_ISSUER`, `POSTGRES_PASSWORD`, `CLIENT_WEB_IMAGE`, `AI_IMAGE` |
+| `.env` optional overrides | Override variables referenced as `${VAR:-default}` in compose without editing compose | e.g. `LLM_MODEL=llama3.2:latest` |
 
 When adding new configuration:
 
@@ -223,12 +225,12 @@ Hooks are stored under `git/hooks/` in the repository so they are version contro
 | Stale `node_modules`, build output, or AI caches on the host | `make clean` |
 | Broken compose state, old images, pnpm store issues | `make deep-clean`, then `make init` |
 | Tooling container fails after Dockerfile or entrypoint changes | `make build-tooling-images` |
-| Dependency or lockfile changes not picked up in the dev container | `docker compose --profile dev restart client-web-dev` (entrypoint reinstalls into the named volume) |
+| Dependency or lockfile changes not picked up in the dev container | `docker compose -f docker-compose.yml -f docker-compose.dev.yml restart client-web` (entrypoint reinstalls into the named volume) |
 | Dependency or lockfile changes not picked up in the IDE | `make init` or run tooling install again |
 | Permission errors on files created by tooling | Check you are not mixing root-owned files with host UID tooling. Re-run init tooling steps after fixing ownership. |
 | Lint fails in pre-commit but you thought you were done | Run `make lint` locally; same command as the hook |
-| Keycloak rejects login / invalid redirect URI after hostname change | Re-run `docker compose --profile dev up -d --force-recreate keycloak-config-cli client-web-dev gateway` |
-| `client-web-dev` exits on startup with `Failed to discover OIDC configuration` / `fetch failed` | Caddy's internal TLS cert for `auth.tutormatch.localhost` is missing, expired, or not yet ready. Run `docker compose --profile dev restart gateway`, then `docker compose --profile dev up -d client-web-dev`. If it persists, remove the project-specific `caddy_data` volume and start again. |
+| Keycloak rejects login / invalid redirect URI after hostname change | Re-run `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate keycloak-config-cli client-web gateway` |
+| `client-web` exits on startup with `Failed to discover OIDC configuration` / `fetch failed` | Caddy's internal TLS cert for `auth.tutormatch.localhost` is missing, expired, or not yet ready. Run `docker compose -f docker-compose.yml -f docker-compose.dev.yml restart gateway`, then `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d client-web`. If it persists, remove the project-specific `caddy_data` volume and start again. |
 
 `make clean` removes api and client-web `node_modules`, client-web build artifacts, and AI `.venv`, `__pycache__`, and ruff cache.
 

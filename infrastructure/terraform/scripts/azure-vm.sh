@@ -13,8 +13,9 @@ Environment variables:
   IMAGE_TAG              GHCR image tag to deploy. Defaults to the latest successful Build and Push Images run on main.
   GHCR_USERNAME          GitHub username for private GHCR packages.
   GHCR_TOKEN             GitHub token with read:packages for private GHCR packages.
-  LLM_API_KEY            Optional LLM provider API key passed to the AI service.
-  APP_HOSTNAME           Optional public hostname. Defaults to <vm-public-ip>.nip.io.
+  LLM_API_KEY            Optional LLM provider API key passed to the AI service when set.
+  AZURE_APP_HOSTNAME     Optional public hostname loaded from .env. Defaults to <vm-public-ip>.nip.io.
+  APP_HOSTNAME           Optional shell-only public hostname override kept for compatibility.
   SSH_PRIVATE_KEY        SSH private key for the Azure admin user. Defaults to ~/.ssh/id_ed25519.
   TERRAFORM_DIR          Terraform directory. Defaults to infrastructure/terraform/azure-vm.
   INVENTORY_FILE         Generated Ansible inventory path.
@@ -25,7 +26,7 @@ Environment variables:
                          Terraform list of public TCP ports. Defaults to [22,80,443]; terraform.tfvars can override it.
   TF_VAR_*               Any Terraform variable supported by the Azure VM module.
 
-The script loads unset variables from the repository root .env file when it exists.
+The script loads unset deployment variables from the repository root .env file when it exists.
 
 Common examples:
   GHCR_USERNAME=<user> GHCR_TOKEN=<token> infrastructure/terraform/scripts/azure-vm.sh deploy
@@ -52,11 +53,22 @@ repo_root="$(cd "${script_dir}/../../.." && pwd)"
 
 action="${1:-deploy}"
 
+env_file_variable_is_allowed() {
+  case "$1" in
+    AZURE_APP_HOSTNAME|GHCR_USERNAME|GHCR_TOKEN|IMAGE_TAG|LLM_API_KEY|POSTGRES_PASSWORD|KEYCLOAK_DB_PASSWORD|KEYCLOAK_ADMIN_PASSWORD|KEYCLOAK_CLIENT_SECRET|ARM_SUBSCRIPTION_ID|SSH_PRIVATE_KEY|TERRAFORM_DIR|INVENTORY_FILE|PLAN_FILE|DESTROY_PLAN_FILE|TF_VAR_*)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 load_env_file() {
   local env_file="${repo_root}/.env"
   [[ -f "$env_file" ]] || return 0
 
-  log "Loading unset environment variables from ${env_file}"
+  log "Loading unset deployment environment variables from ${env_file}"
 
   local line name value
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -73,6 +85,10 @@ load_env_file() {
 
     name="${line%%=*}"
     value="${line#*=}"
+
+    if ! env_file_variable_is_allowed "$name"; then
+      continue
+    fi
 
     if [[ -n "${!name+x}" ]]; then
       continue
@@ -240,12 +256,13 @@ run_setup_playbook() {
 
 run_compose_playbook() {
   local extra_vars=("-e" "image_tag=${image_tag}")
+  local app_hostname_override="${AZURE_APP_HOSTNAME:-${APP_HOSTNAME:-}}"
 
-  if [[ -n "${APP_HOSTNAME:-}" ]]; then
-    extra_vars+=("-e" "app_hostname=${APP_HOSTNAME}")
+  if [[ -n "$app_hostname_override" ]]; then
+    extra_vars+=("-e" "app_hostname=${app_hostname_override}")
   fi
 
-  log "Deploying GHCR images with Docker Compose prod profile"
+  log "Deploying GHCR images with Docker Compose Azure override"
   ansible-playbook \
     -i "$inventory_file" \
     --private-key "$ssh_private_key" \
@@ -273,21 +290,21 @@ remote_command() {
 verify_deployment() {
   log "Verifying running containers and GHCR image references"
 
-  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure --profile prod ps'
-  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure --profile prod images'
+  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps'
+  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml images'
 
-  if remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure --profile prod config | grep "build:"'; then
-    printf 'Verification failed: prod profile contains a build section.\n' >&2
+  if remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml config | grep "build:"'; then
+    printf 'Verification failed: Azure Compose config contains a build section.\n' >&2
     exit 1
   fi
 
-  log "No build sections found in the prod profile"
-  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure --profile prod ps -q client-web)" --format "{{ .Config.Image }}"'
-  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure --profile prod ps -q ai)" --format "{{ .Config.Image }}"'
+  log "No build sections found in the Azure Compose config"
+  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q client-web)" --format "{{ .Config.Image }}"'
+  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q ai)" --format "{{ .Config.Image }}"'
 
   local public_ip app_hostname
   public_ip="$(terraform_output public_ip_address)"
-  app_hostname="${APP_HOSTNAME:-${public_ip}.nip.io}"
+  app_hostname="${AZURE_APP_HOSTNAME:-${APP_HOSTNAME:-${public_ip}.nip.io}}"
   log "Deployment URL: https://${app_hostname}"
   log "Keycloak URL: https://auth.${app_hostname}"
 }
@@ -297,7 +314,7 @@ stop_deployment() {
   ensure_terraform_inputs
   terraform_init
   log "Stopping Docker Compose application while keeping Azure resources"
-  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure --profile prod down'
+  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml down'
 }
 
 destroy_deployment() {
