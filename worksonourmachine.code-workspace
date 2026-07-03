@@ -95,6 +95,7 @@
             "editor.detectIndentation": false,
             "editor.insertSpaces": true,
             "editor.tabSize": 2
-        }
+        },
+        "java.compile.nullAnalysis.mode": "automatic"
     }
 }
