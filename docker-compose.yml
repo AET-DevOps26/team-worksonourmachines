@@ -13,6 +13,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
+      - client-web
       - keycloak
     networks:
       default:
@@ -114,29 +115,6 @@ services:
       PORT: "3000"
 
   client-web:
-    profiles: ["prod"]
-    image: ${CLIENT_WEB_IMAGE:-ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest}
-    restart: unless-stopped
-    environment:
-      NODE_ENV: production
-      LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
-      LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
-      APP_BASE_URL: ${APP_BASE_URL:-https://${APP_HOSTNAME:-tutormatch.localhost}}
-      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
-      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-secret}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
-      SERVER_COMMUNICATION_API_URL: ${SERVER_COMMUNICATION_API_URL:-tbd}
-      SERVER_MARKETPLACE_API_URL: ${SERVER_MARKETPLACE_API_URL:-tbd}
-      SERVER_STUDENT_API_URL: ${SERVER_STUDENT_API_URL:-tbd}
-    depends_on:
-      keycloak-config-cli:
-        condition: service_completed_successfully
-      redis:
-        condition: service_healthy
-
-  client-web-dev:
-    profiles: ["dev"]
     build:
       context: .
       dockerfile: artifacts/client-web/docker/Dockerfile
@@ -169,7 +147,6 @@ services:
         condition: service_started
 
   ollama:
-    profiles: ["dev"]
     image: ollama/ollama
     volumes:
       - ollama_data:/root/.ollama
@@ -187,18 +164,6 @@ services:
       start_period: 120s
 
   ai:
-    profiles: ["prod"]
-    image: ${AI_IMAGE:-ghcr.io/aet-devops26/team-worksonourmachines/ai:latest}
-    restart: unless-stopped
-    environment:
-      LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
-      LLM_PROVIDER: ${LLM_PROVIDER:-logos}
-      LLM_BASE_URL: ${LLM_BASE_URL:-https://logos.aet.cit.tum.de}
-      LLM_MODEL: ${LLM_MODEL:-openai/gpt-oss-120b}
-      LLM_API_KEY: ${LLM_API_KEY:-}
-
-  ai-dev:
-    profiles: ["dev"]
     build:
       context: .
       dockerfile: artifacts/ai/docker/Dockerfile
