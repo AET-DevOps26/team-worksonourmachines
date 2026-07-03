@@ -1,10 +1,6 @@
 # Default: any team member can review root-level changes
 * @juwCoding @ivanovahr @amritanshusikdar
 
-/worksonourmachine.code-workspace @juwCoding
-/Makefile @juwCoding
-/api/ @juwCoding
-/git/ @juwCoding
 /artifacts/client-web/ @juwCoding
 /artifacts/gateway/ @juwCoding
 /artifacts/api-ui/ @juwCoding
