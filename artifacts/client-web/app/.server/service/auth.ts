@@ -33,6 +33,7 @@ const oidcConfig = await client
             token_endpoint_auth_method: 'client_secret_post',
         },
         client.ClientSecretPost(env.get('KEYCLOAK_CLIENT_SECRET')),
+        env.isDev ? { execute: [client.allowInsecureRequests] } : undefined,
     )
     .then((config) => {
         logger.info('OIDC configuration discovered successfully');

@@ -29,6 +29,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -38,12 +41,13 @@ jobs:
           context: .
           file: artifacts/ai/docker/Dockerfile
           target: prod
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ env.IMAGE_PREFIX }}/ai:latest
             ${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=ai
+          cache-to: type=gha,mode=max,scope=ai
 
       - name: Build and push Client Web image
         uses: docker/build-push-action@v6
@@ -51,12 +55,13 @@ jobs:
           context: .
           file: artifacts/client-web/docker/Dockerfile
           target: prod
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ env.IMAGE_PREFIX }}/client-web:latest
             ${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=client-web
+          cache-to: type=gha,mode=max,scope=client-web
 
   deploy:
     runs-on: ubuntu-latest

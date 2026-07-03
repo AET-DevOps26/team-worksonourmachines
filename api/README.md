@@ -46,3 +46,48 @@ make api-generate
 ## Code Style
 
 Always use `pnpm run format` or from the root `make format` to format the files to the common standard. Formatting and linting of the spec files is not needed, as those are always generated the same way using TypeSpec. Use the formatter of the respective artifact to format the generated code.
+
+## Key Models
+
+### `LearningGoal` (`Student API`)
+
+Represents a student's study objective for a specific module.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | `string` | response only | Unique identifier |
+| `moduleId` | `string` | yes | The course/module this goal targets |
+| `topicIds` | `string[]` | yes | Topics within the module to focus on |
+| `description` | `string` | yes | Free-text description of the goal |
+| `targetDate` | `utcDateTime` | yes | Deadline the student is working towards |
+| `selfAssessedLevel` | `string` | yes | Student's self-assessed current level (e.g. `"beginner"`, `"intermediate"`) |
+| `budgetEur` | `float32` | no | Optional budget cap in EUR |
+| `locations` | `Location[]` | yes | Preferred tutoring locations (see `Location` enum in `marketplace.tsp`) |
+
+Endpoints: `GET/POST /v1/students/me/goals`, `GET/PUT/DELETE /v1/students/me/goals/{id}`.
+
+### `Milestone` (`Student API`)
+
+A concrete checkpoint belonging to a `LearningGoal`.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | `string` | response only | Unique identifier |
+| `goalId` | `string` | response only | Parent goal |
+| `title` | `string` | yes | Short label for the milestone |
+| `dueDate` | `utcDateTime` | yes | Target completion date |
+| `completed` | `boolean` | response only | Whether the milestone has been marked complete |
+
+Endpoints: `GET/POST /v1/students/me/goals/{goalId}/milestones`, `PUT/DELETE /v1/students/me/goals/{goalId}/milestones/{id}`, `POST .../complete` to mark done.
+
+### `StudyPlan` (`Student API`)
+
+Links one `LearningGoal` to its `Milestone`s. A student has at most one plan.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | `string` | response only | Unique identifier |
+| `goalId` | `string` | yes | The single `LearningGoal` this plan targets |
+| `milestoneIds` | `string[]` | yes | Ordered milestones that make up the plan |
+
+Endpoints: `GET /v1/students/me/plan`, `PUT /v1/students/me/plan` (create or replace).
