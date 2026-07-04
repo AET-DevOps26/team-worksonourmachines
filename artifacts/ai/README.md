@@ -14,16 +14,15 @@ The AI component is a FastAPI service that wraps a configurable LLM (Ollama, LM 
 | `student.displayName` | string | Display name |
 | `student.bio` | string | Free-text self-description — gives the AI context about the student's background |
 | `student.languages` | string[] | e.g. `["en", "de"]` — **primary filter for tutor selection**; only tutors who teach in at least one of these languages are considered. Falls back to all tutors if none match. |
+| `student.location` | string | Student's city / location — used to filter tutors who offer in-person sessions nearby |
 | `student.studyFocus` | `StudyFocus` | Self-assessed proficiency per study skill (1 = needs work, 5 = confident) — used to prioritise tutor matching and session sequencing |
-| `context` | string | Optional free-text from the student — e.g. "I struggle with proofs but exam is in 3 weeks" — passed directly into the LLM prompt for richer personalisation |
-| `studyGoal` | `"pass" \| "good_grade" \| "top_grade"` | The student's target outcome — influences how intensively the AI schedules sessions and selects tutors |
+| `dueDate` | ISO 8601 datetime | Target date by which the student wants to complete the plan (e.g. exam date) |
+| `description` | string | Free-text description of the learning goal — what the student wants to achieve |
+| `budgetEur` | float | Maximum budget in EUR the student is willing to spend across all sessions |
 | `course.id` | string | Course / module identifier |
 | `course.name` | string | Human-readable course name (e.g. "Linear Algebra") |
 | `course.topics` | `Topic[]` | Ordered list of topics with difficulty levels and study-focus weights |
-| `milestone.id` | string | Goal identifier (e.g. exam session) |
-| `milestone.name` | string | Human-readable goal name |
-| `milestone.dueDate` | ISO 8601 datetime | Deadline — the plan fits sessions before this date |
-| `milestone.completed` | boolean | Whether the milestone is already done |
+
 
 Tutor data (rates, languages, topic coverage, weekday availability) is fetched internally by the AI service from the Marketplace API and injected into the LLM prompt — it is not passed by the caller.
 
@@ -49,9 +48,7 @@ Each dimension is rated 1–5. For the student this reflects **self-assessed pro
 ```
 
 #### Budget
-The budget is not a top-level field in the current API contract — it is **derived** from the student context and the number of sessions the AI schedules.
-
-> **Planned extension:** add an explicit `budgetEur` field to `GeneratePlanRequest` so the AI can generate the three suggestion tiers described below without requiring three separate calls.
+The student's budget is passed explicitly as `budgetEur` (EUR). The AI uses it to define the "within budget" tier and as a reference for the other two tiers.
 
 ---
 
@@ -61,19 +58,23 @@ The AI generates (or should generate) **three ranked suggestions** for each requ
 
 | Tier | Label | Description |
 |---|---|---|
-| 1 | **Cheapest option** | Schedule built exclusively from the lowest-rate tutors who cover the required topics. Total cost is minimised; may not cover all topics if no cheap tutor covers them. |
-| 2 | **Within budget** | Balanced plan that stays inside the student's stated budget while covering all topics. Prefers higher-rated tutors when cost headroom allows. |
-| 3 | **Best quality** | Highest-rated or most experienced tutors for every topic, regardless of cost. Total may exceed the base budget. |
+| 1 | **Cheapest option** | Schedule built exclusively from the lowest-rate tutors who cover the required topics. Total cost is minimised; may not cover all topics or may have more tutor changes if no cheap tutor covers them. |
+| 2 | **Within budget** | Balanced plan that stays inside the student's stated budget while covering all topics if feasible. Prefers higher-rated tutors when cost headroom allows. |
+| 3 | **Best quality** | Highest-rated or most experienced tutors for every topic, regardless of cost. Total may exceed the base budget. 
 
-Each suggestion returns a `StudyPlan`:
+
+Each suggestion returns a `StudyPlan` with an array of milestones (one per topic) and a schedule:
 
 | Field | Type | Description |
 |---|---|---|
 | `planId` | string | Unique identifier for this plan |
-| `milestoneId` | string | The goal this plan targets |
-| `status` | `"pending" \| "ready" \| "failed"` | Async generation status |
+| `milestones` | `Milestone[]` | One milestone per topic — ordered checkpoints leading to the due date |
+| `milestone.id` | string | Unique milestone identifier |
+| `milestone.title` | string | Human-readable milestone name, e.g. "Master Matrix Decomposition" |
+| `milestone.dueDate` | ISO 8601 datetime | Target completion date for this topic milestone |
+| `suggestedTutors` | `Tutor[]` | Deduplicated list of tutors assigned in this plan — ideally one, as few as possible |
 | `mode` | `"standard" \| "cost_optimized"` | Mode used |
-| `schedule` | `ScheduleEntry[]` | Ordered list of suggested sessions |
+| `schedule` | `ScheduleEntry[]` | Ordered list of suggested sessions - which tutor for which topic |
 | `totalEstimatedCost` | float | Sum of all session costs in EUR |
 
 #### `ScheduleEntry` shape
@@ -133,6 +134,7 @@ You are an academic study planner. Your task is to suggest a personalised tutori
 ## Student
 - Name: {{student.displayName}}
 - About: {{student.bio}}
+- Location: {{student.location}}
 - Teaching language preference: {{student.languages | join(", ")}}
 - Self-assessed study skills (1 = needs work, 5 = confident):
   - Memorization: {{student.studyFocus.memorization}}
@@ -142,8 +144,10 @@ You are an academic study planner. Your task is to suggest a personalised tutori
 
 ## Goal
 - Course: {{course.name}}
-- Study goal: {{studyGoal}}  {# pass | good_grade | top_grade #}
-- Milestone: {{milestone.name}} on {{milestone.dueDate}}
+- Description: {{description}}
+- Study goal: {{studyGoal}}
+- Due date: {{dueDate}}
+- Budget: €{{budgetEur}}
 - Additional context from the student: {{context | default("none")}}
 
 ## Topics to cover
@@ -164,16 +168,18 @@ You are an academic study planner. Your task is to suggest a personalised tutori
 ## Instructions
 Generate THREE ranked study plan suggestions:
 1. **Cheapest option** — minimise total cost; use the lowest-rate tutors who cover each topic.
-2. **Within budget** — stay within the student's budget while preferring higher-rated tutors where possible.
+2. **Within budget** — stay within €{{budgetEur}} while preferring higher-rated tutors where possible.
 3. **Best quality** — use the highest-rated tutors for every topic regardless of cost.
 
 Rules:
 - Only assign tutors who cover the topic AND teach in one of the student's preferred languages (fall back to all tutors if none match).
 - Schedule sessions on weekdays when the tutor is available.
 - Prioritise topics where the student's weak skills (low studyFocus scores) overlap with the topic's high demands.
-- A student aiming to "pass" needs fewer sessions than one aiming for "top_grade" — scale intensity accordingly.
+- A student whose goal indicates minimal effort ("just pass") needs fewer sessions than one aiming for excellence — scale intensity accordingly.
+- Minimise the number of distinct tutors across the plan — ideally a single tutor covers all topics; only introduce a second (or third) tutor when no single tutor covers the remaining topics.
 - Do not suggest booking or transactions — this platform is for finding tutors only.
-- All sessions must fall before {{milestone.dueDate}}.
+- All sessions must fall before {{dueDate}}.
+- Generate one milestone per topic with a `title` and a `dueDate` spaced evenly before {{dueDate}}, ordered by topic priority.
 
 ## Output format
 Return a JSON array of exactly three plan objects in this shape:
@@ -181,6 +187,20 @@ Return a JSON array of exactly three plan objects in this shape:
   {
     "tier": "cheapest" | "within_budget" | "best_quality",
     "totalEstimatedCost": <float>,
+    "suggestedTutors": [
+      {
+        "tutorId": "<id>",
+        "tutorName": "<name>"
+      }
+    ],
+    "milestones": [
+      {
+        "id": "<unique id>",
+        "title": "<milestone title>",
+        "dueDate": "<ISO 8601 datetime>",
+        "completed": false
+      }
+    ],
     "schedule": [
       {
         "weekday": "<weekday>",
