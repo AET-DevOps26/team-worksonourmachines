@@ -4,7 +4,6 @@ TutorMatch is deployed to the TUM Rancher cluster. This document covers the Helm
 
 ## Live environment
 
-| | |
 |---|---|
 | **Cluster** | TUM Rancher (`stud` kubeconfig context) |
 | **Namespace** | `team-worksonourmachines` |
@@ -105,73 +104,142 @@ helm upgrade --install tutormatch helm/tutormatch \
   --set ai.llmApiKey=<key>
 ```
 
-## Checking the deployed AI service
 
-The AI service is not exposed through an Ingress — it is internal to the cluster. To hit it directly:
+## Local cluster (k3d)
+
+Run the full Helm chart on your laptop without touching the Rancher cluster. Uses [k3d](https://k3d.io/) (k3s in Docker) and `values.local.yaml`, which routes traffic through `tutormatch.127.0.0.1.nip.io` (no `/etc/hosts` edits needed — `nip.io` resolves `*.127.0.0.1.nip.io` to `127.0.0.1`).
+
+The chart uses `ingressClassName: nginx`. k3d's built-in Traefik must be disabled and [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) installed instead. TLS is handled by nginx's default self-signed certificate locally — expect a browser security warning on first visit.
+
+### Prerequisites
 
 ```bash
-kubectl --context stud -n team-worksonourmachines port-forward svc/ai 8000:8000
+brew install k3d kubectl helm
 ```
 
-Then in another terminal:
+Docker must be running.
+
+### 1. Create a cluster with port mappings
+
+Disable k3d's built-in Traefik so it doesn't conflict with nginx:
 
 ```bash
-curl -X POST http://localhost:8000/v1/chat \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "Hello"}'
+k3d cluster create tutormatch \
+  --port "80:80@loadbalancer" \
+  --port "443:443@loadbalancer" \
+  --k3s-arg '--disable=traefik@server:0'
 ```
 
-The `/health` endpoint is also available:
+### 2. Install nginx ingress controller
 
 ```bash
-curl http://localhost:8000/health
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --kube-context k3d-tutormatch \
+  --namespace ingress-nginx \
+  --create-namespace \
+  --set controller.service.type=LoadBalancer
+kubectl --context k3d-tutormatch -n ingress-nginx \
+  wait --for=condition=ready pod \
+  -l app.kubernetes.io/component=controller \
+  --timeout=90s
 ```
 
-## AI provider options
+### 3. Load images into the cluster
 
-The AI service (`artifacts/ai`) supports four providers configured via environment variables. In K8s these come from `values.yaml`; locally they come from `.env`.
+The chart pulls from GHCR. Do **not** import two images in parallel — k3d's import tool uses a shared tarball path and parallel writes corrupt each other. Run them sequentially.
 
-| Provider | Where it runs | VPN needed? | How to use |
-|---|---|---|---|
-| **Logos** | TUM cloud | Yes (TUM network/VPN) | Set `LLM_PROVIDER=logos`, `LLM_BASE_URL=https://logos.aet.cit.tum.de`, `LLM_API_KEY=lg-...` |
-| **Ollama** | Local Docker | No | Default in `docker-compose.yml`. Pulls the model on first start (~5 min, needs ~4 GB disk, slow without GPU) |
-| **LM Studio** | Local host app | No | Install LM Studio, load a model, enable the local server, set `LLM_PROVIDER=lmstudio`, `LLM_BASE_URL=http://host.docker.internal:1234/v1` |
-| **OpenAI** | OpenAI cloud | No | Set `LLM_PROVIDER=openai`, `LLM_API_KEY=sk-...` |
-
-### Running locally with Logos (recommended for dev without GPU)
-
-If you want to test the full stack locally but want to skip the Ollama startup time, use Logos. **You must be on TUM VPN.**
-
-1. Connect to TUM VPN.
-2. Edit `.env` (copy from `.env.dist` first if you haven't):
+**Option A — pull from GHCR** (needs a recent push to `main`):
 
 ```bash
-LLM_PROVIDER=logos
-LLM_BASE_URL=https://logos.aet.cit.tum.de
-LLM_MODEL=openai/gpt-oss-120b
-LLM_API_KEY=lg-...
+docker pull ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
+docker pull ghcr.io/aet-devops26/team-worksonourmachines/ai:latest
+k3d image import ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest -c tutormatch
+k3d image import ghcr.io/aet-devops26/team-worksonourmachines/ai:latest -c tutormatch
 ```
 
-3. Start the stack — the `ollama` service still starts but the AI container ignores it:
+**Option B — build locally and load** (build context is the repo root):
 
 ```bash
-make up
+docker build -f artifacts/client-web/docker/Dockerfile --target prod \
+  -t ghcr.io/aet-devops26/team-worksonourmachines/client-web:local .
+docker build -f artifacts/ai/docker/Dockerfile --target prod \
+  -t ghcr.io/aet-devops26/team-worksonourmachines/ai:local .
+k3d image import ghcr.io/aet-devops26/team-worksonourmachines/client-web:local -c tutormatch
+k3d image import ghcr.io/aet-devops26/team-worksonourmachines/ai:local -c tutormatch
 ```
 
-If you want to skip starting Ollama entirely (saves startup time and memory):
+When using locally-built images, add `--set clientWeb.image=...:local --set ai.image=...:local --set clientWeb.imagePullPolicy=IfNotPresent --set ai.imagePullPolicy=IfNotPresent` to the deploy command in step 5.
+
+### 4. Set the nginx ClusterIP in values.local.yaml
+
+`client-web` performs server-side OIDC discovery at startup against `https://auth.tutormatch.127.0.0.1.nip.io`. Two things must be set in `helm/tutormatch/values.local.yaml` for this to work:
+
+1. **`ingress.hostAliasIP`** — from inside the pod, `127.0.0.1` resolves to the pod loopback (not the host), so the nip.io hostnames must be aliased to the nginx ingress ClusterIP.
+2. **`clientWeb.tlsRejectUnauthorized: false`** — nginx uses a self-signed certificate locally; Node.js rejects it by default, which causes the OIDC fetch to fail.
+
+Get the nginx ClusterIP:
 
 ```bash
-docker compose up --scale ollama=0
+kubectl --context k3d-tutormatch -n ingress-nginx \
+  get svc ingress-nginx-controller -o jsonpath='{.spec.clusterIP}'
 ```
 
-> The `ai` service has `depends_on: ollama: condition: service_healthy` in `docker-compose.yml`. If you skip Ollama with `--scale ollama=0`, Docker Compose will warn about the unmet dependency but the `ai` container will still start. This is safe when using Logos.
+Edit `helm/tutormatch/values.local.yaml` and set `ingress.hostAliasIP` to the ClusterIP printed above. The `clientWeb.tlsRejectUnauthorized: false` entry is already present in `values.local.yaml`.
 
-### Switching providers at runtime
+> **If you recreate the cluster**, nginx gets a new ClusterIP. Repeat this step before deploying.
 
-The LLM provider is read from environment variables at startup. To switch, update `.env` and restart the AI service:
+### 5. Deploy with local overrides
+
+`values.local.yaml` sets `ai.llmBaseUrl: http://ollama:11434`. There is no Ollama pod in the chart — you must either start Ollama on your host or override to Logos.
+
+**Option A — Ollama on your host** (run `ollama serve` first):
 
 ```bash
-docker compose restart ai
+helm upgrade --install tutormatch helm/tutormatch \
+  --kube-context k3d-tutormatch \
+  --namespace team-worksonourmachines \
+  --create-namespace \
+  -f helm/tutormatch/values.local.yaml \
+  --set ai.llmBaseUrl=http://host.k3d.internal:11434
+```
+
+**Option B — Logos** (requires TUM VPN):
+
+```bash
+helm upgrade --install tutormatch helm/tutormatch \
+  --kube-context k3d-tutormatch \
+  --namespace team-worksonourmachines \
+  --create-namespace \
+  -f helm/tutormatch/values.local.yaml \
+  --set ai.llmProvider=logos \
+  --set ai.llmBaseUrl=https://logos.aet.cit.tum.de \
+  --set ai.llmModel=openai/gpt-oss-120b \
+  --set ai.llmApiKey=<your-logos-api-key>
+```
+
+### 6. Check rollout
+
+```bash
+kubectl --context k3d-tutormatch -n team-worksonourmachines get pods
+kubectl --context k3d-tutormatch -n team-worksonourmachines rollout status deployment/client-web
+kubectl --context k3d-tutormatch -n team-worksonourmachines rollout status deployment/ai
+```
+
+### 7. Open the app
+
+nginx uses HTTPS with its default self-signed certificate — accept the browser security warning on first visit.
+
+| URL | Service |
+|---|---|
+| <https://tutormatch.127.0.0.1.nip.io> | App |
+| <https://auth.tutormatch.127.0.0.1.nip.io> | Keycloak |
+
+### 8. Tear down
+
+```bash
+k3d cluster delete tutormatch
 ```
 
 ## Secrets
@@ -194,3 +262,6 @@ In K8s, secrets are managed by the Helm chart in `templates/secret.yaml`. They a
 | Keycloak `config-cli` Job fails | The Job has `helm.sh/hook: post-install,post-upgrade` — it runs after every `helm upgrade`. Check its logs: `kubectl --context stud -n team-worksonourmachines logs job/keycloak-config`. |
 | `client-web` redirects loop at login | Keycloak `client-web` redirect URIs may not match the current ingress host. Re-run `helm upgrade` so the config-cli Job reapplies the realm. |
 | Local stack slow / AI times out | Ollama is still downloading the model. Wait for `docker compose logs ollama` to show the pull complete, or switch to Logos. |
+| Local `client-web` crashes with `Failed to discover OIDC configuration` | Two possible causes: (1) `ingress.hostAliasIP` not set in `values.local.yaml` — nip.io resolves to the pod loopback inside the pod; (2) `clientWeb.tlsRejectUnauthorized` not set to `false` — Node.js rejects nginx's self-signed cert. Check both values are set and redeploy. |
+| Local ingresses show no `ADDRESS` / return 404 | nginx ingress controller not installed, or `ingressClassName` mismatch. Verify nginx is running: `kubectl --context k3d-tutormatch -n ingress-nginx get pods`. The chart uses `ingressClassName: nginx`. |
+| `k3d image import` fails with `invalid tar header` | Two imports ran in parallel and corrupted each other's tarball. Run imports sequentially. |
