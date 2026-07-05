@@ -1,0 +1,70 @@
+services:
+  gateway:
+    restart: unless-stopped
+    environment:
+      APP_HOSTNAME: ${APP_HOSTNAME:?Set APP_HOSTNAME for Azure deployment}
+    volumes:
+      - ./artifacts/gateway/Caddyfile.prod:/etc/caddy/Caddyfile:ro,Z
+
+  postgres:
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tutormatch}
+      POSTGRES_USER: ${POSTGRES_USER:-tutormatch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD for Azure deployment}
+      KEYCLOAK_DB: ${KEYCLOAK_DB:-keycloak}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?Set KEYCLOAK_DB_PASSWORD for Azure deployment}
+
+  keycloak:
+    restart: unless-stopped
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD for Azure deployment}
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?Set KEYCLOAK_DB_PASSWORD for Azure deployment}
+      KC_FEATURE_LOGIN: ${KEYCLOAK_LOGIN_FEATURE:-v1}
+      KC_HEALTH_ENABLED: "true"
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:?Set KEYCLOAK_HOSTNAME for Azure deployment}
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "true"
+      KC_PROXY_HEADERS: xforwarded
+
+  redis:
+    restart: unless-stopped
+
+  keycloak-config-cli:
+    environment:
+      APP_HOSTNAME: ${APP_HOSTNAME:?Set APP_HOSTNAME for Azure deployment}
+      KEYCLOAK_DEV_CLI_ENABLED: "false"
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD for Azure deployment}
+      KEYCLOAK_USER: ${KEYCLOAK_ADMIN:-admin}
+
+  client-web:
+    image: ${CLIENT_WEB_IMAGE:?Set CLIENT_WEB_IMAGE to the GHCR image tag}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
+      LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
+      APP_BASE_URL: ${APP_BASE_URL:?Set APP_BASE_URL for Azure deployment}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:?Set KEYCLOAK_ISSUER for Azure deployment}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:?Set KEYCLOAK_CLIENT_SECRET for Azure deployment}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      SERVER_COMMUNICATION_API_URL: ${SERVER_COMMUNICATION_API_URL:-tbd}
+      SERVER_MARKETPLACE_API_URL: ${SERVER_MARKETPLACE_API_URL:-tbd}
+      SERVER_STUDENT_API_URL: ${SERVER_STUDENT_API_URL:-tbd}
+
+  ai:
+    image: ${AI_IMAGE:?Set AI_IMAGE to the GHCR image tag}
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=${AI_LOG_LEVEL:-INFO}
+      - LLM_PROVIDER=${LLM_PROVIDER:-logos}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://logos.aet.cit.tum.de}
+      - LLM_MODEL=${LLM_MODEL:-openai/gpt-oss-120b}
+      - LLM_API_KEY

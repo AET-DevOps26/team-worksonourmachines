@@ -6,10 +6,12 @@ AI_DIR := $(ROOT_DIR)/artifacts/ai
 SERVER_COMMUNICATION_DIR := $(ROOT_DIR)/artifacts/server-communication
 SERVER_MARKETPLACE_DIR := $(ROOT_DIR)/artifacts/server-marketplace
 SERVER_STUDENT_DIR := $(ROOT_DIR)/artifacts/server-student
+AZURE_VM_SCRIPT := $(ROOT_DIR)/infrastructure/terraform/scripts/azure-vm.sh
 
 CONTAINER ?= docker
 COMPOSE := $(CONTAINER) compose
-COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) --profile tooling
+COMPOSE_APP := $(COMPOSE) -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docker-compose.dev.yml
+COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) -f $(ROOT_DIR)/docker-compose.tooling.yml
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
 
 
@@ -25,11 +27,33 @@ help: ## Show this help message
 
 .PHONY: up
 up: ## Start all services
-	@$(COMPOSE) up -d
+	@$(COMPOSE_APP) up -dist
+
+.PHONY: up
+up-build: ## Start all services
+	@$(COMPOSE_APP) up -d --build
 
 .PHONY: down
 down: ## Stop all services
-	@$(COMPOSE) down
+	@$(COMPOSE_APP) down --remove-orphans
+
+# ----------------------------- Azure VM -----------------------------
+
+.PHONY: azure-vm-deploy
+azure-vm-deploy: ## Deploy the Azure VM and application
+	@$(AZURE_VM_SCRIPT) deploy
+
+.PHONY: azure-vm-verify
+azure-vm-verify: ## Verify the Azure VM deployment
+	@$(AZURE_VM_SCRIPT) verify
+
+.PHONY: azure-vm-stop
+azure-vm-stop: ## Stop the Azure VM application without deleting Azure resources
+	@$(AZURE_VM_SCRIPT) stop
+
+.PHONY: azure-vm-destroy
+azure-vm-destroy: ## Delete all Terraform-managed Azure VM resources
+	@$(AZURE_VM_SCRIPT) destroy
 
 # ----------------------------- tooling -----------------------------
 
@@ -149,7 +173,7 @@ clean: ## Clean all node_modules and build artifacts
 .PHONY: deep-clean
 deep-clean: clean ## Same as clean but also remove container items and pnpm stores
 	@$(COMPOSE_TOOLING) down -v --rmi all --remove-orphans
-	@$(COMPOSE) down -v --rmi all --remove-orphans
+	@$(COMPOSE_APP) down -v --rmi all --remove-orphans
 	@rm -rf $(API_DIR)/.pnpm-store
 	@rm -rf $(CLIENT_WEB_DIR)/.pnpm-store
 	@env_file=".env"; \
