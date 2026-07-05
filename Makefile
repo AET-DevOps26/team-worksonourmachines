@@ -27,11 +27,15 @@ help: ## Show this help message
 
 .PHONY: up
 up: ## Start all services
-	@$(COMPOSE_APP) up -d
+	@$(COMPOSE_APP) up -dist
+
+.PHONY: up
+up-build: ## Start all services
+	@$(COMPOSE_APP) up -d --build
 
 .PHONY: down
 down: ## Stop all services
-	@$(COMPOSE_APP) down
+	@$(COMPOSE_APP) down --remove-orphans
 
 # ----------------------------- Azure VM -----------------------------
 

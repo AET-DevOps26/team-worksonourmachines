@@ -14,7 +14,7 @@ services:
       KEYCLOAK_DB_USER: keycloak
       KEYCLOAK_DB_PASSWORD: keycloak
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
 
   keycloak:
     environment:
@@ -81,6 +81,10 @@ services:
 
   ollama:
     image: ollama/ollama
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ollama_data:/root/.ollama
     entrypoint:
@@ -105,7 +109,7 @@ services:
     volumes:
       - ./artifacts/ai:/app:Z
     ports:
-      - 8000:8000
+      - 127.0.0.1:8000:8000
     environment:
       LOG_LEVEL: INFO
       LLM_PROVIDER: ollama
