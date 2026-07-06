@@ -1,0 +1,8 @@
+{
+  "metaData": {
+    "title": "TutorMatch API Reference",
+    "description": "OpenAPI specifications for TutorMatch services"
+  },
+  "hideTestRequestButton": true,
+  "hideClientButton": true
+}

@@ -37,7 +37,7 @@
                 - Capacity of tutors
                 - Location (campus, online, ...)
             - Problem: GenAI
-                - Recommender (which tutor to take) -> not good, as only limited amount of tutors, which one could just look through themselfs and *Gen*AI is not so useful for this
+                - Recommender (which tutor to take) -> not good, as only limited amount of tutors, which one could just look through themselves and *Gen*AI is not so useful for this
                 - basically ChatGPT, but with easy integration to ask a tutor specific open topics/messages -> sounds like an artificial use case
                 - AI-generated personal catch-up plan -> ChatGPT can do this as well
                 - Tutor session preparation assistant -> student communicates normally with AI for the normal working on the lecture. All the questions between the last and current meeting are summarized for the tutor to help him prepare for the lesson -> probably not so useful, as students use other AI than the one we provide + will the student ask enough questions to an AI between the (potentially weekly) sessions + in the first sessions, there is no data yet
@@ -52,7 +52,7 @@
 - Find meeting with tutor: 8.5. after Lecture
 - Todos until next meeting
     - Write Tutor @Julian
-        - e-Mail client fine, even though it already exsits
+        - e-Mail client fine, even though it already exists
         - Nachhilfe matcher nice, but no real GenAI use case -> do you have any ideas
         - Microservices -> networked or services within one spring boot application
         - Makefile

@@ -31,14 +31,14 @@
         - TBD
     - *Make sure GenAI is a real business use-case*
     - Name: TUtorMatcher, **TUtorMatch**, TUMatch, ~~Panic2Pro~~, DontTUMAlone, SaveMyTUM, TUMatcher
-- Architecture -> postpone for next meeting, everyone is lookin into his/her area
+- Architecture -> postpone for next meeting, everyone is looking into his/her area
 - Folder Structure -> defined in this meeting as present in the repo. The exact server artifact names need to be defined in next meeting
 - Backlog ideas -> postpone for next meeting, @Adi makes a proposal and sets up GitHub Project
 - Talk about UML -> postpone for next meeting, @Hrisi makes a proposal
 - Next steps project setup -> see todos
 - Find next meeting date: 04.05.26, 20.00
 - Todos until next meeting
-    - Project statment @Julian
+    - Project statement @Julian
     - Create system and first version of UML diagrams @Hrisi
     - Create GitHub Project @Adi
     - Backlog @Adi
