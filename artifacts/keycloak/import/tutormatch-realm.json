@@ -87,6 +87,21 @@
       }
     },
     {
+      "clientId": "server-marketplace-admin",
+      "name": "TUtorMatch Marketplace Admin API",
+      "description": "Service account for marketplace backend to assign realm roles via Admin API.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "server-marketplace-admin-secret",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false
+    },
+    {
       "clientId": "tutormatch-dev-cli",
       "name": "TUtorMatch Dev CLI",
       "description": "Local-only public client for requesting test tokens with dummy users.",
@@ -100,6 +115,15 @@
     }
   ],
   "users": [
+    {
+      "username": "service-account-server-marketplace-admin",
+      "serviceAccountClientId": "server-marketplace-admin",
+      "enabled": true,
+      "realmRoles": [],
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users", "query-users"]
+      }
+    },
     {
       "username": "admin.tutormatch@example.com",
       "email": "admin.tutormatch@example.com",

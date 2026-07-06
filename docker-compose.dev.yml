@@ -49,6 +49,12 @@ services:
       - server-mock-node-modules:/app/node_modules
     environment:
       PORT: "3000"
+      KEYCLOAK_ISSUER: ${KEYCLOAK_INTERNAL_ISSUER:-http://keycloak:8080/realms/tutormatch}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
+    depends_on:
+      keycloak-config-cli:
+        condition: service_completed_successfully
 
   client-web:
     image: tutormatch/client-web:dev
