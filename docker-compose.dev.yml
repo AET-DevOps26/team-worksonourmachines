@@ -122,6 +122,8 @@ services:
       LLM_BASE_URL: http://ollama:11434
       LLM_MODEL: ${LLM_MODEL:-llama3.2:latest}
       LLM_API_KEY: ${LLM_API_KEY:-not-required}
+      STUDENT_API_URL: http://server-mock:3000
+      MARKETPLACE_API_URL: http://server-mock:3000
     depends_on:
       ollama:
         condition: service_healthy
