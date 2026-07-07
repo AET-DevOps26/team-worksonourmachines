@@ -1,139 +1,68 @@
+import "../shared/errors.tsp";
+import "../shared/security.tsp";
+
 using Http;
+using TypeSpec.Http;
 using TypeSpec.Versioning;
+using Shared.Errors;
 
 enum AiVersions {
   v1: "v1",
 }
 
-enum PlanMode {
-  standard: "standard",
-  cost_optimized: "cost_optimized",
-}
+namespace Shared.Ai {
+  model PlanMilestone {
+    title: string;
+    dueDate: utcDateTime;
+    topicId: string;
+    tutorId: string;
+    estimatedCost: float32;
+  }
 
-enum PlanStatus {
-  pending: "pending",
-  ready: "ready",
-  failed: "failed",
-}
+  model ProposedTutor {
+    id: string;
+    displayName: string;
+    hourlyRate: float32;
+  }
 
-model Milestone {
-  id: string;
-  name: string;
-  completed: boolean;
-  dueDate: utcDateTime;
-}
+  enum PlanTier {
+    cheapest,
+    within_budget,
+    best_quality,
+  }
 
-model Topic {
-  id: string;
-  name: string;
-  difficultyLevel: int32;
-}
+  model PlanSuggestion {
+    tier: PlanTier;
+    description: string;
+    totalEstimatedCost: float32;
+    proposedTutors: ProposedTutor[];
+    milestones: PlanMilestone[];
+  }
 
-model Course {
-  id: string;
-  name: string;
-  topics: Topic[];
-}
+  model GeneratePlanRequest {
+    learningGoalId: string;
+  }
 
-model StudentContext {
-  id: string;
-  name: string;
-  preferredLanguages: string[];
-}
-
-model TutorAvailability {
-  date: plainDate;
-  slots: string[];
-}
-
-model Tutor {
-  id: string;
-  name: string;
-  hourlyRate: float32;
-  languages: string[];
-  topicIds: string[];
-  availability: TutorAvailability[];
-}
-
-model ScheduleEntry {
-  date: plainDate;
-  topicId: string;
-  topicName: string;
-  tutorId: string;
-  tutorName: string;
-  estimatedCost: float32;
-}
-
-model StudyPlan {
-  planId: string;
-  milestoneId: string;
-  status: PlanStatus;
-  mode: PlanMode;
-  schedule: ScheduleEntry[];
-  totalEstimatedCost: float32;
-}
-
-model GeneratePlanRequest {
-  mode: PlanMode;
-  milestone: Milestone;
-  student: StudentContext;
-  course: Course;
-  tutors: Tutor[];
-}
-
-model GeneratePlanResponse {
-  planId: string;
-}
-
-model GetPlanResponse {
-  plan: StudyPlan;
-}
-
-model ErrorResponse {
-  message: string;
+  model GeneratePlanResponse {
+    learningGoalId: string;
+    suggestions: PlanSuggestion[];
+  }
 }
 
 @service(#{ title: "AI API" })
 @server("https://ai.example.local", "AI API")
 @versioned(AiVersions)
+@useAuth(KeycloakBearerAuth)
 @route("/v1")
 namespace Ai {
-  @post
-  @route("/chat")
-  op chat(
-    @body body: {
-      prompt: string;
-    },
-  ): {
-    @header contentType: "application/json";
-    @statusCode statusCode: 200;
-    message: string;
-  };
+  using Shared.Ai;
 
+  @summary("Generate study plan")
+  @doc("Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything.")
   @post
   @route("/plan")
-  op generatePlan(@body body: GeneratePlanRequest): {
-    @header contentType: "application/json";
-    @statusCode statusCode: 202;
-    @body body: GeneratePlanResponse;
-  };
-
-  @get
-  @route("/plan/{planId}")
-  op getPlan(@path planId: string):
-    | {
-        @header contentType: "application/json";
-        @statusCode statusCode: 200;
-        @body body: GetPlanResponse;
-      }
-    | {
-        @header contentType: "application/json";
-        @statusCode statusCode: 202;
-        @body body: GeneratePlanResponse;
-      }
-    | {
-        @header contentType: "application/json";
-        @statusCode statusCode: 404;
-        @body body: ErrorResponse;
-      };
+  op generatePlan(@body body: GeneratePlanRequest):
+    | GeneratePlanResponse
+    | NotFoundError
+    | UnauthorizedError;
 }
