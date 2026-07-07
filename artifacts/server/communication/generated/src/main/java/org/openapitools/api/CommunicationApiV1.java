@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.22.0")
 @Validated
-public interface V1Api {
+public interface CommunicationApiV1 {
 
     String PATH_GET_CONVERSATION = "/v1/conversations/{id}";
     /**
@@ -41,7 +41,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_GET_CONVERSATION,
+        value = CommunicationApiV1.PATH_GET_CONVERSATION,
         produces = { "application/json" }
     )
     ResponseEntity<SharedCommunicationConversationDetail> getConversation(
@@ -59,7 +59,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_LIST_CONVERSATIONS,
+        value = CommunicationApiV1.PATH_LIST_CONVERSATIONS,
         produces = { "application/json" }
     )
     ResponseEntity<List<SharedCommunicationConversationSummary>> listConversations(
@@ -81,7 +81,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_LIST_MESSAGES,
+        value = CommunicationApiV1.PATH_LIST_MESSAGES,
         produces = { "application/json" }
     )
     ResponseEntity<MessagePage> listMessages(
@@ -105,7 +105,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.POST,
-        value = V1Api.PATH_SEND_MESSAGE,
+        value = CommunicationApiV1.PATH_SEND_MESSAGE,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -127,7 +127,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.POST,
-        value = V1Api.PATH_START_CONVERSATION,
+        value = CommunicationApiV1.PATH_START_CONVERSATION,
         produces = { "application/json" },
         consumes = { "application/json" }
     )

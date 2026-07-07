@@ -1,8 +1,4 @@
-.openapi-generator-ignore
-README.md
-pom.xml
-src/main/java/org/openapitools/api/ApiUtil.java
-src/main/java/org/openapitools/api/V1Api.java
+src/main/java/org/openapitools/api/CommunicationApiV1.java
 src/main/java/org/openapitools/model/MessagePage.java
 src/main/java/org/openapitools/model/SharedCommunicationChatMessage.java
 src/main/java/org/openapitools/model/SharedCommunicationConversationDetail.java

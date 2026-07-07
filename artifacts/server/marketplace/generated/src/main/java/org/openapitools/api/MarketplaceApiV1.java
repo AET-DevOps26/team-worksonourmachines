@@ -38,7 +38,7 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.22.0")
 @Validated
-public interface V1Api {
+public interface MarketplaceApiV1 {
 
     String PATH_APPROVE_TUTOR_APPLICATION = "/v1/admin/tutor-applications/{id}/approve";
     /**
@@ -52,7 +52,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.POST,
-        value = V1Api.PATH_APPROVE_TUTOR_APPLICATION,
+        value = MarketplaceApiV1.PATH_APPROVE_TUTOR_APPLICATION,
         produces = { "application/json" }
     )
     ResponseEntity<SharedMarketplaceApproveApplicationResponse> approveTutorApplication(
@@ -72,7 +72,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.POST,
-        value = V1Api.PATH_CREATE_ADMIN_MODULE,
+        value = MarketplaceApiV1.PATH_CREATE_ADMIN_MODULE,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -93,7 +93,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_GET_MODULE,
+        value = MarketplaceApiV1.PATH_GET_MODULE,
         produces = { "application/json" }
     )
     ResponseEntity<SharedMarketplaceModuleDetail> getModule(
@@ -111,7 +111,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_GET_MY_TUTOR_PROFILE,
+        value = MarketplaceApiV1.PATH_GET_MY_TUTOR_PROFILE,
         produces = { "application/json" }
     )
     ResponseEntity<SharedMarketplaceTutorMeResponse> getMyTutorProfile(
@@ -131,7 +131,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_GET_TUTOR,
+        value = MarketplaceApiV1.PATH_GET_TUTOR,
         produces = { "application/json" }
     )
     ResponseEntity<SharedMarketplaceTutorDetail> getTutor(
@@ -149,7 +149,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_LIST_ADMIN_MODULES,
+        value = MarketplaceApiV1.PATH_LIST_ADMIN_MODULES,
         produces = { "application/json" }
     )
     ResponseEntity<List<SharedMarketplaceModuleDetail>> listAdminModules(
@@ -168,7 +168,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_LIST_ADMIN_TUTOR_APPLICATIONS,
+        value = MarketplaceApiV1.PATH_LIST_ADMIN_TUTOR_APPLICATIONS,
         produces = { "application/json" }
     )
     ResponseEntity<List<SharedMarketplaceTutorApplication>> listAdminTutorApplications(
@@ -189,7 +189,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_LIST_MODULES,
+        value = MarketplaceApiV1.PATH_LIST_MODULES,
         produces = { "application/json" }
     )
     ResponseEntity<ModulePage> listModules(
@@ -209,7 +209,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_LIST_MY_TUTOR_APPLICATIONS,
+        value = MarketplaceApiV1.PATH_LIST_MY_TUTOR_APPLICATIONS,
         produces = { "application/json" }
     )
     ResponseEntity<List<SharedMarketplaceTutorApplication>> listMyTutorApplications(
@@ -239,7 +239,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_LIST_TUTORS,
+        value = MarketplaceApiV1.PATH_LIST_TUTORS,
         produces = { "application/json" }
     )
     ResponseEntity<TutorPage> listTutors(
@@ -271,7 +271,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.POST,
-        value = V1Api.PATH_REJECT_TUTOR_APPLICATION,
+        value = MarketplaceApiV1.PATH_REJECT_TUTOR_APPLICATION,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -293,7 +293,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.POST,
-        value = V1Api.PATH_SUBMIT_TUTOR_APPLICATION,
+        value = MarketplaceApiV1.PATH_SUBMIT_TUTOR_APPLICATION,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -315,7 +315,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = V1Api.PATH_UPDATE_ADMIN_MODULE,
+        value = MarketplaceApiV1.PATH_UPDATE_ADMIN_MODULE,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -337,7 +337,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = V1Api.PATH_UPDATE_MY_TUTOR_PROFILE,
+        value = MarketplaceApiV1.PATH_UPDATE_MY_TUTOR_PROFILE,
         produces = { "application/json" },
         consumes = { "application/json" }
     )

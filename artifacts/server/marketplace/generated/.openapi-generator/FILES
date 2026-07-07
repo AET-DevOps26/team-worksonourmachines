@@ -1,9 +1,4 @@
-.openapi-generator-ignore
-README.md
-pom.xml
-src/main/java/org/openapitools/api/ApiUtil.java
-src/main/java/org/openapitools/api/V1Api.java
-src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java
+src/main/java/org/openapitools/api/MarketplaceApiV1.java
 src/main/java/org/openapitools/model/ModulePage.java
 src/main/java/org/openapitools/model/SharedErrorsErrorBody.java
 src/main/java/org/openapitools/model/SharedMarketplaceAdminModuleInput.java
