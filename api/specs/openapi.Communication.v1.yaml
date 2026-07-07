@@ -159,7 +159,11 @@ paths:
             schema:
               $ref: '#/components/schemas/Shared.Communication.SendMessageRequest'
 security:
-  - KeycloakBearerAuth: []
+  - KeycloakBearerAuth:
+      - openid
+      - profile
+      - email
+      - roles
 components:
   parameters:
     Shared.Pagination.PageParams.page:
@@ -299,9 +303,16 @@ components:
           type: string
   securitySchemes:
     KeycloakBearerAuth:
-      type: http
-      scheme: Bearer
-      description: Keycloak access token issued to the BFF client
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          scopes:
+            openid: ''
+            profile: ''
+            email: ''
+            roles: ''
+      description: Keycloak OAuth2 client credentials auth for Scalar/API testing
 servers:
   - url: https://communication.example.local
     description: Communication API

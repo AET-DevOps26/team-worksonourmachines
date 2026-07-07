@@ -54,7 +54,11 @@ paths:
             schema:
               $ref: '#/components/schemas/Shared.Student.StudentProfileInput'
 security:
-  - KeycloakBearerAuth: []
+  - KeycloakBearerAuth:
+      - openid
+      - profile
+      - email
+      - roles
 components:
   schemas:
     Shared.Errors.ErrorBody:
@@ -140,10 +144,17 @@ components:
       description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
   securitySchemes:
     KeycloakBearerAuth:
-      type: http
-      scheme: Bearer
-      description: Keycloak access token issued to the BFF client
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          scopes:
+            openid: ''
+            profile: ''
+            email: ''
+            roles: ''
+      description: Keycloak OAuth2 client credentials auth for Scalar/API testing
 servers:
-  - url: https://student.example.local
+  - url: https://api.tutormatch.localhost
     description: Student API
     variables: {}

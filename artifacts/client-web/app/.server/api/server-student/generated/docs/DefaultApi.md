@@ -1,6 +1,6 @@
 # DefaultApi
 
-All URIs are relative to *https://student.example.local*
+All URIs are relative to *https://api.tutormatch.localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
@@ -29,8 +29,8 @@ import type { GetMyProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: KeycloakBearerAuth
-    accessToken: "YOUR BEARER TOKEN",
+    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
 
@@ -93,8 +93,8 @@ import type { UpdateMyProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: KeycloakBearerAuth
-    accessToken: "YOUR BEARER TOKEN",
+    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
 
@@ -128,7 +128,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth](../README.md#KeycloakBearerAuth)
+[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
 
 ### HTTP request headers
 
