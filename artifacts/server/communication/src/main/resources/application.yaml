@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: server-communication
+
+server:
+  port: ${PORT:8083}

@@ -1,3 +1,15 @@
+x-server-base: &server-base
+  image: maven:3.9-eclipse-temurin-17
+  working_dir: /app/server
+  volumes:
+    - ./artifacts/server:/app/server:Z
+    - server-maven-repository:/root/.m2
+  depends_on:
+    postgres:
+      condition: service_healthy
+    keycloak-config-cli:
+      condition: service_completed_successfully
+
 services:
   gateway:
     environment:
@@ -39,22 +51,46 @@ services:
       KEYCLOAK_PASSWORD: admin
       KEYCLOAK_USER: admin
 
-  server-mock:
-    image: tutormatch/server-mock:dev
-    build:
-      context: .
-      dockerfile: artifacts/server-mock/docker/Dockerfile
-    volumes:
-      - ./artifacts/server-mock:/app:Z
-      - server-mock-node-modules:/app/node_modules
+#  server-mock:
+#    image: tutormatch/server-mock:dev
+#    build:
+#      context: .
+#      dockerfile: artifacts/server-mock/docker/Dockerfile
+#    volumes:
+#      - ./artifacts/server-mock:/app:Z
+#      - server-mock-node-modules:/app/node_modules
+#    environment:
+#      PORT: "3000"
+#      KEYCLOAK_ISSUER: ${KEYCLOAK_INTERNAL_ISSUER:-http://keycloak:8080/realms/tutormatch}
+#      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
+#      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
+#    depends_on:
+#      keycloak-config-cli:
+#        condition: service_completed_successfully
+
+  server-communication:
+    <<: *server-base
     environment:
-      PORT: "3000"
-      KEYCLOAK_ISSUER: ${KEYCLOAK_INTERNAL_ISSUER:-http://keycloak:8080/realms/tutormatch}
-      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
-      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
-    depends_on:
-      keycloak-config-cli:
-        condition: service_completed_successfully
+      PORT: "8083"
+    command: ["mvn", "-pl", "communication", "spring-boot:run"]
+    ports:
+      - 127.0.0.1:8083:8083
+
+  server-marketplace:
+    <<: *server-base
+    environment:
+      PORT: "8082"
+    command: ["mvn", "-pl", "communication", "spring-boot:run"]
+    ports:
+      - 127.0.0.1:8082:8082
+
+  server-student:
+    <<: *server-base
+    environment:
+      PORT: "8081"
+    command: ["mvn", "-pl", "student", "spring-boot:run"]
+    ports:
+      - 127.0.0.1:8081:8081
 
   client-web:
     image: tutormatch/client-web:dev
@@ -78,11 +114,17 @@ services:
       KEYCLOAK_CLIENT_ID: client-web
       KEYCLOAK_CLIENT_SECRET: client-web-dev-secret
       REDIS_URL: redis://redis:6379
-      SERVER_COMMUNICATION_API_URL: tbd
-      SERVER_MARKETPLACE_API_URL: http://server-mock:3000
-      SERVER_STUDENT_API_URL: http://server-mock:3000
+      SERVER_COMMUNICATION_API_URL: http://server-communication:8083
+      SERVER_MARKETPLACE_API_URL: http://server-marketplace:8082
+      SERVER_STUDENT_API_URL: http://server-student:8081
     depends_on:
-      server-mock:
+#      server-mock:
+#        condition: service_started
+      server-communication:
+        condition: service_started
+      server-marketplace:
+        condition: service_started
+      server-student:
         condition: service_started
 
   ollama:
@@ -127,7 +169,8 @@ services:
         condition: service_healthy
 
 volumes:
-  server-mock-node-modules:
+#  server-mock-node-modules:
+  server-maven-repository:
   client-web-node-modules:
   client-web-react-router-cache:
   client-web-vite-cache:

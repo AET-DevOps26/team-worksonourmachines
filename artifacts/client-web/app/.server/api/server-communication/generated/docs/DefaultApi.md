@@ -32,8 +32,8 @@ import type { GetConversationRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: KeycloakBearerAuth
-    accessToken: "YOUR BEARER TOKEN",
+    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
 
@@ -67,7 +67,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth](../README.md#KeycloakBearerAuth)
+[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
 
 ### HTTP request headers
 
@@ -105,8 +105,8 @@ import type { ListConversationsRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: KeycloakBearerAuth
-    accessToken: "YOUR BEARER TOKEN",
+    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
 
@@ -132,7 +132,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakBearerAuth](../README.md#KeycloakBearerAuth)
+[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
 
 ### HTTP request headers
 
@@ -169,8 +169,8 @@ import type { ListMessagesRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: KeycloakBearerAuth
-    accessToken: "YOUR BEARER TOKEN",
+    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
 
@@ -210,7 +210,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth](../README.md#KeycloakBearerAuth)
+[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
 
 ### HTTP request headers
 
@@ -248,8 +248,8 @@ import type { SendMessageRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: KeycloakBearerAuth
-    accessToken: "YOUR BEARER TOKEN",
+    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
 
@@ -286,7 +286,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth](../README.md#KeycloakBearerAuth)
+[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
 
 ### HTTP request headers
 
@@ -325,8 +325,8 @@ import type { StartConversationRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // Configure HTTP bearer authorization: KeycloakBearerAuth
-    accessToken: "YOUR BEARER TOKEN",
+    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
 
@@ -360,7 +360,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth](../README.md#KeycloakBearerAuth)
+[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
 
 ### HTTP request headers
 
