@@ -3,9 +3,9 @@ ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 API_DIR := $(ROOT_DIR)/api
 CLIENT_WEB_DIR := $(ROOT_DIR)/artifacts/client-web
 AI_DIR := $(ROOT_DIR)/artifacts/ai
-SERVER_COMMUNICATION_DIR := $(ROOT_DIR)/artifacts/server-communication
-SERVER_MARKETPLACE_DIR := $(ROOT_DIR)/artifacts/server-marketplace
-SERVER_STUDENT_DIR := $(ROOT_DIR)/artifacts/server-student
+SERVER_COMMUNICATION_DIR := $(ROOT_DIR)/artifacts/server/communication
+SERVER_MARKETPLACE_DIR := $(ROOT_DIR)/artifacts/server/marketplace
+SERVER_STUDENT_DIR := $(ROOT_DIR)/artifacts/server/student
 AZURE_VM_SCRIPT := $(ROOT_DIR)/infrastructure/terraform/scripts/azure-vm.sh
 
 CONTAINER ?= docker
@@ -73,11 +73,11 @@ format: ## Format all code
 	@$(RUN_TOOLING) client-web-tooling run format
 	@echo "Formatting AI code..."
 	@$(RUN_TOOLING) ai-tooling run format
-	@echo "Formatting server-communication code..."
+	@echo "Formatting `server/communication` code..."
 	@echo "Not implemented yet; TODO replace with actual formatting command"
-	@echo "Formatting server-marketplace code..."
+	@echo "Formatting `server/marketplace` code..."
 	@echo "Not implemented yet; TODO replace with actual formatting command"
-	@echo "Formatting server-student code..."
+	@echo "Formatting `server/student` code..."
 	@echo "Not implemented yet; TODO replace with actual formatting command"
 
 .PHONY: fmt
@@ -92,11 +92,11 @@ lint: ## Lint all code
 	@$(RUN_TOOLING) client-web-tooling run lint
 	@echo "Linting AI code..."
 	@$(RUN_TOOLING) ai-tooling run lint
-	@echo "Linting server-communication code..."
+	@echo "Linting `server/communication` code..."
 	@echo "Not implemented yet; TODO replace with actual linting command"
-	@echo "Linting server-marketplace code..."
+	@echo "Linting `server/marketplace` code..."
 	@echo "Not implemented yet; TODO replace with actual linting command"
-	@echo "Linting server-student code..."
+	@echo "Linting `server/student` code..."
 	@echo "Not implemented yet; TODO replace with actual linting command"
 
 .PHONY: test
@@ -105,11 +105,11 @@ test: ## Run all tests
 	@$(RUN_TOOLING) client-web-tooling run test
 	@echo "Testing AI code..."
 	@$(RUN_TOOLING) ai-tooling run test
-	@echo "Testing server-communication code..."
+	@echo "Testing `server/communication` code..."
 	@echo "Not implemented yet; TODO replace with actual testing command"
-	@echo "Testing server-marketplace code..."
+	@echo "Testing `server/marketplace` code..."
 	@echo "Not implemented yet; TODO replace with actual testing command"
-	@echo "Testing server-student code..."
+	@echo "Testing `server/student` code..."
 	@echo "Not implemented yet; TODO replace with actual testing command"
 
 ARGS ?=
