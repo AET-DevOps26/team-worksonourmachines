@@ -4,287 +4,140 @@ info:
   version: v1
 tags: []
 paths:
-  /v1/chat:
-    post:
-      operationId: chat
-      summary: Chat with AI
-      description: Sends a prompt to the AI service and returns a generated response.
-      parameters: []
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                prompt:
-                  type: string
-              required:
-                - prompt
   /v1/plan:
     post:
       operationId: generatePlan
+      summary: Generate study plan
+      description: Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything.
       parameters: []
-      responses:
-        '202':
-          description: The request has been accepted for processing, but processing has not yet completed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GeneratePlanResponse'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GeneratePlanRequest'
-  /v1/plan/{planId}:
-    get:
-      operationId: getPlan
-      parameters:
-        - name: planId
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPlanResponse'
-        '202':
-          description: The request has been accepted for processing, but processing has not yet completed.
+                $ref: '#/components/schemas/Shared.Ai.GeneratePlanResponse'
+        '401':
+          description: Access is unauthorized.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GeneratePlanResponse'
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
         '404':
           description: The server cannot find the requested resource.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shared.Ai.GeneratePlanRequest'
+security:
+  - KeycloakBearerAuth: []
 components:
   schemas:
-    Course:
+    Shared.Errors.ErrorBody:
       type: object
       required:
-        - id
-        - name
-        - topics
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        topics:
-          type: array
-          items:
-            $ref: '#/components/schemas/Topic'
-    ErrorResponse:
-      type: object
-      required:
+        - code
         - message
       properties:
+        code:
+          type: string
         message:
           type: string
-    GeneratePlanRequest:
+    Shared.Ai.PlanTier:
+      type: string
+      enum:
+        - cheapest
+        - within_budget
+        - best_quality
+    Shared.Ai.PlanMilestone:
       type: object
       required:
-        - mode
-        - milestone
-        - student
-        - course
-        - tutors
-      properties:
-        mode:
-          $ref: '#/components/schemas/PlanMode'
-        milestone:
-          $ref: '#/components/schemas/Milestone'
-        student:
-          $ref: '#/components/schemas/StudentContext'
-        course:
-          $ref: '#/components/schemas/Course'
-        tutors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Tutor'
-    GeneratePlanResponse:
-      type: object
-      required:
-        - planId
-      properties:
-        planId:
-          type: string
-    GetPlanResponse:
-      type: object
-      required:
-        - plan
-      properties:
-        plan:
-          $ref: '#/components/schemas/StudyPlan'
-    Milestone:
-      type: object
-      required:
-        - id
-        - name
-        - completed
+        - title
         - dueDate
+        - topicId
+        - tutorId
+        - estimatedCost
       properties:
-        id:
+        title:
           type: string
-        name:
-          type: string
-        completed:
-          type: boolean
         dueDate:
           type: string
           format: date-time
-    PlanMode:
-      type: string
-      enum:
-        - standard
-        - cost_optimized
-    PlanStatus:
-      type: string
-      enum:
-        - pending
-        - ready
-        - failed
-    ScheduleEntry:
-      type: object
-      required:
-        - date
-        - topicId
-        - topicName
-        - tutorId
-        - tutorName
-        - estimatedCost
-      properties:
-        date:
-          type: string
-          format: date
         topicId:
           type: string
-        topicName:
-          type: string
         tutorId:
-          type: string
-        tutorName:
           type: string
         estimatedCost:
           type: number
           format: float
-    StudentContext:
+    Shared.Ai.ProposedTutor:
       type: object
       required:
         - id
-        - name
-        - preferredLanguages
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        preferredLanguages:
-          type: array
-          items:
-            type: string
-    StudyPlan:
-      type: object
-      required:
-        - planId
-        - milestoneId
-        - status
-        - mode
-        - schedule
-        - totalEstimatedCost
-      properties:
-        planId:
-          type: string
-        milestoneId:
-          type: string
-        status:
-          $ref: '#/components/schemas/PlanStatus'
-        mode:
-          $ref: '#/components/schemas/PlanMode'
-        schedule:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScheduleEntry'
-        totalEstimatedCost:
-          type: number
-          format: float
-    Topic:
-      type: object
-      required:
-        - id
-        - name
-        - difficultyLevel
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        difficultyLevel:
-          type: integer
-          format: int32
-    Tutor:
-      type: object
-      required:
-        - id
-        - name
+        - displayName
         - hourlyRate
-        - languages
-        - topicIds
-        - availability
       properties:
         id:
           type: string
-        name:
+        displayName:
           type: string
         hourlyRate:
           type: number
           format: float
-        languages:
-          type: array
-          items:
-            type: string
-        topicIds:
-          type: array
-          items:
-            type: string
-        availability:
-          type: array
-          items:
-            $ref: '#/components/schemas/TutorAvailability'
-    TutorAvailability:
+    Shared.Ai.PlanSuggestion:
       type: object
       required:
-        - date
-        - slots
+        - tier
+        - description
+        - totalEstimatedCost
+        - proposedTutors
+        - milestones
       properties:
-        date:
+        tier:
+          $ref: '#/components/schemas/Shared.Ai.PlanTier'
+        description:
           type: string
-          format: date
-        slots:
+        totalEstimatedCost:
+          type: number
+          format: float
+        proposedTutors:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/Shared.Ai.ProposedTutor'
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Ai.PlanMilestone'
+    Shared.Ai.GeneratePlanRequest:
+      type: object
+      required:
+        - learningGoalId
+      properties:
+        learningGoalId:
+          type: string
+    Shared.Ai.GeneratePlanResponse:
+      type: object
+      required:
+        - learningGoalId
+        - suggestions
+      properties:
+        learningGoalId:
+          type: string
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Ai.PlanSuggestion'
+  securitySchemes:
+    KeycloakBearerAuth:
+      type: http
+      scheme: Bearer
+      description: Keycloak access token issued to the BFF client
 servers:
   - url: https://ai.example.local
     description: AI API

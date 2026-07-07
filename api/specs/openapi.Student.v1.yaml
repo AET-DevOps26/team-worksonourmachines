@@ -53,19 +53,152 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Shared.Student.StudentProfileInput'
+  /v1/students/me/goals:
+    get:
+      operationId: listMyGoals
+      summary: List my learning goals
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Shared.Student.LearningGoal'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+    post:
+      operationId: createGoal
+      summary: Create a learning goal
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.LearningGoal'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shared.Student.LearningGoalInput'
+  /v1/students/me/goals/{id}:
+    get:
+      operationId: getGoal
+      summary: Get a learning goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.LearningGoal'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+    put:
+      operationId: updateGoal
+      summary: Update a learning goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.LearningGoal'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shared.Student.LearningGoalInput'
+    delete:
+      operationId: deleteGoal
+      summary: Delete a learning goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
 security:
-  - KeycloakAuth:
-      - openid
-      - basic
-      - profile
-      - email
-      - roles
+  - KeycloakBearerAuth: []
 components:
   schemas:
-    NonBlankString:
-      type: string
-      minLength: 1
-      pattern: .*\S.*
     Shared.Errors.ErrorBody:
       type: object
       required:
@@ -76,6 +209,15 @@ components:
           type: string
         message:
           type: string
+    Shared.Marketplace.Location:
+      type: string
+      enum:
+        - online
+        - garching
+        - munich
+        - weihenstephan
+        - staubing
+        - ottobrun
     Shared.Student.StudentProfile:
       type: object
       required:
@@ -84,14 +226,13 @@ components:
         - languages
       properties:
         displayName:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         bio:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         languages:
           type: array
           items:
-            $ref: '#/components/schemas/NonBlankString'
-          minItems: 1
+            type: string
         studyFocus:
           allOf:
             - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
@@ -104,18 +245,72 @@ components:
         - languages
       properties:
         displayName:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         bio:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         languages:
           type: array
           items:
-            $ref: '#/components/schemas/NonBlankString'
-          minItems: 1
+            type: string
         studyFocus:
           allOf:
             - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
           description: Self-assessed strength in each study skill (1 = needs work, 5 = confident).
+    Shared.Student.LearningGoal:
+      type: object
+      required:
+        - id
+        - moduleId
+        - description
+        - targetDate
+        - selfAssessedLevel
+        - locations
+      properties:
+        id:
+          type: string
+        moduleId:
+          type: string
+        description:
+          type: string
+        targetDate:
+          type: string
+          format: date-time
+        selfAssessedLevel:
+          type: string
+        budgetEur:
+          type: integer
+          format: int32
+          description: Budget in EUR (whole euros).
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Marketplace.Location'
+    Shared.Student.LearningGoalInput:
+      type: object
+      required:
+        - moduleId
+        - description
+        - targetDate
+        - selfAssessedLevel
+        - locations
+      properties:
+        moduleId:
+          type: string
+        description:
+          type: string
+        targetDate:
+          type: string
+          format: date-time
+        selfAssessedLevel:
+          type: string
+        budgetEur:
+          type: integer
+          format: int32
+          description: Budget in EUR (whole euros).
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Marketplace.Location'
     Shared.StudyFocus.StudyFocus:
       type: object
       required:
@@ -150,21 +345,11 @@ components:
           description: Applying theory to exercises and exam-style problems.
       description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
   securitySchemes:
-    KeycloakAuth:
-      type: oauth2
-      flows:
-        authorizationCode:
-          authorizationUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth
-          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
-          refreshUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
-          scopes:
-            openid: ''
-            basic: ''
-            profile: ''
-            email: ''
-            roles: ''
-      description: Keycloak OAuth2 authorization code auth for user login
+    KeycloakBearerAuth:
+      type: http
+      scheme: Bearer
+      description: Keycloak access token issued to the BFF client
 servers:
-  - url: https://api.tutormatch.localhost
+  - url: https://student.example.local
     description: Student API
     variables: {}
