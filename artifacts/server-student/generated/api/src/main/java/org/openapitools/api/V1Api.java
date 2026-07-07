@@ -5,7 +5,9 @@
  */
 package org.openapitools.api;
 
-import org.openapitools.model.Test200Response;
+import org.openapitools.model.SharedErrorsErrorBody;
+import org.openapitools.model.SharedStudentStudentProfile;
+import org.openapitools.model.SharedStudentStudentProfileInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,32 +44,109 @@ public interface V1Api {
         return Optional.empty();
     }
 
-    String PATH_TEST = "/v1/test";
+    String PATH_GET_MY_PROFILE = "/v1/students/me";
     /**
-     * GET /v1/test
+     * GET /v1/students/me : Get my student profile
+     * Returns the authenticated student&#39;s profile. New students receive an empty default profile.
      *
      * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
      */
     @Operation(
-        operationId = "test",
+        operationId = "getMyProfile",
+        summary = "Get my student profile",
+        description = "Returns the authenticated student's profile. New students receive an empty default profile.",
         responses = {
             @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Test200Response.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedStudentStudentProfile.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_TEST,
+        value = V1Api.PATH_GET_MY_PROFILE,
         produces = { "application/json" }
     )
-    default ResponseEntity<Test200Response> test(
+    default ResponseEntity<SharedStudentStudentProfile> getMyProfile(
         
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"message\" : \"message\" }";
+                    String exampleString = "{ \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\", \"studyFocus\" : \"\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPDATE_MY_PROFILE = "/v1/students/me";
+    /**
+     * PUT /v1/students/me : Update my student profile
+     * Creates or updates the authenticated student&#39;s display name, bio, languages, and study focus.
+     *
+     * @param sharedStudentStudentProfileInput  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "updateMyProfile",
+        summary = "Update my student profile",
+        description = "Creates or updates the authenticated student's display name, bio, languages, and study focus.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedStudentStudentProfile.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The server could not understand the request due to invalid syntax.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = V1Api.PATH_UPDATE_MY_PROFILE,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedStudentStudentProfile> updateMyProfile(
+        @Parameter(name = "SharedStudentStudentProfileInput", description = "", required = true) @Valid @RequestBody SharedStudentStudentProfileInput sharedStudentStudentProfileInput
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"languages\" : [ \"languages\", \"languages\" ], \"displayName\" : \"displayName\", \"bio\" : \"bio\", \"studyFocus\" : \"\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

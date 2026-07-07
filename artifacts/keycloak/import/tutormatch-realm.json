@@ -2,7 +2,7 @@
   "realm": "tutormatch",
   "displayName": "TUtorMatch",
   "enabled": true,
-  "registrationAllowed": false,
+  "registrationAllowed": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
@@ -36,6 +36,34 @@
       "realmRoles": ["admin"]
     }
   ],
+  "clientScopes": [
+    {
+      "name": "roles",
+      "description": "OpenID Connect scope for realm roles",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true",
+        "consent.screen.text": "${rolesScopeConsentText}"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "realm_roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
   "clients": [
     {
       "clientId": "client-web",
@@ -52,16 +80,32 @@
       "serviceAccountsEnabled": false,
       "redirectUris": ["https://$(APP_HOSTNAME)/*"],
       "webOrigins": ["https://$(APP_HOSTNAME)"],
+      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "basic", "email"],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "https://$(APP_HOSTNAME)/*"
       }
     },
     {
+      "clientId": "server-marketplace-admin",
+      "name": "TUtorMatch Marketplace Admin API",
+      "description": "Service account for marketplace backend to assign realm roles via Admin API.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "server-marketplace-admin-secret",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false
+    },
+    {
       "clientId": "tutormatch-dev-cli",
       "name": "TUtorMatch Dev CLI",
       "description": "Local-only public client for requesting test tokens with dummy users.",
-      "enabled": true,
+      "enabled": "$${javascript: env.KEYCLOAK_DEV_CLI_ENABLED === 'true'}",
       "protocol": "openid-connect",
       "publicClient": true,
       "standardFlowEnabled": false,
@@ -71,6 +115,15 @@
     }
   ],
   "users": [
+    {
+      "username": "service-account-server-marketplace-admin",
+      "serviceAccountClientId": "server-marketplace-admin",
+      "enabled": true,
+      "realmRoles": [],
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users", "query-users"]
+      }
+    },
     {
       "username": "admin.tutormatch@example.com",
       "email": "admin.tutormatch@example.com",
@@ -89,6 +142,7 @@
       ]
     },
     {
+      "id": "11111111-1111-1111-1111-111111111101",
       "username": "lukas.student@example.com",
       "email": "lukas.student@example.com",
       "firstName": "Lukas",

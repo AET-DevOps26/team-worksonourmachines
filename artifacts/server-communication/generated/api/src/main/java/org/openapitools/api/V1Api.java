@@ -5,7 +5,14 @@
  */
 package org.openapitools.api;
 
-import org.openapitools.model.Test200Response;
+import org.openapitools.model.MessagePage;
+import org.springframework.lang.Nullable;
+import org.openapitools.model.SharedCommunicationChatMessage;
+import org.openapitools.model.SharedCommunicationConversationDetail;
+import org.openapitools.model.SharedCommunicationConversationSummary;
+import org.openapitools.model.SharedCommunicationSendMessageRequest;
+import org.openapitools.model.SharedCommunicationStartConversationRequest;
+import org.openapitools.model.SharedErrorsErrorBody;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,32 +49,308 @@ public interface V1Api {
         return Optional.empty();
     }
 
-    String PATH_TEST = "/v1/test";
+    String PATH_GET_CONVERSATION = "/v1/conversations/{id}";
     /**
-     * GET /v1/test
+     * GET /v1/conversations/{id} : Get conversation
+     * Returns conversation metadata and the chat partner for the authenticated user.
      *
+     * @param id  (required)
      * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
      */
     @Operation(
-        operationId = "test",
+        operationId = "getConversation",
+        summary = "Get conversation",
+        description = "Returns conversation metadata and the chat partner for the authenticated user.",
         responses = {
             @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Test200Response.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedCommunicationConversationDetail.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_TEST,
+        value = V1Api.PATH_GET_CONVERSATION,
         produces = { "application/json" }
     )
-    default ResponseEntity<Test200Response> test(
+    default ResponseEntity<SharedCommunicationConversationDetail> getConversation(
+        @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"partner\" : { \"tutorId\" : \"tutorId\", \"displayName\" : \"displayName\", \"userId\" : \"userId\" }, \"id\" : \"id\", \"updatedAt\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_LIST_CONVERSATIONS = "/v1/conversations";
+    /**
+     * GET /v1/conversations : List conversations
+     * Returns conversation summaries for the authenticated user, ordered by recent activity.
+     *
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "listConversations",
+        summary = "List conversations",
+        description = "Returns conversation summaries for the authenticated user, ordered by recent activity.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SharedCommunicationConversationSummary.class)))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_LIST_CONVERSATIONS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<SharedCommunicationConversationSummary>> listConversations(
         
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"message\" : \"message\" }";
+                    String exampleString = "[ { \"lastMessageAt\" : \"2000-01-23T04:56:07.000+00:00\", \"partner\" : { \"tutorId\" : \"tutorId\", \"displayName\" : \"displayName\", \"userId\" : \"userId\" }, \"lastMessage\" : \"lastMessage\", \"id\" : \"id\", \"updatedAt\" : \"2000-01-23T04:56:07.000+00:00\" }, { \"lastMessageAt\" : \"2000-01-23T04:56:07.000+00:00\", \"partner\" : { \"tutorId\" : \"tutorId\", \"displayName\" : \"displayName\", \"userId\" : \"userId\" }, \"lastMessage\" : \"lastMessage\", \"id\" : \"id\", \"updatedAt\" : \"2000-01-23T04:56:07.000+00:00\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_LIST_MESSAGES = "/v1/conversations/{id}/messages";
+    /**
+     * GET /v1/conversations/{id}/messages : List messages
+     * Returns a paginated list of messages in a conversation.
+     *
+     * @param id  (required)
+     * @param page  (optional, default to 1)
+     * @param pageSize  (optional, default to 20)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @Operation(
+        operationId = "listMessages",
+        summary = "List messages",
+        description = "Returns a paginated list of messages in a conversation.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = MessagePage.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = V1Api.PATH_LIST_MESSAGES,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<MessagePage> listMessages(
+        @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Min(value = 1) @Parameter(name = "page", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @Min(value = 1) @Max(value = 100) @Parameter(name = "pageSize", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"total\" : 1, \"pageSize\" : 6, \"page\" : 0, \"items\" : [ { \"senderId\" : \"senderId\", \"id\" : \"id\", \"sentAt\" : \"2000-01-23T04:56:07.000+00:00\", \"content\" : \"content\" }, { \"senderId\" : \"senderId\", \"id\" : \"id\", \"sentAt\" : \"2000-01-23T04:56:07.000+00:00\", \"content\" : \"content\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_SEND_MESSAGE = "/v1/conversations/{id}/messages";
+    /**
+     * POST /v1/conversations/{id}/messages : Send message
+     * Posts a new message to a conversation.
+     *
+     * @param id  (required)
+     * @param sharedCommunicationSendMessageRequest  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @Operation(
+        operationId = "sendMessage",
+        summary = "Send message",
+        description = "Posts a new message to a conversation.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedCommunicationChatMessage.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The server could not understand the request due to invalid syntax.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The server cannot find the requested resource.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = V1Api.PATH_SEND_MESSAGE,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedCommunicationChatMessage> sendMessage(
+        @Parameter(name = "id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "SharedCommunicationSendMessageRequest", description = "", required = true) @Valid @RequestBody SharedCommunicationSendMessageRequest sharedCommunicationSendMessageRequest
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"senderId\" : \"senderId\", \"id\" : \"id\", \"sentAt\" : \"2000-01-23T04:56:07.000+00:00\", \"content\" : \"content\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_START_CONVERSATION = "/v1/conversations";
+    /**
+     * POST /v1/conversations : Start conversation
+     * Starts a new conversation with another user or returns the existing one.
+     *
+     * @param sharedCommunicationStartConversationRequest  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @Operation(
+        operationId = "startConversation",
+        summary = "Start conversation",
+        description = "Starts a new conversation with another user or returns the existing one.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The request has succeeded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedCommunicationConversationDetail.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The server could not understand the request due to invalid syntax.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access is unauthorized.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SharedErrorsErrorBody.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "KeycloakBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = V1Api.PATH_START_CONVERSATION,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<SharedCommunicationConversationDetail> startConversation(
+        @Parameter(name = "SharedCommunicationStartConversationRequest", description = "", required = true) @Valid @RequestBody SharedCommunicationStartConversationRequest sharedCommunicationStartConversationRequest
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"partner\" : { \"tutorId\" : \"tutorId\", \"displayName\" : \"displayName\", \"userId\" : \"userId\" }, \"id\" : \"id\", \"updatedAt\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

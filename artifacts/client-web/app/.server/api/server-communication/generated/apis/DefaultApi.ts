@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* tslint:disable */
 /* eslint-disable */
 /**
@@ -14,10 +15,59 @@
 
 import * as runtime from '../runtime';
 import {
-    type Test200Response,
-    Test200ResponseFromJSON,
-    Test200ResponseToJSON,
-} from '../models/Test200Response';
+    type MessagePage,
+    MessagePageFromJSON,
+    MessagePageToJSON,
+} from '../models/MessagePage';
+import {
+    type SharedCommunicationChatMessage,
+    SharedCommunicationChatMessageFromJSON,
+    SharedCommunicationChatMessageToJSON,
+} from '../models/SharedCommunicationChatMessage';
+import {
+    type SharedCommunicationConversationDetail,
+    SharedCommunicationConversationDetailFromJSON,
+    SharedCommunicationConversationDetailToJSON,
+} from '../models/SharedCommunicationConversationDetail';
+import {
+    type SharedCommunicationConversationSummary,
+    SharedCommunicationConversationSummaryFromJSON,
+    SharedCommunicationConversationSummaryToJSON,
+} from '../models/SharedCommunicationConversationSummary';
+import {
+    type SharedCommunicationSendMessageRequest,
+    SharedCommunicationSendMessageRequestFromJSON,
+    SharedCommunicationSendMessageRequestToJSON,
+} from '../models/SharedCommunicationSendMessageRequest';
+import {
+    type SharedCommunicationStartConversationRequest,
+    SharedCommunicationStartConversationRequestFromJSON,
+    SharedCommunicationStartConversationRequestToJSON,
+} from '../models/SharedCommunicationStartConversationRequest';
+import {
+    type SharedErrorsErrorBody,
+    SharedErrorsErrorBodyFromJSON,
+    SharedErrorsErrorBodyToJSON,
+} from '../models/SharedErrorsErrorBody';
+
+export interface GetConversationRequest {
+    id: string;
+}
+
+export interface ListMessagesRequest {
+    id: string;
+    page?: number;
+    pageSize?: number;
+}
+
+export interface SendMessageRequest {
+    id: string;
+    sharedCommunicationSendMessageRequest: SharedCommunicationSendMessageRequest;
+}
+
+export interface StartConversationRequest {
+    sharedCommunicationStartConversationRequest: SharedCommunicationStartConversationRequest;
+}
 
 /**
  * 
@@ -25,15 +75,31 @@ import {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for test without sending the request
+     * Creates request options for getConversation without sending the request
      */
-    async testRequestOpts(): Promise<runtime.RequestOpts> {
+    async getConversationRequestOpts(requestParameters: GetConversationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getConversation().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
 
-        let urlPath = `/v1/test`;
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/conversations/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -44,18 +110,254 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns conversation metadata and the chat partner for the authenticated user.
+     * Get conversation
      */
-    async testRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Test200Response>> {
-        const requestOptions = await this.testRequestOpts();
+    async getConversationRaw(requestParameters: GetConversationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedCommunicationConversationDetail>> {
+        const requestOptions = await this.getConversationRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => Test200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedCommunicationConversationDetailFromJSON(jsonValue));
     }
 
     /**
+     * Returns conversation metadata and the chat partner for the authenticated user.
+     * Get conversation
      */
-    async test(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Test200Response> {
-        const response = await this.testRaw(initOverrides);
+    async getConversation(requestParameters: GetConversationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedCommunicationConversationDetail> {
+        const response = await this.getConversationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listConversations without sending the request
+     */
+    async listConversationsRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/conversations`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns conversation summaries for the authenticated user, ordered by recent activity.
+     * List conversations
+     */
+    async listConversationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SharedCommunicationConversationSummary>>> {
+        const requestOptions = await this.listConversationsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SharedCommunicationConversationSummaryFromJSON));
+    }
+
+    /**
+     * Returns conversation summaries for the authenticated user, ordered by recent activity.
+     * List conversations
+     */
+    async listConversations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SharedCommunicationConversationSummary>> {
+        const response = await this.listConversationsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listMessages without sending the request
+     */
+    async listMessagesRequestOpts(requestParameters: ListMessagesRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling listMessages().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['page'] != null) {
+            queryParameters['page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['pageSize'] = requestParameters['pageSize'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/conversations/{id}/messages`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns a paginated list of messages in a conversation.
+     * List messages
+     */
+    async listMessagesRaw(requestParameters: ListMessagesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessagePage>> {
+        const requestOptions = await this.listMessagesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessagePageFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns a paginated list of messages in a conversation.
+     * List messages
+     */
+    async listMessages(requestParameters: ListMessagesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessagePage> {
+        const response = await this.listMessagesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for sendMessage without sending the request
+     */
+    async sendMessageRequestOpts(requestParameters: SendMessageRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling sendMessage().'
+            );
+        }
+
+        if (requestParameters['sharedCommunicationSendMessageRequest'] == null) {
+            throw new runtime.RequiredError(
+                'sharedCommunicationSendMessageRequest',
+                'Required parameter "sharedCommunicationSendMessageRequest" was null or undefined when calling sendMessage().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/conversations/{id}/messages`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedCommunicationSendMessageRequestToJSON(requestParameters['sharedCommunicationSendMessageRequest']),
+        };
+    }
+
+    /**
+     * Posts a new message to a conversation.
+     * Send message
+     */
+    async sendMessageRaw(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedCommunicationChatMessage>> {
+        const requestOptions = await this.sendMessageRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedCommunicationChatMessageFromJSON(jsonValue));
+    }
+
+    /**
+     * Posts a new message to a conversation.
+     * Send message
+     */
+    async sendMessage(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedCommunicationChatMessage> {
+        const response = await this.sendMessageRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for startConversation without sending the request
+     */
+    async startConversationRequestOpts(requestParameters: StartConversationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sharedCommunicationStartConversationRequest'] == null) {
+            throw new runtime.RequiredError(
+                'sharedCommunicationStartConversationRequest',
+                'Required parameter "sharedCommunicationStartConversationRequest" was null or undefined when calling startConversation().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("KeycloakBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/v1/conversations`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedCommunicationStartConversationRequestToJSON(requestParameters['sharedCommunicationStartConversationRequest']),
+        };
+    }
+
+    /**
+     * Starts a new conversation with another user or returns the existing one.
+     * Start conversation
+     */
+    async startConversationRaw(requestParameters: StartConversationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedCommunicationConversationDetail>> {
+        const requestOptions = await this.startConversationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedCommunicationConversationDetailFromJSON(jsonValue));
+    }
+
+    /**
+     * Starts a new conversation with another user or returns the existing one.
+     * Start conversation
+     */
+    async startConversation(requestParameters: StartConversationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedCommunicationConversationDetail> {
+        const response = await this.startConversationRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

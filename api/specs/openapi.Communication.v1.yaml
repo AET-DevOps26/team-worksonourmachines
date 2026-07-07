@@ -4,9 +4,11 @@ info:
   version: v1
 tags: []
 paths:
-  /v1/test:
+  /v1/conversations:
     get:
-      operationId: test
+      operationId: listConversations
+      summary: List conversations
+      description: Returns conversation summaries for the authenticated user, ordered by recent activity.
       parameters: []
       responses:
         '200':
@@ -14,13 +16,292 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
-components: {}
+                type: array
+                items:
+                  $ref: '#/components/schemas/Shared.Communication.ConversationSummary'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+    post:
+      operationId: startConversation
+      summary: Start conversation
+      description: Starts a new conversation with another user or returns the existing one.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Communication.ConversationDetail'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shared.Communication.StartConversationRequest'
+  /v1/conversations/{id}:
+    get:
+      operationId: getConversation
+      summary: Get conversation
+      description: Returns conversation metadata and the chat partner for the authenticated user.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Communication.ConversationDetail'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+  /v1/conversations/{id}/messages:
+    get:
+      operationId: listMessages
+      summary: List messages
+      description: Returns a paginated list of messages in a conversation.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Shared.Pagination.PageParams.page'
+        - $ref: '#/components/parameters/Shared.Pagination.PageParams.pageSize'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagePage'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+    post:
+      operationId: sendMessage
+      summary: Send message
+      description: Posts a new message to a conversation.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Communication.ChatMessage'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shared.Communication.SendMessageRequest'
+security:
+  - KeycloakBearerAuth: []
+components:
+  parameters:
+    Shared.Pagination.PageParams.page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+      explode: false
+    Shared.Pagination.PageParams.pageSize:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+      explode: false
+  schemas:
+    MessagePage:
+      type: object
+      required:
+        - items
+        - page
+        - pageSize
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Communication.ChatMessage'
+        page:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int32
+    Shared.Communication.ChatMessage:
+      type: object
+      required:
+        - id
+        - senderId
+        - content
+        - sentAt
+      properties:
+        id:
+          type: string
+        senderId:
+          type: string
+        content:
+          type: string
+        sentAt:
+          type: string
+          format: date-time
+    Shared.Communication.ConversationDetail:
+      type: object
+      required:
+        - id
+        - partner
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        partner:
+          $ref: '#/components/schemas/Shared.Communication.ConversationPartner'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Shared.Communication.ConversationPartner:
+      type: object
+      required:
+        - userId
+        - displayName
+      properties:
+        userId:
+          type: string
+        displayName:
+          type: string
+        tutorId:
+          type: string
+    Shared.Communication.ConversationSummary:
+      type: object
+      required:
+        - id
+        - partner
+        - lastMessage
+        - lastMessageAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        partner:
+          $ref: '#/components/schemas/Shared.Communication.ConversationPartner'
+        lastMessage:
+          type: string
+        lastMessageAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Shared.Communication.SendMessageRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+    Shared.Communication.StartConversationRequest:
+      type: object
+      required:
+        - participantUserId
+      properties:
+        participantUserId:
+          type: string
+    Shared.Errors.ErrorBody:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    KeycloakBearerAuth:
+      type: http
+      scheme: Bearer
+      description: Keycloak access token issued to the BFF client
 servers:
   - url: https://communication.example.local
     description: Communication API

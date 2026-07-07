@@ -1,0 +1,11 @@
+# Default: any team member can review root-level changes
+* @juwCoding @ivanovahr @amritanshusikdar
+
+/artifacts/client-web/ @juwCoding
+/artifacts/gateway/ @juwCoding
+/artifacts/api-ui/ @juwCoding
+/artifacts/ai/ @ivanovahr
+/artifacts/server-communication/ @amritanshusikdar
+/artifacts/server-marketplace/ @amritanshusikdar
+/artifacts/server-student/ @amritanshusikdar
+/artifacts/postgres/ @amritanshusikdar

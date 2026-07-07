@@ -1,35 +1,51 @@
 name: tutormatch
 
+x-hardening: &hardening
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
 services:
   gateway:
+    <<: *hardening
     image: caddy:2-alpine
+    cap_add:
+      - NET_BIND_SERVICE
     ports:
-      - 80:80
-      - 443:443
+      - 127.0.0.1:80:80
+      - 127.0.0.1:443:443
     environment:
       APP_HOSTNAME: ${APP_HOSTNAME:-tutormatch.localhost}
     volumes:
-      - ${GATEWAY_CADDYFILE:-./artifacts/gateway/Caddyfile.dev}:/etc/caddy/Caddyfile:ro,Z
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
+      - api-ui
       - client-web
       - keycloak
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:2019/config/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      default:
+        aliases:
+          - auth.${APP_HOSTNAME:-tutormatch.localhost}
 
   postgres:
+    <<: *hardening
     image: postgres:17-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-tutormatch}
-      POSTGRES_USER: ${POSTGRES_USER:-tutormatch}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tutormatch}
-      KEYCLOAK_DB: ${KEYCLOAK_DB:-keycloak}
-      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER:-keycloak}
-      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./artifacts/postgres/init:/docker-entrypoint-initdb.d:Z
-    ports:
-      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -37,45 +53,50 @@ services:
       retries: 10
 
   keycloak:
+    <<: *hardening
     image: quay.io/keycloak/keycloak:26.6.1
-    command: ["start-dev"]
-    environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
-      KC_DB: postgres
-      KC_DB_URL_HOST: postgres
-      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
-      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
-      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
-      KC_FEATURE_LOGIN: ${KEYCLOAK_LOGIN_FEATURE:-v1}
-      KC_HEALTH_ENABLED: "true"
-      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}}
-      KC_HTTP_ENABLED: "true"
-      KC_HOSTNAME_STRICT: "false"
-      KC_PROXY_HEADERS: xforwarded
+    command: ["start"]
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"]
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/127.0.0.1/9000; printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3",
+        ]
       interval: 5s
       timeout: 5s
       retries: 30
       start_period: 60s
 
+  redis:
+    <<: *hardening
+    image: redis:7-alpine
+    cap_add:
+      - SETUID
+      - SETGID
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   keycloak-config-cli:
+    <<: *hardening
     image: adorsys/keycloak-config-cli:latest
+    command:
+      - "--import.var-substitution.enabled=true"
+      - "--import.var-substitution.script-evaluation-enabled=true"
     environment:
-      APP_HOSTNAME: ${APP_HOSTNAME:-tutormatch.localhost}
-      IMPORT_FILES_LOCATIONS: /config/*
+      IMPORT_FILES_LOCATIONS: /config/tutormatch-realm.json
       IMPORT_MANAGED: partial
       IMPORT_REMOTESTATE_ENABLED: "true"
       IMPORT_VARSUBSTITUTION_ENABLED: "true"
+      JAVA_OPTS: "-Duser.home=/tmp"
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
       KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: 120s
-      KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
       KEYCLOAK_URL: http://keycloak:8080
-      KEYCLOAK_USER: ${KEYCLOAK_ADMIN:-admin}
     volumes:
       - ./artifacts/keycloak/import:/config:ro,Z
     depends_on:
@@ -84,6 +105,7 @@ services:
     restart: "no"
 
   client-web:
+    <<: *hardening
     build:
       context: .
       dockerfile: artifacts/client-web/docker/Dockerfile
@@ -91,93 +113,55 @@ services:
     volumes:
       - ./artifacts/client-web:/app:Z
       - client-web-node-modules:/app/node_modules
-    environment:
-      LOG_FORMAT: ${CLIENT_WEB_LOG_FORMAT:-json}
-      LOG_LEVEL: ${CLIENT_WEB_LOG_LEVEL:-info}
-      APP_BASE_URL: ${APP_BASE_URL:-https://${APP_HOSTNAME:-tutormatch.localhost}}
-      KEYCLOAK_ISSUER_PUBLIC: ${KEYCLOAK_ISSUER_PUBLIC:-https://auth.${APP_HOSTNAME:-tutormatch.localhost}/realms/tutormatch}
-      KEYCLOAK_ISSUER_INTERNAL: ${KEYCLOAK_ISSUER_INTERNAL:-http://keycloak:8080/realms/tutormatch}
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
-      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-client-web-dev-secret}
-      SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret-change-before-production}
-      SERVER_COMMUNICATION_API_URL: tbd
-      SERVER_MARKETPLACE_API_URL: tbd
-      SERVER_STUDENT_API_URL: tbd
+      - client-web-react-router-cache:/app/.react-router
+      - client-web-vite-cache:/app/.vite
+      - caddy_data:/caddy-data:ro
     depends_on:
       keycloak-config-cli:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      server-mock:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:5173/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  api-ui:
+    <<: *hardening
+    image: scalarapi/api-reference:latest
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /config/caddy
+      - /data/caddy
+    entrypoint: ["/bin/sh", "/config/entrypoint.sh"]
+    volumes:
+      - ./api/specs:/docs:ro,Z
+      - ./artifacts/api-ui/scalar.config.json:/config/scalar.config.json:ro,Z
+      - ./artifacts/api-ui/docker/entrypoint.sh:/config/entrypoint.sh:ro,Z
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ai:
-    build:
-      context: .
-      dockerfile: artifacts/ai/docker/Dockerfile
-      target: dev
-    volumes:
-      - ./artifacts/ai:/app:Z
-    ports:
-      - 8000:8000
-    environment:
-      LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
-    depends_on:
-      - ollama
-
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - 11434:11434
-
-  # ----------------------------- tooling -----------------------------
-
-  api-tooling:
-    profiles: ["tooling"]
-    build:
-      context: .
-      dockerfile: api/docker/Dockerfile
-    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
-    userns_mode: keep-id
-    environment:
-      CI: "true"
-    volumes:
-      - ./:/workspace/:Z
-      - pnpm-store:/pnpm/store
-
-  client-web-tooling:
-    profiles: ["tooling"]
-    build:
-      context: .
-      dockerfile: artifacts/client-web/docker/Dockerfile
-      target: tooling
-    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
-    userns_mode: keep-id
-    environment:
-      CI: "true"
-    volumes:
-      - ./artifacts/client-web:/workspace/artifacts/client-web:Z
-      - ./.git:/workspace/.git:Z # git mounts necessary for biome
-      - ./.gitignore:/workspace/.gitignore:Z
-      - pnpm-store:/pnpm/store
-
-  ai-tooling:
-    profiles: ["tooling"]
-    build:
-      context: .
-      dockerfile: artifacts/ai/docker/Dockerfile
-      target: tooling
-    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
-    userns_mode: keep-id
-    volumes:
-      - ./artifacts/ai:/workspace/artifacts/ai:Z
-      - /workspace/artifacts/ai/.venv # prevent venv from overriding host venv
+    <<: *hardening
+    image: ${AI_IMAGE:-ghcr.io/aet-devops26/team-worksonourmachines/ai:latest}
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgres_data:
-  pnpm-store:
-  client-web-node-modules:
-  ollama_data:
   caddy_data:
   caddy_config:

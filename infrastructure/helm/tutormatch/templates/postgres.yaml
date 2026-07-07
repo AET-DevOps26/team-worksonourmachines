@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.postgres.storageSize | default "1Gi" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 900
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
+            - name: KEYCLOAK_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: KEYCLOAK_DB
+            - name: KEYCLOAK_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: KEYCLOAK_DB_USER
+            - name: KEYCLOAK_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: KEYCLOAK_DB_PASSWORD
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql
+            - name: postgres-init
+              mountPath: /docker-entrypoint-initdb.d
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "pg_isready -U {{ .Values.postgres.user }} -d {{ .Values.postgres.db }}"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+        - name: postgres-init
+          configMap:
+            name: postgres-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  namespace: {{ .Values.namespace }}
+data:
+  init-keycloak-db.sh: |
+    #!/usr/bin/env sh
+    set -eu
+
+    : "${KEYCLOAK_DB:=keycloak}"
+    : "${KEYCLOAK_DB_USER:=keycloak}"
+    : "${KEYCLOAK_DB_PASSWORD:=keycloak}"
+
+    psql -v ON_ERROR_STOP=1 \
+      --username "$POSTGRES_USER" \
+      --dbname "$POSTGRES_DB" \
+      --set keycloak_db="$KEYCLOAK_DB" \
+      --set keycloak_user="$KEYCLOAK_DB_USER" \
+      --set keycloak_password="$KEYCLOAK_DB_PASSWORD" <<'EOSQL'
+    CREATE DATABASE :"keycloak_db";
+    CREATE USER :"keycloak_user" WITH PASSWORD :'keycloak_password';
+    GRANT ALL PRIVILEGES ON DATABASE :"keycloak_db" TO :"keycloak_user";
+    EOSQL
+
+    psql -v ON_ERROR_STOP=1 \
+      --username "$POSTGRES_USER" \
+      --dbname "$KEYCLOAK_DB" \
+      --set keycloak_user="$KEYCLOAK_DB_USER" <<'EOSQL'
+    GRANT ALL ON SCHEMA public TO :"keycloak_user";
+    EOSQL

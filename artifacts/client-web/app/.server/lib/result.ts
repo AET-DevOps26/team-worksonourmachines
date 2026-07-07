@@ -37,7 +37,7 @@ export type AsyncResult<T, E = Error> = Promise<Result<T, E>>;
 /**
  * Success variant of Result
  */
-export class Ok<T> implements IResult<T, never> {
+class Ok<T> implements IResult<T, never> {
     readonly isOk: true = true;
     readonly isErr: false = false;
     readonly value: T;
@@ -75,7 +75,7 @@ export class Ok<T> implements IResult<T, never> {
 /**
  * Error variant of Result
  */
-export class Err<E = Error> implements IResult<never, E> {
+class Err<E = Error> implements IResult<never, E> {
     readonly isOk: false = false;
     readonly isErr: true = true;
     readonly error: E;

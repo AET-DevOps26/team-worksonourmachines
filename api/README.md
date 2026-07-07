@@ -26,7 +26,7 @@ Below are the most important scripts. Check out [package.json](./package.json) f
 | `pnpm run api:generate`        | Generate server and client code.                                                        |
 | `pnpm run generate`            | First generate specs and then client and server code.                                   |
 | `pnpm run format`              | Format all TypeSpec files.                                                              |
-| `pnpm run lint`                | Check that formatting of TypeSpce files matches the expected style.                     |
+| `pnpm run lint`                | Check that formatting of TypeSpec files matches the expected style.                     |
 
 From the repo root you can proxy any script:
 
@@ -41,8 +41,11 @@ make api-generate
 
 1. Edit `main.tsp` (and any other `.tsp` files).
 2. Run `pnpm run format` (or `make api-pnpm run format`).
-3. Run `pnpm run api:generate` when you need updated OpenAPI files and generated client/server code.
-
+3. Run `pnpm run generate` when you need updated OpenAPI files and generated client/server code.
 ## Code Style
 
 Always use `pnpm run format` or from the root `make format` to format the files to the common standard. Formatting and linting of the spec files is not needed, as those are always generated the same way using TypeSpec. Use the formatter of the respective artifact to format the generated code.
+
+## API reference UI
+
+Generated OpenAPI specs are browsable in a [Scalar](https://github.com/scalar/scalar) UI at **https://api.tutormatch.localhost** when the dev stack is running (`make up`). See [docs/technical/api.md](../docs/technical/api.md) for layout, deployment, and how dev vs prod pick up spec changes.

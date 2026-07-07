@@ -14,10 +14,11 @@ Repository for team WorksOnOurMachines
 The project is configured to run locally using Docker Compose. Common commands are provided via make. Use `make help` to view the available commands.
 
 For architecture, container roles, environment variables, VS Code workspace, git hooks, and troubleshooting, see the [technical local setup doc](./docs/technical/local-setup.md).
+For the first Azure VM setup using Terraform and Ansible, see the [Azure VM setup doc](./docs/technical/azure-vm-setup.md).
 
 ### Prerequisites
 
-- You need to have a container runtime installed with a docker compose complient command.
+- You need to have a container runtime installed with a Docker Compose compliant command.
 - You need to have `make` installed.
 
 ### Setup
@@ -26,7 +27,7 @@ Run the command `make init` to setup a local development environment including t
 
 ### Running the Application
 
-To start the project without initializing the full development environment, run `make setup-env` and then `make up` (or `docker compose up`). Stop services with `make down`.
+To start the project without initializing the full development environment, run `make setup-env` and then `make up`. Stop services with `make down`.
 
 ### Cleaning up
 

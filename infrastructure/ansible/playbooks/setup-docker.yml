@@ -1,0 +1,90 @@
+---
+- name: Prepare Azure VM for TUtorMatch Docker Compose
+  hosts: all
+  become: true
+  vars:
+    application_user: tutormatch
+    application_group: tutormatch
+    application_home: /home/tutormatch
+    application_dir: /opt/tutormatch
+
+  tasks:
+    - name: Install prerequisite packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - git
+          - gnupg
+          - lsb-release
+          - python3-apt
+          - rsync
+        state: present
+        update_cache: true
+
+    - name: Ensure apt keyring directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Add Docker apt repository signing key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    - name: Determine Docker apt architecture
+      ansible.builtin.set_fact:
+        docker_apt_arch: "{{ 'arm64' if ansible_architecture in ['aarch64', 'arm64'] else 'amd64' }}"
+
+    - name: Add Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ docker_apt_arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        filename: docker
+        state: present
+        update_cache: true
+
+    - name: Install Docker Engine and Compose plugin
+      ansible.builtin.apt:
+        name:
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-ce
+          - docker-ce-cli
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Ensure application group exists
+      ansible.builtin.group:
+        name: "{{ application_group }}"
+        state: present
+
+    - name: Ensure application user exists
+      ansible.builtin.user:
+        name: "{{ application_user }}"
+        group: "{{ application_group }}"
+        groups: docker
+        append: true
+        create_home: true
+        home: "{{ application_home }}"
+        shell: /bin/bash
+        state: present
+
+    - name: Ensure application directory exists
+      ansible.builtin.file:
+        path: "{{ application_dir }}"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        state: directory
+        mode: "0755"
+
+    - name: Verify Docker Compose plugin
+      ansible.builtin.command: docker compose version
+      changed_when: false
