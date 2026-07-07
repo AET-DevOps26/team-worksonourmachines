@@ -54,8 +54,8 @@ class PlanMilestone(BaseModel):
         return cls.model_validate({
             "title": obj.get("title"),
             "dueDate": obj.get("dueDate"),
-            "topicId": obj.get("topicId"),
-            "tutorId": obj.get("tutorId"),
+            "topicId": str(obj["topicId"]) if obj.get("topicId") is not None else None,
+            "tutorId": str(obj["tutorId"]) if obj.get("tutorId") is not None else None,
             "estimatedCost": obj.get("estimatedCost"),
         })
 
@@ -96,7 +96,7 @@ class ProposedTutor(BaseModel):
         if not isinstance(obj, dict):
             return cls.model_validate(obj)
         return cls.model_validate({
-            "id": obj.get("id"),
+            "id": str(obj["id"]) if obj.get("id") is not None else None,
             "displayName": obj.get("displayName"),
             "hourlyRate": obj.get("hourlyRate"),
         })
