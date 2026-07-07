@@ -1,7 +1,9 @@
 import json
 import logging
+import re
 import time
 
+from fastapi import HTTPException
 from langchain_core.messages import HumanMessage
 from openapi_server.apis.default_api_base import BaseDefaultApi
 from openapi_server.models.chat200_response import Chat200Response
@@ -20,6 +22,16 @@ from app.prompt import build_prompt
 
 logger = logging.getLogger(__name__)
 
+_FENCE_RE = re.compile(r"```(?:json)?\s*([\s\S]*?)```", re.IGNORECASE)
+
+
+def _extract_json(text: str) -> dict:
+    """Strip markdown fences and parse JSON. Raises ValueError on failure."""
+    stripped = text.strip()
+    match = _FENCE_RE.search(stripped)
+    candidate = match.group(1).strip() if match else stripped
+    return json.loads(candidate)
+
 
 def _map_response(data: dict) -> GeneratePlanResponse:
     suggestions = []
@@ -30,7 +42,7 @@ def _map_response(data: dict) -> GeneratePlanResponse:
             PlanSuggestion(
                 tier=s["tier"],
                 description=s.get("description", ""),
-                totalEstimatedCost=s.get("totalEstimatedCost", 0.0),
+                totalEstimatedCost=s.get("totalEstimatedCost", 0),
                 proposedTutors=tutors,
                 milestones=milestones,
             )
@@ -90,39 +102,54 @@ class DefaultApiImpl(BaseDefaultApi):
         )
 
         prompt = build_prompt(student, goal, module, tutors)
+        raw = await self._invoke_llm(prompt, goal_id)
 
         try:
-            raw = await get_llm().ainvoke([HumanMessage(content=prompt)])
-            latency_ms = round((time.perf_counter() - start) * 1000, 1)
-            logger.info(
-                "generate_plan completed provider=%s model=%s latency_ms=%s goal_id=%s",
-                llm_info["provider"],
-                llm_info["model"],
-                latency_ms,
+            data = _extract_json(raw.content)
+        except (json.JSONDecodeError, ValueError):
+            logger.warning(
+                "generate_plan non-json response, retrying goal_id=%s preview=%s",
                 goal_id,
+                raw.content[:200],
             )
+            retry_prompt = (
+                prompt + "\n\nIMPORTANT: Your previous response was not valid JSON."
+                " Return only the raw JSON object, no markdown, no explanation."
+            )
+            raw = await self._invoke_llm(retry_prompt, goal_id, attempt=2)
+            try:
+                data = _extract_json(raw.content)
+            except (json.JSONDecodeError, ValueError):
+                logger.error(
+                    "generate_plan json parse failed after retry goal_id=%s"
+                    " response=%s",
+                    goal_id,
+                    raw.content[:500],
+                )
+                raise HTTPException(
+                    status_code=500, detail="LLM returned non-JSON output"
+                )
+
+        latency_ms = round((time.perf_counter() - start) * 1000, 1)
+        logger.info(
+            "generate_plan completed provider=%s model=%s latency_ms=%s goal_id=%s",
+            llm_info["provider"],
+            llm_info["model"],
+            latency_ms,
+            goal_id,
+        )
+        return _map_response(data)
+
+    async def _invoke_llm(self, prompt: str, goal_id: str, attempt: int = 1):
+        llm_info = get_llm_info()
+        try:
+            return await get_llm().ainvoke([HumanMessage(content=prompt)])
         except Exception:
-            latency_ms = round((time.perf_counter() - start) * 1000, 1)
             logger.exception(
-                "generate_plan llm failed provider=%s model=%s"
-                " latency_ms=%s goal_id=%s",
+                "generate_plan llm failed provider=%s model=%s goal_id=%s attempt=%s",
                 llm_info["provider"],
                 llm_info["model"],
-                latency_ms,
                 goal_id,
+                attempt,
             )
             raise
-
-        try:
-            data = json.loads(raw.content)
-        except json.JSONDecodeError:
-            logger.error(
-                "generate_plan json parse failed goal_id=%s response=%s",
-                goal_id,
-                raw.content[:500],
-            )
-            from fastapi import HTTPException
-
-            raise HTTPException(status_code=500, detail="LLM returned non-JSON output")
-
-        return _map_response(data)
