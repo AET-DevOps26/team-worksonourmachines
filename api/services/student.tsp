@@ -26,25 +26,20 @@ namespace Shared.Student {
     moduleId: string;
     description: string;
     targetDate: utcDateTime;
-    selfAssessedLevel: string;
+
+    @doc("Self-assessed level from 1 (beginner) to 5 (expert).")
+    @minValue(1)
+    @maxValue(5)
+    selfAssessedLevel: int32;
 
     @doc("Budget in EUR (whole euros).")
+    @minValue(0)
     budgetEur?: int32;
 
     locations: Shared.Marketplace.Location[];
   }
 
-  model LearningGoalInput {
-    moduleId: string;
-    description: string;
-    targetDate: utcDateTime;
-    selfAssessedLevel: string;
-
-    @doc("Budget in EUR (whole euros).")
-    budgetEur?: int32;
-
-    locations: Shared.Marketplace.Location[];
-  }
+  model LearningGoalInput is OmitProperties<LearningGoal, "id">;
 }
 
 enum StudentVersions {
@@ -81,7 +76,10 @@ namespace Student {
   @post
   @route("/students/me/goals")
   op createGoal(@body body: LearningGoalInput):
-    | LearningGoal
+    | {
+        @statusCode statusCode: 201;
+        @body body: LearningGoal;
+      }
     | BadRequestError
     | UnauthorizedError;
 

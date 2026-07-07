@@ -78,8 +78,8 @@ paths:
       summary: Create a learning goal
       parameters: []
       responses:
-        '200':
-          description: The request has succeeded.
+        '201':
+          description: The resource was created successfully.
           content:
             application/json:
               schema:
@@ -276,10 +276,15 @@ components:
           type: string
           format: date-time
         selfAssessedLevel:
-          type: string
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Self-assessed level from 1 (beginner) to 5 (expert).
         budgetEur:
           type: integer
           format: int32
+          minimum: 0
           description: Budget in EUR (whole euros).
         locations:
           type: array
@@ -302,10 +307,15 @@ components:
           type: string
           format: date-time
         selfAssessedLevel:
-          type: string
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Self-assessed level from 1 (beginner) to 5 (expert).
         budgetEur:
           type: integer
           format: int32
+          minimum: 0
           description: Budget in EUR (whole euros).
         locations:
           type: array
