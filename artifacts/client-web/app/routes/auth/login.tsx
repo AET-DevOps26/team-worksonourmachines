@@ -7,7 +7,7 @@ import { login } from '~/.server/service/auth';
 export async function loader({ request }: LoaderFunctionArgs) {
     const requestUrl = new URL(request.url);
     const redirectTo = requestUrl.searchParams.get('redirectTo');
-    const loginResult = await login(safeRedirectPath(redirectTo));
+    const loginResult = await login(safeRedirectPath(redirectTo ?? '/dashboard'));
 
     if (loginResult.isErr) {
         logger.error('Failed to start login flow', { error: loginResult.error });
