@@ -102,6 +102,29 @@ class DefaultApiImpl(BaseDefaultApi):
         )
 
         prompt = build_prompt(student, goal, module, tutors)
+
+        # Prefer structured output (function calling) when the provider supports it —
+        # OpenAI and Logos enforce the schema at the API level so the response is always
+        # a valid GeneratePlanResponse with no parsing needed. Ollama and LM Studio may
+        # not support tool use depending on the loaded model, so we fall back to plain
+        # text generation + fence stripping + one retry for those cases.
+        llm = get_llm()
+        if get_llm_info()["provider"] in ("openai", "logos"):
+            structured = llm.with_structured_output(GeneratePlanResponse)
+            result: GeneratePlanResponse = await structured.ainvoke(
+                [HumanMessage(content=prompt)]
+            )
+            latency_ms = round((time.perf_counter() - start) * 1000, 1)
+            logger.info(
+                "generate_plan completed (structured) provider=%s model=%s"
+                " latency_ms=%s goal_id=%s",
+                get_llm_info()["provider"],
+                get_llm_info()["model"],
+                latency_ms,
+                goal_id,
+            )
+            return result
+
         raw = await self._invoke_llm(prompt, goal_id)
 
         try:

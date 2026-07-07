@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi import HTTPException
 from openapi_server.models.generate_plan_request import GeneratePlanRequest
+from openapi_server.models.generate_plan_response import GeneratePlanResponse
 
 from app.ai_impl import DefaultApiImpl, _extract_json, _map_response
 from app.prompt import build_prompt
@@ -221,6 +222,33 @@ def mock_clients():
         gm.return_value = MODULE
         lt.return_value = TUTORS
         yield gl, gs, gm, lt
+
+
+@pytest.mark.asyncio
+async def test_generate_plan_uses_structured_output_for_openai(mock_clients):
+    expected = _map_response(VALID_RESPONSE)
+    with (
+        patch("app.ai_impl.get_llm") as mock_get_llm,
+        patch(
+            "app.ai_impl.get_llm_info",
+            return_value={"provider": "openai", "model": "gpt-4o"},
+        ),
+    ):
+        structured_llm = AsyncMock()
+        structured_llm.ainvoke = AsyncMock(return_value=expected)
+        llm = MagicMock()
+        llm.with_structured_output = MagicMock(return_value=structured_llm)
+        mock_get_llm.return_value = llm
+
+        impl = DefaultApiImpl()
+        req = GeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        result = await impl.generate_plan(req, "Bearer tok")
+
+    # with_structured_output called with the response model
+    llm.with_structured_output.assert_called_once_with(GeneratePlanResponse)
+    # ainvoke called exactly once — no fallback needed
+    structured_llm.ainvoke.assert_called_once()
+    assert result.learning_goal_id == "goal-1"
 
 
 @pytest.mark.asyncio
