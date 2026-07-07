@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.22.0")
 @Validated
-public interface V1Api {
+public interface StudentApiV1 {
 
     String PATH_GET_MY_PROFILE = "/v1/students/me";
     /**
@@ -34,7 +34,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.GET,
-        value = V1Api.PATH_GET_MY_PROFILE,
+        value = StudentApiV1.PATH_GET_MY_PROFILE,
         produces = { "application/json" }
     )
     ResponseEntity<SharedStudentStudentProfile> getMyProfile(
@@ -54,7 +54,7 @@ public interface V1Api {
      */
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = V1Api.PATH_UPDATE_MY_PROFILE,
+        value = StudentApiV1.PATH_UPDATE_MY_PROFILE,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
