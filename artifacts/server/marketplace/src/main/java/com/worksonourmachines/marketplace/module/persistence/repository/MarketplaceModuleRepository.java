@@ -14,5 +14,7 @@ public interface MarketplaceModuleRepository extends JpaRepository<MarketplaceMo
     @EntityGraph(attributePaths = "topics")
     List<MarketplaceModuleEntity> findAllByOrderByCodeAsc();
 
+    boolean existsByCodeIgnoreCase(String code);
+
     Optional<MarketplaceModuleEntity> findByCodeIgnoreCase(String code);
 }

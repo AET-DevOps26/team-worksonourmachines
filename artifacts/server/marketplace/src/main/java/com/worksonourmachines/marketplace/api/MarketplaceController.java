@@ -24,9 +24,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.worksonourmachines.marketplace.module.service.MarketplaceModuleService;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class MarketplaceController implements MarketplaceApiV1 {
@@ -49,9 +52,10 @@ public class MarketplaceController implements MarketplaceApiV1 {
     }
 
     @Override
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<SharedMarketplaceModuleDetail> createAdminModule(
-            SharedMarketplaceAdminModuleInput sharedMarketplaceAdminModuleInput) {
-        return notImplemented();
+            @Valid @RequestBody SharedMarketplaceAdminModuleInput sharedMarketplaceAdminModuleInput) {
+        return ResponseEntity.ok(marketplaceModuleService.createAdminModule(sharedMarketplaceAdminModuleInput));
     }
 
     @Override

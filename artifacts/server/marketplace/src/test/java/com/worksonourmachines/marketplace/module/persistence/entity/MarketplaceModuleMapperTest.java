@@ -5,13 +5,45 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.SharedMarketplaceAdminModuleInput;
 import org.openapitools.model.SharedMarketplaceModuleDetail;
+import org.openapitools.model.SharedMarketplaceTopicInput;
+import org.openapitools.model.SharedStudyFocusStudyFocus;
 
 import com.worksonourmachines.marketplace.module.mapper.MarketplaceModuleMapper;
 
 class MarketplaceModuleMapperTest {
 
     private final MarketplaceModuleMapper mapper = new MarketplaceModuleMapper();
+
+    @Test
+    void mapsAdminModuleInputToEntityWithTopicPositions() {
+        SharedMarketplaceAdminModuleInput input = new SharedMarketplaceAdminModuleInput(
+                "IN0001",
+                "Introduction to Informatics",
+                "Foundations of computer science.",
+                "Good for first-semester students.",
+                List.of(
+                        new SharedMarketplaceTopicInput(
+                                "Logic",
+                                "Propositional and predicate logic.",
+                                "Focus on formal reasoning.",
+                                new SharedStudyFocusStudyFocus(2, 5, 4, 3)),
+                        new SharedMarketplaceTopicInput(
+                                "Algorithms",
+                                "Basic algorithm design.",
+                                "Focus on problem solving.",
+                                new SharedStudyFocusStudyFocus(3, 4, 4, 5))));
+
+        MarketplaceModuleEntity entity = mapper.toCreateEntity(input);
+
+        assertEquals("IN0001", entity.getCode());
+        assertEquals("Introduction to Informatics", entity.getTitle());
+        assertEquals(2, entity.getTopics().size());
+        assertEquals(0, entity.getTopics().get(0).getPosition());
+        assertEquals(1, entity.getTopics().get(1).getPosition());
+        assertEquals(5, entity.getTopics().get(1).getProblemSolving());
+    }
 
     @Test
     void mapsModuleWithTopicsToGeneratedDto() {
