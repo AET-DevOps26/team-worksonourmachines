@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.ModulePage;
 import org.openapitools.model.SharedMarketplaceAdminModuleInput;
 import org.openapitools.model.SharedMarketplaceAdminModuleUpdateInput;
 import org.openapitools.model.SharedMarketplaceModuleDetail;
 import org.openapitools.model.SharedMarketplaceTopicInput;
 import org.openapitools.model.SharedStudyFocusStudyFocus;
+import org.springframework.data.domain.PageImpl;
 
 import com.worksonourmachines.marketplace.module.mapper.MarketplaceModuleMapper;
 
@@ -112,5 +114,23 @@ class MarketplaceModuleMapperTest {
         assertEquals(1, dto.getTopics().size());
         assertEquals(List.of("Logic"), dto.getTopics().stream().map(topicDto -> topicDto.getName()).toList());
         assertEquals(5, dto.getTopics().get(0).getStudyFocus().getFormalReasoning());
+    }
+
+    @Test
+    void mapsModulePageToGeneratedDto() {
+        MarketplaceModuleEntity module = new MarketplaceModuleEntity(
+                "IN0001",
+                "Introduction to Informatics",
+                "Foundations of computer science.",
+                "Good for first-semester students.");
+        module.assignId();
+
+        ModulePage page = mapper.toPage(new PageImpl<>(List.of(module)), 1, 20);
+
+        assertEquals(1, page.getPage());
+        assertEquals(20, page.getPageSize());
+        assertEquals(1, page.getTotal());
+        assertEquals("IN0001", page.getItems().get(0).getCode());
+        assertEquals("Introduction to Informatics", page.getItems().get(0).getTitle());
     }
 }

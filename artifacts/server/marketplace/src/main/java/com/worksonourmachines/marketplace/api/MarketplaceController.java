@@ -92,7 +92,7 @@ public class MarketplaceController implements MarketplaceApiV1 {
             Integer page,
             Integer pageSize,
             @Nullable String q) {
-        return notImplemented();
+        return ResponseEntity.ok(marketplaceModuleService.listModules(page, pageSize, q));
     }
 
     @Override

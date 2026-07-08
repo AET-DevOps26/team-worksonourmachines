@@ -3,12 +3,15 @@ package com.worksonourmachines.marketplace.module.mapper;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.openapitools.model.ModulePage;
 import org.openapitools.model.SharedMarketplaceAdminModuleInput;
 import org.openapitools.model.SharedMarketplaceAdminModuleUpdateInput;
 import org.openapitools.model.SharedMarketplaceModuleDetail;
+import org.openapitools.model.SharedMarketplaceModuleListItem;
 import org.openapitools.model.SharedMarketplaceTopic;
 import org.openapitools.model.SharedMarketplaceTopicInput;
 import org.openapitools.model.SharedStudyFocusStudyFocus;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.worksonourmachines.marketplace.module.persistence.entity.MarketplaceModuleEntity;
@@ -54,6 +57,25 @@ public class MarketplaceModuleMapper {
         return modules.stream()
                 .map(this::toDetail)
                 .toList();
+    }
+
+    public ModulePage toPage(Page<MarketplaceModuleEntity> modules, int page, int pageSize) {
+        return new ModulePage(
+                modules.getContent().stream()
+                        .map(this::toListItem)
+                        .toList(),
+                page,
+                pageSize,
+                Math.toIntExact(modules.getTotalElements()));
+    }
+
+    private SharedMarketplaceModuleListItem toListItem(MarketplaceModuleEntity module) {
+        return new SharedMarketplaceModuleListItem(
+                module.getId().toString(),
+                module.getCode(),
+                module.getTitle(),
+                module.getDescription(),
+                module.getDifficultyHint());
     }
 
     private MarketplaceModuleTopicEntity toTopicEntity(int position, SharedMarketplaceTopicInput input) {
