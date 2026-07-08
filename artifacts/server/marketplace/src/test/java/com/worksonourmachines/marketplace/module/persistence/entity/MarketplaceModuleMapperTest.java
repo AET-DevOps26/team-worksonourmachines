@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.SharedMarketplaceAdminModuleInput;
+import org.openapitools.model.SharedMarketplaceAdminModuleUpdateInput;
 import org.openapitools.model.SharedMarketplaceModuleDetail;
 import org.openapitools.model.SharedMarketplaceTopicInput;
 import org.openapitools.model.SharedStudyFocusStudyFocus;
@@ -15,6 +16,44 @@ import com.worksonourmachines.marketplace.module.mapper.MarketplaceModuleMapper;
 class MarketplaceModuleMapperTest {
 
     private final MarketplaceModuleMapper mapper = new MarketplaceModuleMapper();
+
+    @Test
+    void updatesEntityFromAdminModuleUpdateInput() {
+        MarketplaceModuleEntity module = new MarketplaceModuleEntity(
+                "IN0001",
+                "Old title",
+                "Old description.",
+                "Old hint.");
+        module.addTopic(new MarketplaceModuleTopicEntity(
+                0,
+                "Old topic",
+                "Old topic description.",
+                "Old topic hint.",
+                1,
+                1,
+                1,
+                1));
+        SharedMarketplaceAdminModuleUpdateInput input = new SharedMarketplaceAdminModuleUpdateInput(
+                "New title",
+                "New description.",
+                "New hint.",
+                List.of(new SharedMarketplaceTopicInput(
+                        "New topic",
+                        "New topic description.",
+                        "New topic hint.",
+                        new SharedStudyFocusStudyFocus(3, 4, 5, 2))));
+
+        mapper.updateEntity(module, input);
+
+        assertEquals("IN0001", module.getCode());
+        assertEquals("New title", module.getTitle());
+        assertEquals("New description.", module.getDescription());
+        assertEquals("New hint.", module.getDifficultyHint());
+        assertEquals(1, module.getTopics().size());
+        assertEquals("New topic", module.getTopics().get(0).getName());
+        assertEquals(0, module.getTopics().get(0).getPosition());
+        assertEquals(5, module.getTopics().get(0).getConceptualUnderstanding());
+    }
 
     @Test
     void mapsAdminModuleInputToEntityWithTopicPositions() {

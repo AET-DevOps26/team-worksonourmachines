@@ -3,6 +3,7 @@ package com.worksonourmachines.marketplace.module.service;
 import java.util.List;
 
 import org.openapitools.model.SharedMarketplaceAdminModuleInput;
+import org.openapitools.model.SharedMarketplaceAdminModuleUpdateInput;
 import org.openapitools.model.SharedMarketplaceModuleDetail;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,5 +38,15 @@ public class MarketplaceModuleService {
         }
         return marketplaceModuleMapper.toDetail(
                 marketplaceModuleRepository.save(marketplaceModuleMapper.toCreateEntity(input)));
+    }
+
+    @Transactional
+    public SharedMarketplaceModuleDetail updateAdminModule(
+            String code,
+            SharedMarketplaceAdminModuleUpdateInput input) {
+        var module = marketplaceModuleRepository.findByCodeIgnoreCase(code)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Module not found."));
+        marketplaceModuleMapper.updateEntity(module, input);
+        return marketplaceModuleMapper.toDetail(marketplaceModuleRepository.save(module));
     }
 }

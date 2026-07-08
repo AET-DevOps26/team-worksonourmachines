@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.openapitools.model.SharedMarketplaceAdminModuleInput;
+import org.openapitools.model.SharedMarketplaceAdminModuleUpdateInput;
 import org.openapitools.model.SharedMarketplaceModuleDetail;
 import org.openapitools.model.SharedMarketplaceTopic;
 import org.openapitools.model.SharedMarketplaceTopicInput;
@@ -26,6 +27,15 @@ public class MarketplaceModuleMapper {
                 .mapToObj(index -> toTopicEntity(index, input.getTopics().get(index)))
                 .toList());
         return module;
+    }
+
+    public void updateEntity(MarketplaceModuleEntity module, SharedMarketplaceAdminModuleUpdateInput input) {
+        module.setTitle(input.getTitle());
+        module.setDescription(input.getDescription());
+        module.setDifficultyHint(input.getDifficultyHint());
+        module.replaceTopics(IntStream.range(0, input.getTopics().size())
+                .mapToObj(index -> toTopicEntity(index, input.getTopics().get(index)))
+                .toList());
     }
 
     public SharedMarketplaceModuleDetail toDetail(MarketplaceModuleEntity module) {

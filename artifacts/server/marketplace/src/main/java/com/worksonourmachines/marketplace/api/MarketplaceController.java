@@ -123,10 +123,11 @@ public class MarketplaceController implements MarketplaceApiV1 {
     }
 
     @Override
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<SharedMarketplaceModuleDetail> updateAdminModule(
             String code,
-            SharedMarketplaceAdminModuleUpdateInput sharedMarketplaceAdminModuleUpdateInput) {
-        return notImplemented();
+            @Valid @RequestBody SharedMarketplaceAdminModuleUpdateInput sharedMarketplaceAdminModuleUpdateInput) {
+        return ResponseEntity.ok(marketplaceModuleService.updateAdminModule(code, sharedMarketplaceAdminModuleUpdateInput));
     }
 
     @Override
