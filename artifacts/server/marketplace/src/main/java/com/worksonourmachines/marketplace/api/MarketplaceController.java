@@ -67,7 +67,7 @@ public class MarketplaceController implements MarketplaceApiV1 {
 
     @Override
     public ResponseEntity<SharedMarketplaceModuleDetail> getModule(String code) {
-        return notImplemented();
+        return ResponseEntity.ok(marketplaceModuleService.getModule(code));
     }
 
     @Override

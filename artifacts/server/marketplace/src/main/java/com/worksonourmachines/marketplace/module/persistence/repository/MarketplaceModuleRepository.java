@@ -30,5 +30,6 @@ public interface MarketplaceModuleRepository extends JpaRepository<MarketplaceMo
 
     boolean existsByCodeIgnoreCase(String code);
 
+    @EntityGraph(attributePaths = "topics")
     Optional<MarketplaceModuleEntity> findByCodeIgnoreCase(String code);
 }

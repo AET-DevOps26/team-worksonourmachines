@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.worksonourmachines.marketplace.module.mapper.MarketplaceModuleMapper;
+import com.worksonourmachines.marketplace.module.persistence.entity.MarketplaceModuleEntity;
 import com.worksonourmachines.marketplace.module.persistence.repository.MarketplaceModuleRepository;
 
 @Service
@@ -47,6 +48,11 @@ public class MarketplaceModuleService {
                 resolvedPageSize);
     }
 
+    @Transactional(readOnly = true)
+    public SharedMarketplaceModuleDetail getModule(String code) {
+        return marketplaceModuleMapper.toDetail(findModuleByCode(code));
+    }
+
     @Transactional
     public SharedMarketplaceModuleDetail createAdminModule(SharedMarketplaceAdminModuleInput input) {
         if (marketplaceModuleRepository.existsByCodeIgnoreCase(input.getCode())) {
@@ -60,10 +66,14 @@ public class MarketplaceModuleService {
     public SharedMarketplaceModuleDetail updateAdminModule(
             String code,
             SharedMarketplaceAdminModuleUpdateInput input) {
-        var module = marketplaceModuleRepository.findByCodeIgnoreCase(code)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Module not found."));
+        var module = findModuleByCode(code);
         marketplaceModuleMapper.updateEntity(module, input);
         return marketplaceModuleMapper.toDetail(marketplaceModuleRepository.save(module));
+    }
+
+    private MarketplaceModuleEntity findModuleByCode(String code) {
+        return marketplaceModuleRepository.findByCodeIgnoreCase(code)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Module not found."));
     }
 
     private static String normalizeSearchQuery(@Nullable String q) {
