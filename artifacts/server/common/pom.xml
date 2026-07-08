@@ -10,14 +10,25 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>server-student</artifactId>
-    <name>server-student</name>
+    <artifactId>server-common</artifactId>
+    <name>server-common</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
-            <groupId>com.worksonourmachines</groupId>
-            <artifactId>server-common</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -17,6 +17,7 @@
     <name>server</name>
 
     <modules>
+        <module>common</module>
         <module>communication</module>
         <module>marketplace</module>
         <module>student</module>
@@ -60,6 +61,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <inherited>false</inherited>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>
