@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,24 +17,97 @@ import org.junit.jupiter.api.Test;
 import org.openapitools.model.SharedMarketplaceApplicationStatus;
 import org.openapitools.model.SharedMarketplaceApproveApplicationResponse;
 import org.openapitools.model.SharedMarketplaceRejectApplicationRequest;
+import org.openapitools.model.SharedMarketplaceSubmitTutorApplicationRequest;
 import org.openapitools.model.SharedMarketplaceTutorApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.worksonourmachines.marketplace.module.persistence.entity.MarketplaceModuleEntity;
+import com.worksonourmachines.marketplace.module.persistence.repository.MarketplaceModuleRepository;
 import com.worksonourmachines.marketplace.tutorapplication.mapper.MarketplaceTutorApplicationMapper;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationEntity;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationStatus;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.repository.MarketplaceTutorApplicationRepository;
+import com.worksonourmachines.server.common.security.AuthenticatedUser;
 
 class MarketplaceTutorApplicationServiceTest {
 
+    private final AuthenticatedUser authenticatedUser = org.mockito.Mockito.mock(AuthenticatedUser.class);
+    private final MarketplaceModuleRepository moduleRepository = org.mockito.Mockito.mock(MarketplaceModuleRepository.class);
     private final MarketplaceTutorApplicationRepository repository = org.mockito.Mockito.mock(
             MarketplaceTutorApplicationRepository.class);
     private final MarketplaceTutorApplicationService service = new MarketplaceTutorApplicationService(
+            authenticatedUser,
+            moduleRepository,
             repository,
             new MarketplaceTutorApplicationMapper());
+
+    @Test
+    void submitsTutorApplication() {
+        UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111101");
+        UUID moduleId = UUID.fromString("11111111-1111-1111-1111-111111111201");
+        UUID applicationId = UUID.fromString("11111111-1111-1111-1111-111111111301");
+        MarketplaceModuleEntity module = module(moduleId);
+        when(authenticatedUser.id()).thenReturn(userId);
+        when(moduleRepository.findById(moduleId)).thenReturn(Optional.of(module));
+        when(repository.existsByUserIdAndModule_IdAndStatus(
+                userId,
+                moduleId,
+                MarketplaceTutorApplicationStatus.PENDING)).thenReturn(false);
+        when(repository.save(any(MarketplaceTutorApplicationEntity.class))).thenAnswer(invocation -> {
+            MarketplaceTutorApplicationEntity application = invocation.getArgument(0);
+            ReflectionTestUtils.setField(application, "id", applicationId);
+            return application;
+        });
+
+        SharedMarketplaceTutorApplication response = service.submitTutorApplication(
+                new SharedMarketplaceSubmitTutorApplicationRequest(
+                        moduleId.toString(),
+                        " cert://intro.pdf "));
+
+        assertEquals(applicationId.toString(), response.getId());
+        assertEquals(userId.toString(), response.getUserId());
+        assertEquals(moduleId.toString(), response.getModuleId());
+        assertEquals("IN0001", response.getModuleCode());
+        assertEquals(SharedMarketplaceApplicationStatus.PENDING, response.getStatus());
+        assertEquals("cert://intro.pdf", response.getCertificateRef());
+    }
+
+    @Test
+    void rejectsTutorApplicationSubmissionForUnknownModule() {
+        UUID moduleId = UUID.fromString("11111111-1111-1111-1111-111111111299");
+        when(authenticatedUser.id()).thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111101"));
+        when(moduleRepository.findById(moduleId)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.submitTutorApplication(new SharedMarketplaceSubmitTutorApplicationRequest(
+                        moduleId.toString(),
+                        "cert://intro.pdf")));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    }
+
+    @Test
+    void rejectsDuplicatePendingTutorApplicationSubmission() {
+        UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111101");
+        UUID moduleId = UUID.fromString("11111111-1111-1111-1111-111111111201");
+        when(authenticatedUser.id()).thenReturn(userId);
+        when(moduleRepository.findById(moduleId)).thenReturn(Optional.of(module(moduleId)));
+        when(repository.existsByUserIdAndModule_IdAndStatus(
+                userId,
+                moduleId,
+                MarketplaceTutorApplicationStatus.PENDING)).thenReturn(true);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.submitTutorApplication(new SharedMarketplaceSubmitTutorApplicationRequest(
+                        moduleId.toString(),
+                        "cert://intro.pdf")));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    }
 
     @Test
     void approvesTutorApplication() {
@@ -126,12 +200,7 @@ class MarketplaceTutorApplicationServiceTest {
             UUID applicationId,
             MarketplaceTutorApplicationStatus status) {
         UUID moduleId = UUID.fromString("11111111-1111-1111-1111-111111111201");
-        MarketplaceModuleEntity module = new MarketplaceModuleEntity(
-                "IN0001",
-                "Introduction to Informatics",
-                "Foundations of computer science.",
-                "Good for first-semester students.");
-        ReflectionTestUtils.setField(module, "id", moduleId);
+        MarketplaceModuleEntity module = module(moduleId);
 
         MarketplaceTutorApplicationEntity application = new MarketplaceTutorApplicationEntity(
                 UUID.fromString("11111111-1111-1111-1111-111111111101"),
@@ -141,5 +210,15 @@ class MarketplaceTutorApplicationServiceTest {
                 OffsetDateTime.parse("2026-07-08T12:00:00Z"));
         ReflectionTestUtils.setField(application, "id", applicationId);
         return application;
+    }
+
+    private static MarketplaceModuleEntity module(UUID moduleId) {
+        MarketplaceModuleEntity module = new MarketplaceModuleEntity(
+                "IN0001",
+                "Introduction to Informatics",
+                "Foundations of computer science.",
+                "Good for first-semester students.");
+        ReflectionTestUtils.setField(module, "id", moduleId);
+        return module;
     }
 }

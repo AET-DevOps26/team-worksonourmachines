@@ -129,8 +129,9 @@ public class MarketplaceController implements MarketplaceApiV1 {
 
     @Override
     public ResponseEntity<SharedMarketplaceTutorApplication> submitTutorApplication(
-            SharedMarketplaceSubmitTutorApplicationRequest sharedMarketplaceSubmitTutorApplicationRequest) {
-        return notImplemented();
+            @Valid @RequestBody SharedMarketplaceSubmitTutorApplicationRequest sharedMarketplaceSubmitTutorApplicationRequest) {
+        return ResponseEntity.ok(marketplaceTutorApplicationService.submitTutorApplication(
+                sharedMarketplaceSubmitTutorApplicationRequest));
     }
 
     @Override

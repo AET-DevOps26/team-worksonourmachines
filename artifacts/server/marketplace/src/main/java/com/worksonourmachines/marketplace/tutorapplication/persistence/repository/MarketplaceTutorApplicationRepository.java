@@ -23,4 +23,9 @@ public interface MarketplaceTutorApplicationRepository extends JpaRepository<Mar
     Optional<MarketplaceTutorApplicationEntity> findWithModuleById(UUID id);
 
     boolean existsByUserIdAndStatus(UUID userId, MarketplaceTutorApplicationStatus status);
+
+    boolean existsByUserIdAndModule_IdAndStatus(
+            UUID userId,
+            UUID moduleId,
+            MarketplaceTutorApplicationStatus status);
 }
