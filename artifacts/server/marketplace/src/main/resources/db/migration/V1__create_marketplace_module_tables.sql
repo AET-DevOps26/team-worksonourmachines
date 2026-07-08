@@ -21,3 +21,19 @@ CREATE TABLE IF NOT EXISTS marketplace.module_topics (
     problem_solving integer NOT NULL CHECK (problem_solving BETWEEN 1 AND 5),
     UNIQUE (module_id, position)
 );
+
+CREATE TABLE IF NOT EXISTS marketplace.tutor_applications (
+    id uuid PRIMARY KEY,
+    user_id uuid NOT NULL,
+    module_id uuid NOT NULL REFERENCES marketplace.modules(id),
+    status varchar(32) NOT NULL CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    certificate_ref varchar(512) NOT NULL,
+    submitted_at timestamp with time zone NOT NULL,
+    rejection_reason text
+);
+
+CREATE INDEX IF NOT EXISTS idx_tutor_applications_status_submitted_at
+    ON marketplace.tutor_applications (status, submitted_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_tutor_applications_user_id
+    ON marketplace.tutor_applications (user_id);

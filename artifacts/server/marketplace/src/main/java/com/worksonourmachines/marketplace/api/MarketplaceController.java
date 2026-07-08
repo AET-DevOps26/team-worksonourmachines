@@ -25,9 +25,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.worksonourmachines.marketplace.module.service.MarketplaceModuleService;
+import com.worksonourmachines.marketplace.tutorapplication.service.MarketplaceTutorApplicationService;
 
 import jakarta.validation.Valid;
 
@@ -35,9 +37,13 @@ import jakarta.validation.Valid;
 public class MarketplaceController implements MarketplaceApiV1 {
 
     private final MarketplaceModuleService marketplaceModuleService;
+    private final MarketplaceTutorApplicationService marketplaceTutorApplicationService;
 
-    public MarketplaceController(MarketplaceModuleService marketplaceModuleService) {
+    public MarketplaceController(
+            MarketplaceModuleService marketplaceModuleService,
+            MarketplaceTutorApplicationService marketplaceTutorApplicationService) {
         this.marketplaceModuleService = marketplaceModuleService;
+        this.marketplaceTutorApplicationService = marketplaceTutorApplicationService;
     }
 
     @Override
@@ -74,9 +80,10 @@ public class MarketplaceController implements MarketplaceApiV1 {
     }
 
     @Override
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<SharedMarketplaceTutorApplication>> listAdminTutorApplications(
-            @Nullable SharedMarketplaceApplicationStatus status) {
-        return notImplemented();
+            @Valid @RequestParam(value = "status", required = false) @Nullable SharedMarketplaceApplicationStatus status) {
+        return ResponseEntity.ok(marketplaceTutorApplicationService.listAdminTutorApplications(status));
     }
 
     @Override
