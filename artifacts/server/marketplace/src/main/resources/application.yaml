@@ -1,6 +1,22 @@
 spring:
   application:
     name: server-marketplace
+  datasource:
+    url: ${MARKETPLACE_DB_URL:jdbc:postgresql://postgres:5432/marketplace}
+    username: ${MARKETPLACE_DB_USER:marketplace}
+    password: ${MARKETPLACE_DB_PASSWORD:marketplace}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    create-schemas: true
+    default-schema: marketplace
+    schemas: marketplace
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: marketplace
 
 server:
   port: ${PORT:8082}

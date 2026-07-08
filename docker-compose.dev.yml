@@ -19,12 +19,9 @@ services:
 
   postgres:
     environment:
-      POSTGRES_DB: tutormatch
-      POSTGRES_USER: tutormatch
-      POSTGRES_PASSWORD: tutormatch
-      KEYCLOAK_DB: keycloak
-      KEYCLOAK_DB_USER: keycloak
-      KEYCLOAK_DB_PASSWORD: keycloak
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - 127.0.0.1:5432:5432
 
@@ -80,7 +77,7 @@ services:
     <<: *server-base
     environment:
       PORT: "8082"
-    command: ["mvn", "-pl", "communication", "spring-boot:run"]
+    command: ["mvn", "-pl", "marketplace", "spring-boot:run"]
     ports:
       - 127.0.0.1:8082:8082
 

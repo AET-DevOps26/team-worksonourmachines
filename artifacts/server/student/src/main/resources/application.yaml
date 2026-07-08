@@ -1,12 +1,21 @@
 spring:
   application:
     name: server-student
+  datasource:
+    url: ${STUDENT_DB_URL:jdbc:postgresql://postgres:5432/student}
+    username: ${STUDENT_DB_USER:student}
+    password: ${STUDENT_DB_PASSWORD:student}
+  flyway:
+    create-schemas: true
+    default-schema: student
+    schemas: student
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: student
 
 server:
   port: ${PORT:8081}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
