@@ -13,7 +13,7 @@
  * Do not edit the class manually.
  */
 
-export const BASE_PATH = "https://marketplace.example.local".replace(/\/+$/, "");
+export const BASE_PATH = "https://api.tutormatch.localhost".replace(/\/+$/, "");
 
 export interface ConfigurationParameters {
     basePath?: string; // override base path

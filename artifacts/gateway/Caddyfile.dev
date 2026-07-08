@@ -24,6 +24,22 @@ api.{$APP_HOSTNAME} {
     	reverse_proxy server-marketplace:8082
     }
 
+    handle /v1/admin* {
+    	reverse_proxy server-marketplace:8082
+    }
+
+    handle /v1/tutors* {
+    	reverse_proxy server-marketplace:8082
+    }
+
+    handle /v1/tutor-applications* {
+    	reverse_proxy server-marketplace:8082
+    }
+
+    handle /v1/modules* {
+    	reverse_proxy server-marketplace:8082
+    }
+
     handle /v1/communication* {
     	reverse_proxy server-communication:8083
     }

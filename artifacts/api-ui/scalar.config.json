@@ -6,19 +6,15 @@
   "hideTestRequestButton": false,
   "hideClientButton": false,
   "authentication": {
-    "preferredSecurityScheme": "KeycloakBearerAuth",
+    "preferredSecurityScheme": "KeycloakAuth",
     "securitySchemes": {
-      "KeycloakBearerAuth": {
+      "KeycloakAuth": {
         "flows": {
-          "clientCredentials": {
+          "authorizationCode": {
             "x-scalar-client-id": "scalar-dev",
-            "clientSecret": "scalar-dev-secret",
-            "scopes": [
-              "openid",
-              "profile",
-              "email",
-              "roles"
-            ]
+            "x-scalar-redirect-uri": "https://api.tutormatch.localhost",
+            "x-usePkce": "SHA-256",
+            "selectedScopes": ["openid", "basic", "profile", "email", "roles"]
           }
         }
       }

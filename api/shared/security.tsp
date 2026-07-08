@@ -14,8 +14,8 @@ model KeycloakClientAuth
     ["openid", "profile", "email", "roles"]
   >;
 
-@doc("Keycloak OAuth2 authorization code auth for student login")
-model KeycloakStudentAuth
+@doc("Keycloak OAuth2 authorization code auth for user login")
+model KeycloakAuth
   is OAuth2Auth<
     [
       {

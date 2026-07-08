@@ -77,6 +77,8 @@ services:
     <<: *server-base
     environment:
       PORT: "8082"
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
+      KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
     command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
     ports:
       - 127.0.0.1:8082:8082
