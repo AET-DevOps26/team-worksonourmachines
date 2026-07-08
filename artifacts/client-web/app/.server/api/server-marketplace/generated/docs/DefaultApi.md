@@ -41,7 +41,7 @@ import type { ApproveTutorApplicationRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -76,7 +76,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -114,7 +114,7 @@ import type { CreateAdminModuleRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -149,7 +149,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -187,7 +187,7 @@ import type { GetModuleRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -222,7 +222,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -260,7 +260,7 @@ import type { GetMyTutorProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -287,7 +287,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -324,7 +324,7 @@ import type { GetTutorRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -359,7 +359,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -397,7 +397,7 @@ import type { ListAdminModulesRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -424,7 +424,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -461,7 +461,7 @@ import type { ListAdminTutorApplicationsRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -496,7 +496,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -533,7 +533,7 @@ import type { ListModulesRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -574,7 +574,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -611,7 +611,7 @@ import type { ListMyTutorApplicationsRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -638,7 +638,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -675,7 +675,7 @@ import type { ListTutorsRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -743,7 +743,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -780,7 +780,7 @@ import type { RejectTutorApplicationRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -818,7 +818,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -856,7 +856,7 @@ import type { SubmitTutorApplicationRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -891,7 +891,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -929,7 +929,7 @@ import type { UpdateAdminModuleRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -967,7 +967,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 
@@ -1005,7 +1005,7 @@ import type { UpdateMyTutorProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakBearerAuth application
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -1040,7 +1040,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakBearerAuth application](../README.md#KeycloakBearerAuth-application)
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
 
 ### HTTP request headers
 

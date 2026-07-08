@@ -3,6 +3,7 @@ package com.worksonourmachines.student.profile.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
 import org.openapitools.model.SharedStudentStudentProfile;
 import org.openapitools.model.SharedStudentStudentProfileInput;
 import org.openapitools.model.SharedStudyFocusStudyFocus;
@@ -10,15 +11,17 @@ import org.springframework.stereotype.Component;
 
 import com.worksonourmachines.student.profile.persistence.entity.StudentProfileEntity;
 
+import javax.annotation.Nonnull;
+
 @Component
 public class StudentProfileMapper {
 
-    public SharedStudentStudentProfile defaultDto() {
+    public SharedStudentStudentProfile defaultDto(String name) {
         SharedStudentStudentProfile profile = new SharedStudentStudentProfile(
-                "Demo Student",
-                "Temporary profile until authentication is wired.",
-                List.of("English"));
-        profile.setStudyFocus(new SharedStudyFocusStudyFocus(3, 3, 3, 3));
+                name,
+                "Add your bio here...",
+                List.of("German"));
+        profile.setStudyFocus(new SharedStudyFocusStudyFocus(0,0,0,0));
         return profile;
     }
 

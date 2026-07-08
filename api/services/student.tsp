@@ -7,11 +7,20 @@ using TypeSpec.Versioning;
 using Shared.Errors;
 using Shared.Student;
 
+@minLength(1)
+@pattern(".*\\S.*")
+scalar NonBlankString extends string;
+
 namespace Shared.Student {
   model StudentProfile {
-    displayName: string;
-    bio: string;
-    languages: string[];
+    displayName: NonBlankString;
+
+    @minLength(1)
+    @pattern(".*\\S.*")
+    bio: NonBlankString;
+
+    @minItems(1)
+    languages: NonBlankString[];
 
     @doc("Self-assessed strength in each study skill (1 = needs work, 5 = confident).")
     studyFocus?: Shared.StudyFocus.StudyFocus;
@@ -27,7 +36,7 @@ enum StudentVersions {
 @service(#{ title: "Student API" })
 @server("https://api.tutormatch.localhost", "Student API")
 @versioned(StudentVersions)
-@useAuth(KeycloakBearerAuth)
+@useAuth(KeycloakStudentAuth)
 @route("/v1")
 namespace Student {
   @summary("Get my student profile")

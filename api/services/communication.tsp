@@ -53,7 +53,7 @@ enum CommunicationVersions {
 @service(#{ title: "Communication API" })
 @server("https://communication.example.local", "Communication API")
 @versioned(CommunicationVersions)
-@useAuth(KeycloakBearerAuth)
+@useAuth(KeycloakClientAuth)
 @route("/v1")
 namespace Communication {
   model MessagePage {

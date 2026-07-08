@@ -1,6 +1,12 @@
 spring:
   application:
     name: server-student
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER:https://auth.tutormatch.localhost/realms/tutormatch}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
   datasource:
     url: ${STUDENT_DB_URL:jdbc:postgresql://postgres:5432/student}
     username: ${STUDENT_DB_USER:student}
