@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.openapitools.model.SharedMarketplaceApplicationStatus;
 import org.openapitools.model.SharedMarketplaceApproveApplicationResponse;
+import org.openapitools.model.SharedMarketplaceRejectApplicationRequest;
 import org.openapitools.model.SharedMarketplaceTutorApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.worksonourmachines.marketplace.tutorapplication.mapper.MarketplaceTutorApplicationMapper;
+import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationEntity;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationStatus;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.repository.MarketplaceTutorApplicationRepository;
 
@@ -43,8 +45,7 @@ public class MarketplaceTutorApplicationService {
 
     @Transactional
     public SharedMarketplaceApproveApplicationResponse approveTutorApplication(String id) {
-        var application = marketplaceTutorApplicationRepository.findWithModuleById(parseApplicationId(id))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tutor application not found."));
+        var application = findApplication(id);
         boolean isFirstApproval = !marketplaceTutorApplicationRepository.existsByUserIdAndStatus(
                 application.getUserId(),
                 MarketplaceTutorApplicationStatus.APPROVED);
@@ -55,6 +56,23 @@ public class MarketplaceTutorApplicationService {
         return new SharedMarketplaceApproveApplicationResponse(
                 marketplaceTutorApplicationMapper.toDto(marketplaceTutorApplicationRepository.save(application)),
                 isFirstApproval);
+    }
+
+    @Transactional
+    public SharedMarketplaceTutorApplication rejectTutorApplication(
+            String id,
+            SharedMarketplaceRejectApplicationRequest request) {
+        var application = findApplication(id);
+
+        application.setStatus(MarketplaceTutorApplicationStatus.REJECTED);
+        application.setRejectionReason(request.getReason());
+
+        return marketplaceTutorApplicationMapper.toDto(marketplaceTutorApplicationRepository.save(application));
+    }
+
+    private MarketplaceTutorApplicationEntity findApplication(String id) {
+        return marketplaceTutorApplicationRepository.findWithModuleById(parseApplicationId(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tutor application not found."));
     }
 
     private static UUID parseApplicationId(String id) {
