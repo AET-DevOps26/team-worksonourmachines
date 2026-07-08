@@ -53,8 +53,9 @@ public class MarketplaceController implements MarketplaceApiV1 {
     }
 
     @Override
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<SharedMarketplaceApproveApplicationResponse> approveTutorApplication(String id) {
-        return notImplemented();
+        return ResponseEntity.ok(marketplaceTutorApplicationService.approveTutorApplication(id));
     }
 
     @Override

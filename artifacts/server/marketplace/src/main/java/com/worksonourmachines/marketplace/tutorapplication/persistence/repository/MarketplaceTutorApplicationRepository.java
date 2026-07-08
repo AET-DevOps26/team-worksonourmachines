@@ -1,6 +1,7 @@
 package com.worksonourmachines.marketplace.tutorapplication.persistence.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,4 +18,9 @@ public interface MarketplaceTutorApplicationRepository extends JpaRepository<Mar
     @EntityGraph(attributePaths = "module")
     List<MarketplaceTutorApplicationEntity> findByStatusOrderBySubmittedAtDesc(
             MarketplaceTutorApplicationStatus status);
+
+    @EntityGraph(attributePaths = "module")
+    Optional<MarketplaceTutorApplicationEntity> findWithModuleById(UUID id);
+
+    boolean existsByUserIdAndStatus(UUID userId, MarketplaceTutorApplicationStatus status);
 }
