@@ -78,7 +78,7 @@ services:
       KEYCLOAK_CLIENT_ID: client-web
       KEYCLOAK_CLIENT_SECRET: client-web-dev-secret
       REDIS_URL: redis://redis:6379
-      SERVER_COMMUNICATION_API_URL: tbd
+      SERVER_COMMUNICATION_API_URL: http://server-mock:3000
       SERVER_MARKETPLACE_API_URL: http://server-mock:3000
       SERVER_STUDENT_API_URL: http://server-mock:3000
     depends_on:

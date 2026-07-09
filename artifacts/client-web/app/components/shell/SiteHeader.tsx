@@ -11,9 +11,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { Input } from '~/components/ui/input';
 import { cn } from '~/lib/ui/utils';
-
+import { HeaderSearch } from './HeaderSearch';
 import { Logo } from './Logo';
 import { appNavLinks, getProfileMenuGroups, publicNavLinks } from './nav';
 import { ThemeToggle } from './ThemeToggle';
@@ -40,16 +39,12 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     return (
         <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
             <div className="mx-auto grid h-14 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-6">
-                <Logo />
+                <Logo to={user ? '/dashboard' : '/'} />
 
                 <div className="flex min-w-0 items-center justify-center">
                     {user ? (
-                        <div className="hidden w-full max-w-md sm:block">
-                            <Input
-                                aria-label="Search tutors and modules"
-                                placeholder="Search tutors and modules…"
-                                type="search"
-                            />
+                        <div className="hidden w-full justify-center sm:flex">
+                            <HeaderSearch />
                         </div>
                     ) : (
                         <nav aria-label="Main" className="hidden items-center gap-2 sm:flex">
@@ -80,10 +75,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                     </Link>
                                 ))}
                             </nav>
-
-                            <Link className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))} to="/notifications">
-                                Alerts
-                            </Link>
 
                             <Link className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }))} to="/chat">
                                 Chat

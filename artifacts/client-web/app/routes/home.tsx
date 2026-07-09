@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from 'react-router';
-import { Link, useLoaderData } from 'react-router';
+import { Link, redirect } from 'react-router';
 import { getSessionUser } from '~/.server/service/session';
 import { buttonVariants } from '~/components/ui/button';
 import { cn } from '~/lib/ui/utils';
@@ -62,28 +62,16 @@ const studentScenarios = [
 
 const REGISTER_REDIRECT = encodeURIComponent('/me/profile?edit=1');
 
-function hasRole(roles: readonly string[], role: string) {
-    return roles.includes(role);
-}
-
 export async function loader({ request }: LoaderFunctionArgs) {
     const userResult = await getSessionUser(request);
-    if (userResult.isErr || !userResult.value) {
-        return { user: null };
+    if (userResult.isOk && userResult.value) {
+        throw redirect('/dashboard');
     }
 
-    return {
-        user: {
-            roles: [...userResult.value.roles],
-        },
-    };
+    return { user: null };
 }
 
 export default function HomeRoute() {
-    const { user } = useLoaderData<typeof loader>();
-    const isLoggedIn = user !== null;
-    const isTutor = user ? hasRole(user.roles, 'tutor') : false;
-
     return (
         <div className="-mx-6 flex flex-col">
             <section className="border-b border-border bg-muted/30">
@@ -93,46 +81,28 @@ export default function HomeRoute() {
                             Personal tutoring for your courses
                         </p>
                         <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-                            {isLoggedIn
-                                ? 'Welcome back — pick up where you left off.'
-                                : 'Find personal help for TUM courses — matched to your budget and deadline.'}
+                            Find personal help for TUM courses — matched to your budget and deadline.
                         </h1>
                         <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-                            {isLoggedIn
-                                ? 'Complete your profile, discover tutors for your modules, or manage your learning goals.'
-                                : 'Stop searching WhatsApp groups. TUtorMatch connects you with tutors who understand your modules and exam timelines, then helps you build a personalized study plan from real availability and course context.'}
+                            Stop searching WhatsApp groups. TUtorMatch connects you with tutors who understand your
+                            modules and exam timelines, then helps you build a personalized study plan from real
+                            availability and course context.
                         </p>
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                        {isLoggedIn ? (
-                            <>
-                                <Link className={cn(buttonVariants({ size: 'lg' }))} to="/me/profile">
-                                    My profile
-                                </Link>
-                                <Link className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))} to="/discover">
-                                    Discover tutors
-                                </Link>
-                            </>
-                        ) : (
-                            <>
-                                <Link
-                                    className={cn(buttonVariants({ size: 'lg' }))}
-                                    to={`/auth/register?redirectTo=${REGISTER_REDIRECT}`}
-                                >
-                                    Create free account
-                                </Link>
-                                <Link className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))} to="/login">
-                                    Sign in
-                                </Link>
-                                <Link
-                                    className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))}
-                                    to="/become-a-tutor"
-                                >
-                                    Become a tutor
-                                </Link>
-                            </>
-                        )}
+                        <Link
+                            className={cn(buttonVariants({ size: 'lg' }))}
+                            to={`/auth/register?redirectTo=${REGISTER_REDIRECT}`}
+                        >
+                            Create free account
+                        </Link>
+                        <Link className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))} to="/login">
+                            Sign in
+                        </Link>
+                        <Link className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))} to="/become-a-tutor">
+                            Become a tutor
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -226,41 +196,33 @@ export default function HomeRoute() {
                             availability — students find you through targeted discovery.
                         </p>
                     </div>
-                    <Link
-                        className={cn(buttonVariants())}
-                        to={isLoggedIn ? (isTutor ? '/tutor/dashboard' : '/tutor/apply') : '/become-a-tutor'}
-                    >
-                        {isLoggedIn ? (isTutor ? 'Tutor dashboard' : 'Apply as tutor') : 'Apply as tutor'}
+                    <Link className={cn(buttonVariants())} to="/become-a-tutor">
+                        Apply as tutor
                     </Link>
                 </div>
             </section>
 
-            {!isLoggedIn ? (
-                <section>
-                    <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
-                        <div className="flex max-w-xl flex-col gap-2">
-                            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                                Ready to stop searching WhatsApp groups?
-                            </h2>
-                            <p className="text-sm leading-relaxed text-muted-foreground">
-                                Create an account, set up your profile, and discover tutors matched to the modules you
-                                are studying.
-                            </p>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            <Link
-                                className={cn(buttonVariants())}
-                                to={`/auth/register?redirectTo=${REGISTER_REDIRECT}`}
-                            >
-                                Create free account
-                            </Link>
-                            <Link className={cn(buttonVariants({ variant: 'outline' }))} to="/modules">
-                                Browse modules
-                            </Link>
-                        </div>
+            <section>
+                <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
+                    <div className="flex max-w-xl flex-col gap-2">
+                        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                            Ready to stop searching WhatsApp groups?
+                        </h2>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                            Create an account, set up your profile, and discover tutors matched to the modules you are
+                            studying.
+                        </p>
                     </div>
-                </section>
-            ) : null}
+                    <div className="flex flex-wrap gap-3">
+                        <Link className={cn(buttonVariants())} to={`/auth/register?redirectTo=${REGISTER_REDIRECT}`}>
+                            Create free account
+                        </Link>
+                        <Link className={cn(buttonVariants({ variant: 'outline' }))} to="/modules">
+                            Browse modules
+                        </Link>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

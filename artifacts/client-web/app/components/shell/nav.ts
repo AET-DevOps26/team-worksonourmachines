@@ -90,10 +90,7 @@ export function getProfileMenuGroups(roles: readonly string[]): ProfileMenuGroup
 
     groups.push({
         label: 'Messages',
-        links: [
-            { href: '/notifications', label: 'Notifications' },
-            { href: '/chat', label: 'Messages' },
-        ],
+        links: [{ href: '/chat', label: 'Messages' }],
     });
 
     if (hasRole(roles, 'admin')) {
