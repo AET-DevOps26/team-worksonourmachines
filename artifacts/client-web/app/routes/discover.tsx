@@ -1,9 +1,11 @@
 import { useId } from 'react';
 import { Link, useLoaderData, useSearchParams } from 'react-router';
-import type {
-    SharedMarketplaceLocation,
-    SharedMarketplaceTutorSort,
-    SharedMarketplaceWeekday,
+import {
+    instanceOfSharedMarketplaceLocation,
+    instanceOfSharedMarketplaceTutorSort,
+    type SharedMarketplaceLocation,
+    type SharedMarketplaceTutorSort,
+    type SharedMarketplaceWeekday,
 } from '~/.server/api/server-marketplace/generated';
 import { isErr } from '~/.server/lib/result';
 import { getModule, listModules, listTutors } from '~/.server/service/marketplace';
@@ -16,6 +18,20 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Select } from '~/components/ui/select';
 import { cn } from '~/lib/ui/utils';
+
+function parsePositiveInt(value: string | null, fallback: number): number {
+    if (!value) return fallback;
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed < 1 || !Number.isInteger(parsed)) return fallback;
+    return parsed;
+}
+
+function parseOptionalNonNegativeNumber(value: string | null): number | undefined {
+    if (!value) return undefined;
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed < 0) return undefined;
+    return parsed;
+}
 
 function paginationSearchParams(searchParams: URLSearchParams, page: number) {
     const next = new URLSearchParams();
@@ -35,18 +51,26 @@ export const loader = protectedLoader(async ({ request }) => {
     const moduleId = params.get('moduleId') ?? undefined;
     const topicId = params.get('topicId') ?? undefined;
     const q = params.get('q') ?? undefined;
-    const page = Number(params.get('page') ?? 1);
-    const sort = (params.get('sort') as SharedMarketplaceTutorSort | null) ?? undefined;
+    const page = parsePositiveInt(params.get('page'), 1);
+    const sortParam = params.get('sort');
+    const sort =
+        sortParam && instanceOfSharedMarketplaceTutorSort(sortParam)
+            ? (sortParam as SharedMarketplaceTutorSort)
+            : undefined;
     const weekdays = params
         .getAll('weekdays')
         .filter((day): day is SharedMarketplaceWeekday =>
             ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].includes(day),
         );
     const language = params.get('language') ?? undefined;
-    const location = (params.get('location') as SharedMarketplaceLocation | null) ?? undefined;
-    const minRate = params.get('minRate') ? Number(params.get('minRate')) : undefined;
-    const maxRate = params.get('maxRate') ? Number(params.get('maxRate')) : undefined;
-    const minRating = params.get('minRating') ? Number(params.get('minRating')) : undefined;
+    const locationParam = params.get('location');
+    const location =
+        locationParam && instanceOfSharedMarketplaceLocation(locationParam)
+            ? (locationParam as SharedMarketplaceLocation)
+            : undefined;
+    const minRate = parseOptionalNonNegativeNumber(params.get('minRate'));
+    const maxRate = parseOptionalNonNegativeNumber(params.get('maxRate'));
+    const minRating = parseOptionalNonNegativeNumber(params.get('minRating'));
 
     const tutorParams: Parameters<typeof listTutors>[0] = { page, pageSize: 12 };
     if (q) tutorParams.q = q;

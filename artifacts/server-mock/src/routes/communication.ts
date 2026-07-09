@@ -4,6 +4,12 @@ import { displayNameForUser, newId, state, tutorIdForUser } from '../state.js';
 
 export const communicationRouter = Router();
 
+function parsePagination(pageRaw: unknown, pageSizeRaw: unknown, defaultPageSize: number) {
+  const page = Math.max(1, Math.floor(Number(pageRaw)) || 1);
+  const pageSize = Math.min(100, Math.max(1, Math.floor(Number(pageSizeRaw)) || defaultPageSize));
+  return { page, pageSize };
+}
+
 communicationRouter.use(requireAuth);
 
 communicationRouter.get('/conversations', (req, res) => {
@@ -109,8 +115,7 @@ communicationRouter.get('/conversations/:id/messages', (req, res) => {
     res.status(404).json({ code: 'not_found', message: 'Conversation not found' });
     return;
   }
-  const page = Number(req.query.page ?? 1);
-  const pageSize = Number(req.query.pageSize ?? 50);
+  const { page, pageSize } = parsePagination(req.query.page, req.query.pageSize, 50);
   const msgs = state.messages
     .filter((m) => m.conversationId === conv.id)
     .sort((a, b) => a.sentAt.localeCompare(b.sentAt));

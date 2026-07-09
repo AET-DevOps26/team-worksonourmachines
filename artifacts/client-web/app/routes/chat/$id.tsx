@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useNavigation } from 'react-router';
+import { Link, useActionData, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { getConversation, listMessages, sendMessage } from '~/.server/service/communication';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
@@ -34,8 +34,10 @@ export const action = protectedAction(async ({ request, params }) => {
 
 export default function ChatThreadRoute() {
     const { conversation, currentUserId, messages } = useLoaderData<typeof loader>();
+    const actionData = useActionData() as { error?: string } | undefined;
     const navigation = useNavigation();
     const partner = conversation.partner;
+    const inputKey = messages.at(-1)?.id ?? 'empty';
 
     return (
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
@@ -73,11 +75,14 @@ export default function ChatThreadRoute() {
                 ))}
             </Card>
 
-            <form className="flex gap-2" method="post">
-                <Input name="content" placeholder="Type a message…" required />
-                <Button disabled={navigation.state === 'submitting'} type="submit">
-                    Send
-                </Button>
+            <form className="flex flex-col gap-2" method="post">
+                <div className="flex gap-2">
+                    <Input key={inputKey} name="content" placeholder="Type a message…" required />
+                    <Button disabled={navigation.state === 'submitting'} type="submit">
+                        Send
+                    </Button>
+                </div>
+                {actionData?.error ? <p className="text-sm text-destructive">{actionData.error}</p> : null}
             </form>
         </div>
     );
