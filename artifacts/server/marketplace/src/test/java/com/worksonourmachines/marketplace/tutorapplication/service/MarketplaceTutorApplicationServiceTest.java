@@ -10,15 +10,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.SharedMarketplaceApplicationStatus;
 import org.openapitools.model.SharedMarketplaceApproveApplicationResponse;
+import org.openapitools.model.SharedMarketplaceLocation;
 import org.openapitools.model.SharedMarketplaceRejectApplicationRequest;
 import org.openapitools.model.SharedMarketplaceSubmitTutorApplicationRequest;
+import org.openapitools.model.SharedMarketplaceTutorAvailability;
 import org.openapitools.model.SharedMarketplaceTutorApplication;
+import org.openapitools.model.SharedMarketplaceTutorProfileInput;
+import org.openapitools.model.SharedMarketplaceWeekday;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,6 +34,9 @@ import com.worksonourmachines.marketplace.tutorapplication.mapper.MarketplaceTut
 import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationEntity;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationStatus;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.repository.MarketplaceTutorApplicationRepository;
+import com.worksonourmachines.marketplace.tutorprofile.mapper.MarketplaceTutorProfileMapper;
+import com.worksonourmachines.marketplace.tutorprofile.persistence.entity.MarketplaceTutorProfileEntity;
+import com.worksonourmachines.marketplace.tutorprofile.persistence.repository.MarketplaceTutorProfileRepository;
 import com.worksonourmachines.server.common.security.AuthenticatedUser;
 
 class MarketplaceTutorApplicationServiceTest {
@@ -37,11 +45,15 @@ class MarketplaceTutorApplicationServiceTest {
     private final MarketplaceModuleRepository moduleRepository = org.mockito.Mockito.mock(MarketplaceModuleRepository.class);
     private final MarketplaceTutorApplicationRepository repository = org.mockito.Mockito.mock(
             MarketplaceTutorApplicationRepository.class);
+    private final MarketplaceTutorProfileRepository profileRepository = org.mockito.Mockito.mock(
+            MarketplaceTutorProfileRepository.class);
     private final MarketplaceTutorApplicationService service = new MarketplaceTutorApplicationService(
             authenticatedUser,
             moduleRepository,
             repository,
-            new MarketplaceTutorApplicationMapper());
+            new MarketplaceTutorApplicationMapper(),
+            profileRepository,
+            new MarketplaceTutorProfileMapper());
 
     @Test
     void submitsTutorApplication() {
@@ -55,6 +67,8 @@ class MarketplaceTutorApplicationServiceTest {
                 userId,
                 moduleId,
                 MarketplaceTutorApplicationStatus.PENDING)).thenReturn(false);
+        when(profileRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(profileRepository.save(any(MarketplaceTutorProfileEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(repository.save(any(MarketplaceTutorApplicationEntity.class))).thenAnswer(invocation -> {
             MarketplaceTutorApplicationEntity application = invocation.getArgument(0);
             ReflectionTestUtils.setField(application, "id", applicationId);
@@ -64,7 +78,8 @@ class MarketplaceTutorApplicationServiceTest {
         SharedMarketplaceTutorApplication response = service.submitTutorApplication(
                 new SharedMarketplaceSubmitTutorApplicationRequest(
                         moduleId.toString(),
-                        " cert://intro.pdf "));
+                        " cert://intro.pdf ")
+                        .profile(profileInput()));
 
         assertEquals(applicationId.toString(), response.getId());
         assertEquals(userId.toString(), response.getUserId());
@@ -72,6 +87,7 @@ class MarketplaceTutorApplicationServiceTest {
         assertEquals("IN0001", response.getModuleCode());
         assertEquals(SharedMarketplaceApplicationStatus.PENDING, response.getStatus());
         assertEquals("cert://intro.pdf", response.getCertificateRef());
+        verify(profileRepository).save(any(MarketplaceTutorProfileEntity.class));
     }
 
     @Test
@@ -110,6 +126,22 @@ class MarketplaceTutorApplicationServiceTest {
     }
 
     @Test
+    void listsMyTutorApplications() {
+        UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111101");
+        MarketplaceTutorApplicationEntity application = application(
+                UUID.fromString("11111111-1111-1111-1111-111111111304"),
+                MarketplaceTutorApplicationStatus.PENDING);
+        when(authenticatedUser.id()).thenReturn(userId);
+        when(repository.findByUserIdOrderBySubmittedAtDesc(userId)).thenReturn(List.of(application));
+
+        List<SharedMarketplaceTutorApplication> response = service.listMyTutorApplications();
+
+        assertEquals(1, response.size());
+        assertEquals(userId.toString(), response.get(0).getUserId());
+        assertEquals(SharedMarketplaceApplicationStatus.PENDING, response.get(0).getStatus());
+    }
+
+    @Test
     void approvesTutorApplication() {
         UUID applicationId = UUID.fromString("11111111-1111-1111-1111-111111111301");
         MarketplaceTutorApplicationEntity application = application(
@@ -120,6 +152,13 @@ class MarketplaceTutorApplicationServiceTest {
         when(repository.existsByUserIdAndStatus(
                 application.getUserId(),
                 MarketplaceTutorApplicationStatus.APPROVED)).thenReturn(false);
+        MarketplaceTutorProfileEntity profile = new MarketplaceTutorProfileEntity(
+                application.getUserId(),
+                "Ada Lovelace",
+                "Tutor bio.",
+                25.0f,
+                false);
+        when(profileRepository.findByUserId(application.getUserId())).thenReturn(Optional.of(profile));
         when(repository.save(application)).thenReturn(application);
 
         SharedMarketplaceApproveApplicationResponse response = service.approveTutorApplication(applicationId.toString());
@@ -129,7 +168,9 @@ class MarketplaceTutorApplicationServiceTest {
         assertNull(response.getApplication().getRejectionReason());
         assertEquals(MarketplaceTutorApplicationStatus.APPROVED, application.getStatus());
         assertNull(application.getRejectionReason());
+        assertEquals(1, profile.getCoverages().size());
         verify(repository).save(application);
+        verify(profileRepository).save(profile);
     }
 
     @Test
@@ -142,6 +183,7 @@ class MarketplaceTutorApplicationServiceTest {
         when(repository.existsByUserIdAndStatus(
                 application.getUserId(),
                 MarketplaceTutorApplicationStatus.APPROVED)).thenReturn(true);
+        when(profileRepository.findByUserId(application.getUserId())).thenReturn(Optional.empty());
         when(repository.save(application)).thenReturn(application);
 
         SharedMarketplaceApproveApplicationResponse response = service.approveTutorApplication(applicationId.toString());
@@ -220,5 +262,15 @@ class MarketplaceTutorApplicationServiceTest {
                 "Good for first-semester students.");
         ReflectionTestUtils.setField(module, "id", moduleId);
         return module;
+    }
+
+    private static SharedMarketplaceTutorProfileInput profileInput() {
+        return new SharedMarketplaceTutorProfileInput(
+                "Ada Lovelace",
+                "Tutor bio.",
+                List.of("English"),
+                List.of(SharedMarketplaceLocation.ONLINE),
+                25.0f,
+                List.of(new SharedMarketplaceTutorAvailability(SharedMarketplaceWeekday.MONDAY, true)));
     }
 }

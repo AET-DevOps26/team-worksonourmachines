@@ -1,6 +1,7 @@
 package com.worksonourmachines.marketplace.module.persistence.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ class MarketplaceModuleMapperTest {
                 1,
                 1,
                 1));
+        MarketplaceModuleTopicEntity existingTopic = module.getTopics().get(0);
         SharedMarketplaceAdminModuleUpdateInput input = new SharedMarketplaceAdminModuleUpdateInput(
                 "New title",
                 "New description.",
@@ -52,9 +54,97 @@ class MarketplaceModuleMapperTest {
         assertEquals("New description.", module.getDescription());
         assertEquals("New hint.", module.getDifficultyHint());
         assertEquals(1, module.getTopics().size());
+        assertSame(existingTopic, module.getTopics().get(0));
         assertEquals("New topic", module.getTopics().get(0).getName());
         assertEquals(0, module.getTopics().get(0).getPosition());
         assertEquals(5, module.getTopics().get(0).getConceptualUnderstanding());
+    }
+
+    @Test
+    void updatesExistingTopicsBeforeAddingNewTailTopics() {
+        MarketplaceModuleEntity module = new MarketplaceModuleEntity(
+                "IN0001",
+                "Old title",
+                "Old description.",
+                "Old hint.");
+        module.addTopic(new MarketplaceModuleTopicEntity(
+                0,
+                "Old first topic",
+                "Old first topic description.",
+                "Old first topic hint.",
+                1,
+                1,
+                1,
+                1));
+        MarketplaceModuleTopicEntity existingTopic = module.getTopics().get(0);
+        SharedMarketplaceAdminModuleUpdateInput input = new SharedMarketplaceAdminModuleUpdateInput(
+                "New title",
+                "New description.",
+                "New hint.",
+                List.of(
+                        new SharedMarketplaceTopicInput(
+                                "Updated first topic",
+                                "Updated first topic description.",
+                                "Updated first topic hint.",
+                                new SharedStudyFocusStudyFocus(2, 3, 4, 5)),
+                        new SharedMarketplaceTopicInput(
+                                "New second topic",
+                                "New second topic description.",
+                                "New second topic hint.",
+                                new SharedStudyFocusStudyFocus(5, 4, 3, 2))));
+
+        mapper.updateEntity(module, input);
+
+        assertEquals(2, module.getTopics().size());
+        assertSame(existingTopic, module.getTopics().get(0));
+        assertEquals("Updated first topic", module.getTopics().get(0).getName());
+        assertEquals(0, module.getTopics().get(0).getPosition());
+        assertEquals("New second topic", module.getTopics().get(1).getName());
+        assertEquals(1, module.getTopics().get(1).getPosition());
+    }
+
+    @Test
+    void removesSurplusTailTopicsOnUpdate() {
+        MarketplaceModuleEntity module = new MarketplaceModuleEntity(
+                "IN0001",
+                "Old title",
+                "Old description.",
+                "Old hint.");
+        module.addTopic(new MarketplaceModuleTopicEntity(
+                0,
+                "Old first topic",
+                "Old first topic description.",
+                "Old first topic hint.",
+                1,
+                1,
+                1,
+                1));
+        module.addTopic(new MarketplaceModuleTopicEntity(
+                1,
+                "Old second topic",
+                "Old second topic description.",
+                "Old second topic hint.",
+                1,
+                1,
+                1,
+                1));
+        MarketplaceModuleTopicEntity existingTopic = module.getTopics().get(0);
+        SharedMarketplaceAdminModuleUpdateInput input = new SharedMarketplaceAdminModuleUpdateInput(
+                "New title",
+                "New description.",
+                "New hint.",
+                List.of(new SharedMarketplaceTopicInput(
+                        "Only topic",
+                        "Only topic description.",
+                        "Only topic hint.",
+                        new SharedStudyFocusStudyFocus(3, 4, 5, 2))));
+
+        mapper.updateEntity(module, input);
+
+        assertEquals(1, module.getTopics().size());
+        assertSame(existingTopic, module.getTopics().get(0));
+        assertEquals("Only topic", module.getTopics().get(0).getName());
+        assertEquals(0, module.getTopics().get(0).getPosition());
     }
 
     @Test

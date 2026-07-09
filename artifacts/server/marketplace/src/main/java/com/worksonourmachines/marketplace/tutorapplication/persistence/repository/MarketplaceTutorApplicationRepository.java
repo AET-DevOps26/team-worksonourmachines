@@ -20,6 +20,9 @@ public interface MarketplaceTutorApplicationRepository extends JpaRepository<Mar
             MarketplaceTutorApplicationStatus status);
 
     @EntityGraph(attributePaths = "module")
+    List<MarketplaceTutorApplicationEntity> findByUserIdOrderBySubmittedAtDesc(UUID userId);
+
+    @EntityGraph(attributePaths = "module")
     Optional<MarketplaceTutorApplicationEntity> findWithModuleById(UUID id);
 
     boolean existsByUserIdAndStatus(UUID userId, MarketplaceTutorApplicationStatus status);

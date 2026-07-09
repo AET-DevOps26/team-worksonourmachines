@@ -37,3 +37,51 @@ CREATE INDEX IF NOT EXISTS idx_tutor_applications_status_submitted_at
 
 CREATE INDEX IF NOT EXISTS idx_tutor_applications_user_id
     ON marketplace.tutor_applications (user_id);
+
+CREATE TABLE IF NOT EXISTS marketplace.tutor_profiles (
+    id uuid PRIMARY KEY,
+    user_id uuid NOT NULL UNIQUE,
+    display_name varchar(255) NOT NULL,
+    bio text NOT NULL,
+    hourly_rate real NOT NULL,
+    published boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE IF NOT EXISTS marketplace.tutor_profile_languages (
+    profile_id uuid NOT NULL REFERENCES marketplace.tutor_profiles(id) ON DELETE CASCADE,
+    position integer NOT NULL,
+    language varchar(128) NOT NULL,
+    PRIMARY KEY (profile_id, position)
+);
+
+CREATE TABLE IF NOT EXISTS marketplace.tutor_profile_locations (
+    profile_id uuid NOT NULL REFERENCES marketplace.tutor_profiles(id) ON DELETE CASCADE,
+    position integer NOT NULL,
+    location varchar(32) NOT NULL CHECK (
+        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STAUBING', 'OTTOBRUN')
+    ),
+    PRIMARY KEY (profile_id, position)
+);
+
+CREATE TABLE IF NOT EXISTS marketplace.tutor_profile_availability (
+    profile_id uuid NOT NULL REFERENCES marketplace.tutor_profiles(id) ON DELETE CASCADE,
+    position integer NOT NULL,
+    weekday varchar(32) NOT NULL CHECK (
+        weekday IN ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')
+    ),
+    available boolean NOT NULL,
+    note text,
+    PRIMARY KEY (profile_id, position),
+    UNIQUE (profile_id, weekday)
+);
+
+CREATE TABLE IF NOT EXISTS marketplace.tutor_coverages (
+    id uuid PRIMARY KEY,
+    profile_id uuid NOT NULL REFERENCES marketplace.tutor_profiles(id) ON DELETE CASCADE,
+    module_id uuid NOT NULL REFERENCES marketplace.modules(id) ON DELETE CASCADE,
+    proficiency_level varchar(64) NOT NULL,
+    UNIQUE (profile_id, module_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_tutor_profiles_published_display_name
+    ON marketplace.tutor_profiles (published, display_name);

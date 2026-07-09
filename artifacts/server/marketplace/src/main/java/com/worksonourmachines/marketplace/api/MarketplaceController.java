@@ -20,7 +20,6 @@ import org.openapitools.model.SharedMarketplaceTutorProfileInput;
 import org.openapitools.model.SharedMarketplaceTutorSort;
 import org.openapitools.model.SharedMarketplaceWeekday;
 import org.openapitools.model.TutorPage;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.worksonourmachines.marketplace.module.service.MarketplaceModuleService;
 import com.worksonourmachines.marketplace.tutorapplication.service.MarketplaceTutorApplicationService;
+import com.worksonourmachines.marketplace.tutorprofile.service.MarketplaceTutorProfileService;
 
 import jakarta.validation.Valid;
 
@@ -38,12 +38,15 @@ public class MarketplaceController implements MarketplaceApiV1 {
 
     private final MarketplaceModuleService marketplaceModuleService;
     private final MarketplaceTutorApplicationService marketplaceTutorApplicationService;
+    private final MarketplaceTutorProfileService marketplaceTutorProfileService;
 
     public MarketplaceController(
             MarketplaceModuleService marketplaceModuleService,
-            MarketplaceTutorApplicationService marketplaceTutorApplicationService) {
+            MarketplaceTutorApplicationService marketplaceTutorApplicationService,
+            MarketplaceTutorProfileService marketplaceTutorProfileService) {
         this.marketplaceModuleService = marketplaceModuleService;
         this.marketplaceTutorApplicationService = marketplaceTutorApplicationService;
+        this.marketplaceTutorProfileService = marketplaceTutorProfileService;
     }
 
     @Override
@@ -72,12 +75,12 @@ public class MarketplaceController implements MarketplaceApiV1 {
 
     @Override
     public ResponseEntity<SharedMarketplaceTutorMeResponse> getMyTutorProfile() {
-        return notImplemented();
+        return ResponseEntity.ok(marketplaceTutorProfileService.getMyTutorProfile());
     }
 
     @Override
     public ResponseEntity<SharedMarketplaceTutorDetail> getTutor(String id) {
-        return notImplemented();
+        return ResponseEntity.ok(marketplaceTutorProfileService.getTutor(id));
     }
 
     @Override
@@ -97,7 +100,7 @@ public class MarketplaceController implements MarketplaceApiV1 {
 
     @Override
     public ResponseEntity<List<SharedMarketplaceTutorApplication>> listMyTutorApplications() {
-        return notImplemented();
+        return ResponseEntity.ok(marketplaceTutorApplicationService.listMyTutorApplications());
     }
 
     @Override
@@ -114,7 +117,19 @@ public class MarketplaceController implements MarketplaceApiV1 {
             @Nullable Float minRating,
             @Nullable List<SharedMarketplaceWeekday> weekdays,
             @Nullable SharedMarketplaceTutorSort sort) {
-        return notImplemented();
+        return ResponseEntity.ok(marketplaceTutorProfileService.listTutors(
+                page,
+                pageSize,
+                q,
+                moduleId,
+                topicId,
+                languages,
+                locations,
+                minRate,
+                maxRate,
+                minRating,
+                weekdays,
+                sort));
     }
 
     @Override
@@ -144,11 +159,7 @@ public class MarketplaceController implements MarketplaceApiV1 {
 
     @Override
     public ResponseEntity<SharedMarketplaceTutorProfile> updateMyTutorProfile(
-            SharedMarketplaceTutorProfileInput sharedMarketplaceTutorProfileInput) {
-        return notImplemented();
-    }
-
-    private static <T> ResponseEntity<T> notImplemented() {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+            @Valid @RequestBody SharedMarketplaceTutorProfileInput sharedMarketplaceTutorProfileInput) {
+        return ResponseEntity.ok(marketplaceTutorProfileService.updateMyTutorProfile(sharedMarketplaceTutorProfileInput));
     }
 }

@@ -22,6 +22,9 @@ import com.worksonourmachines.marketplace.tutorapplication.mapper.MarketplaceTut
 import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationEntity;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.entity.MarketplaceTutorApplicationStatus;
 import com.worksonourmachines.marketplace.tutorapplication.persistence.repository.MarketplaceTutorApplicationRepository;
+import com.worksonourmachines.marketplace.tutorprofile.mapper.MarketplaceTutorProfileMapper;
+import com.worksonourmachines.marketplace.tutorprofile.persistence.entity.MarketplaceTutorProfileEntity;
+import com.worksonourmachines.marketplace.tutorprofile.persistence.repository.MarketplaceTutorProfileRepository;
 import com.worksonourmachines.server.common.security.AuthenticatedUser;
 
 @Service
@@ -31,16 +34,22 @@ public class MarketplaceTutorApplicationService {
     private final MarketplaceModuleRepository marketplaceModuleRepository;
     private final MarketplaceTutorApplicationRepository marketplaceTutorApplicationRepository;
     private final MarketplaceTutorApplicationMapper marketplaceTutorApplicationMapper;
+    private final MarketplaceTutorProfileRepository marketplaceTutorProfileRepository;
+    private final MarketplaceTutorProfileMapper marketplaceTutorProfileMapper;
 
     public MarketplaceTutorApplicationService(
             AuthenticatedUser authenticatedUser,
             MarketplaceModuleRepository marketplaceModuleRepository,
             MarketplaceTutorApplicationRepository marketplaceTutorApplicationRepository,
-            MarketplaceTutorApplicationMapper marketplaceTutorApplicationMapper) {
+            MarketplaceTutorApplicationMapper marketplaceTutorApplicationMapper,
+            MarketplaceTutorProfileRepository marketplaceTutorProfileRepository,
+            MarketplaceTutorProfileMapper marketplaceTutorProfileMapper) {
         this.authenticatedUser = authenticatedUser;
         this.marketplaceModuleRepository = marketplaceModuleRepository;
         this.marketplaceTutorApplicationRepository = marketplaceTutorApplicationRepository;
         this.marketplaceTutorApplicationMapper = marketplaceTutorApplicationMapper;
+        this.marketplaceTutorProfileRepository = marketplaceTutorProfileRepository;
+        this.marketplaceTutorProfileMapper = marketplaceTutorProfileMapper;
     }
 
     @Transactional(readOnly = true)
@@ -52,7 +61,13 @@ public class MarketplaceTutorApplicationService {
         }
         return marketplaceTutorApplicationMapper.toDtos(
                 marketplaceTutorApplicationRepository.findByStatusOrderBySubmittedAtDesc(
-                MarketplaceTutorApplicationStatus.fromDto(status)));
+                        MarketplaceTutorApplicationStatus.fromDto(status)));
+    }
+
+    @Transactional(readOnly = true)
+    public List<SharedMarketplaceTutorApplication> listMyTutorApplications() {
+        return marketplaceTutorApplicationMapper.toDtos(
+                marketplaceTutorApplicationRepository.findByUserIdOrderBySubmittedAtDesc(authenticatedUser.id()));
     }
 
     @Transactional
@@ -72,6 +87,8 @@ public class MarketplaceTutorApplicationService {
                 MarketplaceTutorApplicationStatus.PENDING)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Application already pending.");
         }
+        marketplaceTutorProfileRepository.findByUserId(userId)
+                .orElseGet(() -> createTutorProfile(userId, request));
 
         MarketplaceTutorApplicationEntity application = new MarketplaceTutorApplicationEntity(
                 userId,
@@ -92,6 +109,11 @@ public class MarketplaceTutorApplicationService {
 
         application.setStatus(MarketplaceTutorApplicationStatus.APPROVED);
         application.setRejectionReason(null);
+        marketplaceTutorProfileRepository.findByUserId(application.getUserId())
+                .ifPresent(profile -> {
+                    profile.addCoverage(application.getModule(), "advanced");
+                    marketplaceTutorProfileRepository.save(profile);
+                });
 
         return new SharedMarketplaceApproveApplicationResponse(
                 marketplaceTutorApplicationMapper.toDto(marketplaceTutorApplicationRepository.save(application)),
@@ -108,6 +130,16 @@ public class MarketplaceTutorApplicationService {
         application.setRejectionReason(request.getReason());
 
         return marketplaceTutorApplicationMapper.toDto(marketplaceTutorApplicationRepository.save(application));
+    }
+
+    private MarketplaceTutorProfileEntity createTutorProfile(
+            UUID userId,
+            SharedMarketplaceSubmitTutorApplicationRequest request) {
+        if (request.getProfile() == null || request.getProfile().getDisplayName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile is required on first application.");
+        }
+        return marketplaceTutorProfileRepository.save(
+                marketplaceTutorProfileMapper.toCreateEntity(userId, request.getProfile()));
     }
 
     private MarketplaceTutorApplicationEntity findApplication(String id) {

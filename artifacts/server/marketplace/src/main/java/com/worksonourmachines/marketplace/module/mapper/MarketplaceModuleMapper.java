@@ -36,9 +36,7 @@ public class MarketplaceModuleMapper {
         module.setTitle(input.getTitle());
         module.setDescription(input.getDescription());
         module.setDifficultyHint(input.getDifficultyHint());
-        module.replaceTopics(IntStream.range(0, input.getTopics().size())
-                .mapToObj(index -> toTopicEntity(index, input.getTopics().get(index)))
-                .toList());
+        updateTopics(module, input.getTopics());
     }
 
     public SharedMarketplaceModuleDetail toDetail(MarketplaceModuleEntity module) {
@@ -89,6 +87,37 @@ public class MarketplaceModuleMapper {
                 studyFocus.getFormalReasoning(),
                 studyFocus.getConceptualUnderstanding(),
                 studyFocus.getProblemSolving());
+    }
+
+    private void updateTopics(MarketplaceModuleEntity module, List<SharedMarketplaceTopicInput> inputs) {
+        List<MarketplaceModuleTopicEntity> topics = module.getTopics();
+
+        for (int index = 0; index < inputs.size(); index++) {
+            if (index < topics.size()) {
+                updateTopicEntity(topics.get(index), index, inputs.get(index));
+            } else {
+                module.addTopic(toTopicEntity(index, inputs.get(index)));
+            }
+        }
+
+        if (topics.size() > inputs.size()) {
+            topics.subList(inputs.size(), topics.size()).clear();
+        }
+    }
+
+    private void updateTopicEntity(
+            MarketplaceModuleTopicEntity topic,
+            int position,
+            SharedMarketplaceTopicInput input) {
+        SharedStudyFocusStudyFocus studyFocus = input.getStudyFocus();
+        topic.setPosition(position);
+        topic.setName(input.getName());
+        topic.setDescription(input.getDescription());
+        topic.setDifficultyHint(input.getDifficultyHint());
+        topic.setMemorization(studyFocus.getMemorization());
+        topic.setFormalReasoning(studyFocus.getFormalReasoning());
+        topic.setConceptualUnderstanding(studyFocus.getConceptualUnderstanding());
+        topic.setProblemSolving(studyFocus.getProblemSolving());
     }
 
     private SharedMarketplaceTopic toTopic(MarketplaceModuleTopicEntity topic) {

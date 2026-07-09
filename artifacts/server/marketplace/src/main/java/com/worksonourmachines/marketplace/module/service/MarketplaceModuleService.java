@@ -6,6 +6,7 @@ import org.openapitools.model.ModulePage;
 import org.openapitools.model.SharedMarketplaceAdminModuleInput;
 import org.openapitools.model.SharedMarketplaceAdminModuleUpdateInput;
 import org.openapitools.model.SharedMarketplaceModuleDetail;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -38,14 +39,16 @@ public class MarketplaceModuleService {
 
     @Transactional(readOnly = true)
     public ModulePage listModules(Integer page, Integer pageSize, @Nullable String q) {
+        String normalizedQuery = normalizeSearchQuery(q);
         int resolvedPage = page == null ? 1 : page;
         int resolvedPageSize = pageSize == null ? 20 : pageSize;
-        var pageable = PageRequest.of(resolvedPage - 1, resolvedPageSize, Sort.by("code").ascending());
+        PageRequest pageable = PageRequest.of(resolvedPage - 1, resolvedPageSize, Sort.by("code").ascending());
 
-        return marketplaceModuleMapper.toPage(
-                marketplaceModuleRepository.findAllMatching(normalizeSearchQuery(q), pageable),
-                resolvedPage,
-                resolvedPageSize);
+        Page<MarketplaceModuleEntity> modulesPage = q == null
+                ? marketplaceModuleRepository.findAll(pageable)
+                : marketplaceModuleRepository.findAllMatching(q, pageable);
+
+        return marketplaceModuleMapper.toPage(modulesPage, resolvedPage, resolvedPageSize);
     }
 
     @Transactional(readOnly = true)

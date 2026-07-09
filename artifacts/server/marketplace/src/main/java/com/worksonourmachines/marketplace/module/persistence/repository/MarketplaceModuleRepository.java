@@ -21,8 +21,7 @@ public interface MarketplaceModuleRepository extends JpaRepository<MarketplaceMo
     @Query("""
             SELECT module
             FROM MarketplaceModuleEntity module
-            WHERE :query IS NULL
-                OR LOWER(module.code) LIKE LOWER(CONCAT('%', :query, '%'))
+            WHERE LOWER(module.code) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(module.title) LIKE LOWER(CONCAT('%', :query, '%'))
                 OR LOWER(module.description) LIKE LOWER(CONCAT('%', :query, '%'))
             """)
