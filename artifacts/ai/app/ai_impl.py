@@ -69,6 +69,40 @@ class DefaultApiImpl(BaseDefaultApi):
             authorization=authorization,
         )
 
+        student_langs = {lang.lower() for lang in student.get("languages", [])}
+        if student_langs:
+            matched = [
+                t
+                for t in tutors
+                if {lang.lower() for lang in t.get("languages", [])} & student_langs
+            ]
+            if not matched:
+                raise HTTPException(
+                    status_code=422,
+                    detail=(
+                        "No tutors available for the requested language(s):"
+                        f" {', '.join(student.get('languages', []))}"
+                    ),
+                )
+            tutors = matched
+
+        goal_locations = {loc.lower() for loc in goal.get("locations", [])}
+        if goal_locations:
+            matched = [
+                t
+                for t in tutors
+                if {loc.lower() for loc in t.get("locations", [])} & goal_locations
+            ]
+            if not matched:
+                raise HTTPException(
+                    status_code=422,
+                    detail=(
+                        "No tutors available in the requested location(s):"
+                        f" {', '.join(goal.get('locations', []))}"
+                    ),
+                )
+            tutors = matched
+
         prompt = build_prompt(student, goal, module, tutors)
 
         # Prefer structured output (function calling) when the provider supports it —

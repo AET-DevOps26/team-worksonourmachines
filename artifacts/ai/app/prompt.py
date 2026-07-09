@@ -56,10 +56,6 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         " higher-rated tutors. If the budget is infeasible set description"
         ' to "This budget is infeasible" and return empty arrays.'
     )
-    rule_languages = (
-        "- Only assign tutors who teach in one of the student's preferred"
-        " languages (fall back to all tutors if none match)."
-    )
     rule_prioritise = (
         "- Prioritise topics where the student's weak skills overlap with"
         " the topic's high demands."
@@ -107,8 +103,6 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "3. **best_quality** — highest-rated tutors regardless of cost.",
         "",
         "Rules:",
-        rule_languages,
-        "- Prefer tutors located near the student for in-person sessions.",
         rule_prioritise,
         "- Minimise the number of distinct tutors across the plan.",
         f"- All milestone dueDates must fall before {target_date}.",
