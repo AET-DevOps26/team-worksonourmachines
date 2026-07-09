@@ -1,5 +1,13 @@
 ingress:
   host: tutormatch.127.0.0.1.nip.io
+  # nginx-ingress ClusterIP — pods need this to resolve the nip.io hostname server-side
+  # (127.0.0.1 from inside a pod is the pod loopback, not the host)
+  # Run: kubectl get svc ingress-nginx-controller -n ingress-nginx -o jsonpath='{.spec.clusterIP}'
+  hostAliasIP: "10.43.72.12"
+
+clientWeb:
+  # Disable TLS verification for pod-internal OIDC discovery against the self-signed nginx cert
+  tlsRejectUnauthorized: false
 
 apiUi:
   imagePullPolicy: IfNotPresent
