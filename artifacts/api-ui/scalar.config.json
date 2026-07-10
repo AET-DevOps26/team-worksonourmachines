@@ -3,26 +3,6 @@
     "title": "TutorMatch API Reference",
     "description": "OpenAPI specifications for TutorMatch services"
   },
-  "hideTestRequestButton": false,
-  "hideClientButton": false,
-  "authentication": {
-    "preferredSecurityScheme": "KeycloakBearerAuth",
-    "securitySchemes": {
-      "KeycloakBearerAuth": {
-        "flows": {
-          "clientCredentials": {
-            "x-scalar-client-id": "scalar-dev",
-            "clientSecret": "scalar-dev-secret",
-            "scopes": [
-              "openid",
-              "profile",
-              "email",
-              "roles"
-            ]
-          }
-        }
-      }
-    }
-  },
-  "persistAuth": true
+  "hideTestRequestButton": true,
+  "hideClientButton": true
 }

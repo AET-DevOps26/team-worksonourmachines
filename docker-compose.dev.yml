@@ -48,6 +48,10 @@ services:
       KEYCLOAK_PASSWORD: admin
       KEYCLOAK_USER: admin
 
+  api-ui:
+    volumes:
+      - ./artifacts/api-ui/scalar.dev.config.json:/config/scalar.config.json:ro,Z
+
 #  server-mock:
 #    image: tutormatch/server-mock:dev
 #    build:
