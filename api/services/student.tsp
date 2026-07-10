@@ -33,7 +33,7 @@ enum StudentVersions {
 @service(#{ title: "Student API" })
 @server("https://api.tutormatch.localhost", "Student API")
 @versioned(StudentVersions)
-@useAuth(KeycloakStudentAuth)
+@useAuth(KeycloakAuth)
 @route("/v1")
 namespace Student {
   @summary("Get my student profile")

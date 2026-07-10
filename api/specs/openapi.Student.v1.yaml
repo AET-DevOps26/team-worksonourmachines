@@ -54,7 +54,7 @@ paths:
             schema:
               $ref: '#/components/schemas/Shared.Student.StudentProfileInput'
 security:
-  - KeycloakStudentAuth:
+  - KeycloakAuth:
       - openid
       - basic
       - profile
@@ -86,10 +86,7 @@ components:
         displayName:
           $ref: '#/components/schemas/NonBlankString'
         bio:
-          allOf:
-            - $ref: '#/components/schemas/NonBlankString'
-          minLength: 1
-          pattern: .*\S.*
+          $ref: '#/components/schemas/NonBlankString'
         languages:
           type: array
           items:
@@ -109,10 +106,7 @@ components:
         displayName:
           $ref: '#/components/schemas/NonBlankString'
         bio:
-          allOf:
-            - $ref: '#/components/schemas/NonBlankString'
-          minLength: 1
-          pattern: .*\S.*
+          $ref: '#/components/schemas/NonBlankString'
         languages:
           type: array
           items:
@@ -156,7 +150,7 @@ components:
           description: Applying theory to exercises and exam-style problems.
       description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
   securitySchemes:
-    KeycloakStudentAuth:
+    KeycloakAuth:
       type: oauth2
       flows:
         authorizationCode:
@@ -169,7 +163,7 @@ components:
             profile: ''
             email: ''
             roles: ''
-      description: Keycloak OAuth2 authorization code auth for student login
+      description: Keycloak OAuth2 authorization code auth for user login
 servers:
   - url: https://api.tutormatch.localhost
     description: Student API

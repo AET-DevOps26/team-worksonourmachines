@@ -29,7 +29,7 @@ import type { GetMyProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakStudentAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -56,7 +56,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakStudentAuth accessCode](../README.md#KeycloakStudentAuth-accessCode)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
@@ -93,7 +93,7 @@ import type { UpdateMyProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakStudentAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -128,7 +128,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakStudentAuth accessCode](../README.md#KeycloakStudentAuth-accessCode)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
