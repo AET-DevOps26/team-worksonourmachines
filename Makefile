@@ -3,6 +3,7 @@ ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 API_DIR := $(ROOT_DIR)/api
 CLIENT_WEB_DIR := $(ROOT_DIR)/artifacts/client-web
 AI_DIR := $(ROOT_DIR)/artifacts/ai
+SERVER_DIR := $(ROOT_DIR)/artifacts/server
 SERVER_COMMUNICATION_DIR := $(ROOT_DIR)/artifacts/server/communication
 SERVER_MARKETPLACE_DIR := $(ROOT_DIR)/artifacts/server/marketplace
 SERVER_STUDENT_DIR := $(ROOT_DIR)/artifacts/server/student
@@ -13,6 +14,10 @@ COMPOSE := $(CONTAINER) compose
 COMPOSE_APP := $(COMPOSE) -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docker-compose.dev.yml
 COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) -f $(ROOT_DIR)/docker-compose.tooling.yml
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
+SERVER_MVN := mvn -q -f $(SERVER_DIR)/pom.xml
+SERVER_FORMAT := $(SERVER_MVN) spotless:apply
+SERVER_LINT := $(SERVER_MVN) spotless:check
+SERVER_TEST := $(SERVER_MVN) test
 
 
 .DEFAULT_GOAL := help
@@ -73,12 +78,8 @@ format: ## Format all code
 	@$(RUN_TOOLING) client-web-tooling run format
 	@echo "Formatting AI code..."
 	@$(RUN_TOOLING) ai-tooling run format
-	@echo "Formatting `server/communication` code..."
-	@echo "Not implemented yet; TODO replace with actual formatting command"
-	@echo "Formatting `server/marketplace` code..."
-	@echo "Not implemented yet; TODO replace with actual formatting command"
-	@echo "Formatting `server/student` code..."
-	@echo "Not implemented yet; TODO replace with actual formatting command"
+	@echo "Formatting server microservices..."
+	@$(SERVER_FORMAT)
 
 .PHONY: fmt
 fmt: ## Alias for format
@@ -92,12 +93,8 @@ lint: ## Lint all code
 	@$(RUN_TOOLING) client-web-tooling run lint
 	@echo "Linting AI code..."
 	@$(RUN_TOOLING) ai-tooling run lint
-	@echo "Linting `server/communication` code..."
-	@echo "Not implemented yet; TODO replace with actual linting command"
-	@echo "Linting `server/marketplace` code..."
-	@echo "Not implemented yet; TODO replace with actual linting command"
-	@echo "Linting `server/student` code..."
-	@echo "Not implemented yet; TODO replace with actual linting command"
+	@echo "Linting server microservices..."
+	@$(SERVER_LINT)
 
 .PHONY: test
 test: ## Run all tests
@@ -105,12 +102,8 @@ test: ## Run all tests
 	@$(RUN_TOOLING) client-web-tooling run test
 	@echo "Testing AI code..."
 	@$(RUN_TOOLING) ai-tooling run test
-	@echo "Testing `server/communication` code..."
-	@echo "Not implemented yet; TODO replace with actual testing command"
-	@echo "Testing `server/marketplace` code..."
-	@echo "Not implemented yet; TODO replace with actual testing command"
-	@echo "Testing `server/student` code..."
-	@echo "Not implemented yet; TODO replace with actual testing command"
+	@echo "Testing server microservices..."
+	@$(SERVER_TEST)
 
 ARGS ?=
 
