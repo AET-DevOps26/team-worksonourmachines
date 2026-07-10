@@ -35,7 +35,7 @@ help: ## Show this help message
 up: ## Start all services
 	@$(COMPOSE_APP) up -d
 
-.PHONY: up
+.PHONY: up-build
 up-build: ## Start all services
 	@$(COMPOSE_APP) up -d --build
 
