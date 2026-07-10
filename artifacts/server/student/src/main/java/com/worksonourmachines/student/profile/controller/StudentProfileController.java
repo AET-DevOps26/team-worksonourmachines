@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.worksonourmachines.student.profile.service.StudentProfileService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @PreAuthorize("hasRole('student')")
@@ -29,7 +30,7 @@ public class StudentProfileController implements StudentApiV1 {
 
     @Override
     public ResponseEntity<SharedStudentStudentProfile> updateMyProfile(
-            @Valid @RequestBody SharedStudentStudentProfileInput input) {
+            @NotNull @Valid @RequestBody SharedStudentStudentProfileInput input) {
         return ResponseEntity.ok(studentProfileService.updateCurrentStudentProfile(input));
     }
 }
