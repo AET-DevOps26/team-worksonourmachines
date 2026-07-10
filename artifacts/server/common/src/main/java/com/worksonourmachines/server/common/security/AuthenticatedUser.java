@@ -31,7 +31,7 @@ public class AuthenticatedUser {
         }
 
         String username = jwtAuthenticationToken.getToken().getClaimAsString("name");
-        if (username.isBlank()) {
+        if (username == null || username.isBlank()) {
             throw new AccessDeniedException("Username cannot be blank.");
         }
         return username;
