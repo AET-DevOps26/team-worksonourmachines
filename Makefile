@@ -15,7 +15,7 @@ COMPOSE_APP := $(COMPOSE) -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docke
 COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) -f $(ROOT_DIR)/docker-compose.tooling.yml
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
 SERVER_MVN := $(RUN_TOOLING) server-tooling mvn -q
-SERVER_MICROSERVICES := communication,marketplace,student
+SERVER_MICROSERVICES := common,communication,marketplace,student
 SERVER_FORMAT := $(SERVER_MVN) -pl $(SERVER_MICROSERVICES) spotless:apply
 SERVER_LINT := $(SERVER_MVN) -pl $(SERVER_MICROSERVICES) spotless:check
 SERVER_TEST := $(SERVER_MVN) -pl $(SERVER_MICROSERVICES) -am test
