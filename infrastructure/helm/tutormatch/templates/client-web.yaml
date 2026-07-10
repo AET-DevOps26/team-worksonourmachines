@@ -13,6 +13,17 @@ spec:
       labels:
         app: client-web
     spec:
+      {{- if .Values.ingress.hostAliasIP }}
+      # Local k3d: nip.io resolves *.127.0.0.1.nip.io to 127.0.0.1, which is the pod
+      # loopback — not the host. client-web fetches Keycloak OIDC discovery at startup,
+      # so it must reach the ingress. hostAliases overrides DNS inside the pod to point
+      # the ingress hostnames at the nginx-ingress ClusterIP instead.
+      hostAliases:
+        - ip: {{ .Values.ingress.hostAliasIP }}
+          hostnames:
+            - {{ .Values.ingress.host }}
+            - auth.{{ .Values.ingress.host }}
+      {{- end }}
       containers:
         - name: client-web
           image: {{ .Values.clientWeb.image }}
@@ -43,6 +54,12 @@ spec:
               value: {{ .Values.clientWeb.serverMarketplaceApiUrl | quote }}
             - name: SERVER_STUDENT_API_URL
               value: {{ .Values.clientWeb.serverStudentApiUrl | quote }}
+            {{- if .Values.clientWeb.tlsRejectUnauthorized | eq false }}
+            # Local k3d: nginx serves HTTPS with a self-signed cert; Node.js rejects it
+            # by default. Disable TLS verification for pod-internal OIDC discovery only.
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "0"
+            {{- end }}
           resources:
             requests:
               cpu: 100m

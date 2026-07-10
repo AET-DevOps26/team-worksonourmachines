@@ -4,13 +4,16 @@ import java.util.UUID;
 
 import org.openapitools.model.SharedStudentStudentProfile;
 import org.openapitools.model.SharedStudentStudentProfileInput;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.worksonourmachines.server.common.security.AuthenticatedUser;
 import com.worksonourmachines.student.profile.mapper.StudentProfileMapper;
 import com.worksonourmachines.student.profile.persistence.entity.StudentProfileEntity;
 import com.worksonourmachines.student.profile.persistence.repository.StudentProfileRepository;
+
 
 @Service
 public class StudentProfileService {
@@ -38,8 +41,14 @@ public class StudentProfileService {
 
     @Transactional
     public SharedStudentStudentProfile updateCurrentStudentProfile(SharedStudentStudentProfileInput input) {
-        if (input.getBio().isBlank() || input.getDisplayName().isBlank() || input.getLanguages().isEmpty()) {
-
+        if (input == null
+                || isBlank(input.getBio())
+                || isBlank(input.getDisplayName())
+                || input.getLanguages() == null
+                || input.getLanguages().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Display name, bio, and at least one language are required.");
         }
 
         UUID studentId = this.authenticatedUser.id();
@@ -47,5 +56,9 @@ public class StudentProfileService {
                 .orElseGet(() -> new StudentProfileEntity(studentId));
         this.studentProfileMapper.updateEntity(profile, input);
         return this.studentProfileMapper.toDto(this.studentProfileRepository.save(profile));
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

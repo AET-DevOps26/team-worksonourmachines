@@ -34,6 +34,9 @@ export default function TutorDashboardRoute() {
                     <Link className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))} to="/tutor/apply">
                         Apply for module
                     </Link>
+                    <Link className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))} to="/chat">
+                        Messages
+                    </Link>
                 </div>
             </Card>
 

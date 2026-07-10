@@ -4,10 +4,10 @@ import { cn } from '~/lib/ui/utils';
 
 type LogoProps = {
     className?: string;
-    linkToHome?: boolean;
+    to?: string;
 };
 
-export function Logo({ className, linkToHome = true }: LogoProps) {
+export function Logo({ className, to = '/' }: LogoProps) {
     const image = (
         <img
             alt="TUtorMatch"
@@ -18,12 +18,8 @@ export function Logo({ className, linkToHome = true }: LogoProps) {
         />
     );
 
-    if (!linkToHome) {
-        return image;
-    }
-
     return (
-        <Link className="shrink-0" to="/">
+        <Link className="shrink-0" to={to}>
             {image}
         </Link>
     );

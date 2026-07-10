@@ -86,10 +86,7 @@ components:
         displayName:
           $ref: '#/components/schemas/NonBlankString'
         bio:
-          allOf:
-            - $ref: '#/components/schemas/NonBlankString'
-          minLength: 1
-          pattern: .*\S.*
+          $ref: '#/components/schemas/NonBlankString'
         languages:
           type: array
           items:
@@ -109,10 +106,7 @@ components:
         displayName:
           $ref: '#/components/schemas/NonBlankString'
         bio:
-          allOf:
-            - $ref: '#/components/schemas/NonBlankString'
-          minLength: 1
-          pattern: .*\S.*
+          $ref: '#/components/schemas/NonBlankString'
         languages:
           type: array
           items:
