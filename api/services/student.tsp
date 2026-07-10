@@ -14,9 +14,6 @@ scalar NonBlankString extends string;
 namespace Shared.Student {
   model StudentProfile {
     displayName: NonBlankString;
-
-    @minLength(1)
-    @pattern(".*\\S.*")
     bio: NonBlankString;
 
     @minItems(1)
