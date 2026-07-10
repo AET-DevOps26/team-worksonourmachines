@@ -18,8 +18,8 @@ public class StudentProfileMapper {
         // Omitting `studyFocus` so it defaults to null; updateEntity will clear it on save
         return new SharedStudentStudentProfile(
                 name,
-                "Add your bio here...",
-                List.of("German"));
+                "",
+                List.of());
     }
 
     public SharedStudentStudentProfile toDto(StudentProfileEntity entity) {
