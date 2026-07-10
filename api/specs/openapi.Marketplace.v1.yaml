@@ -463,7 +463,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
 security:
-  - KeycloakBearerAuth: []
+  - KeycloakClientAuth:
+      - openid
+      - profile
+      - email
+      - roles
 components:
   parameters:
     Shared.Pagination.PageParams.page:
@@ -961,10 +965,17 @@ components:
           type: integer
           format: int32
   securitySchemes:
-    KeycloakBearerAuth:
-      type: http
-      scheme: Bearer
-      description: Keycloak access token issued to the BFF client
+    KeycloakClientAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          scopes:
+            openid: ''
+            profile: ''
+            email: ''
+            roles: ''
+      description: Keycloak OAuth2 client credentials auth for Scalar/API testing
 servers:
   - url: https://marketplace.example.local
     description: Marketplace API

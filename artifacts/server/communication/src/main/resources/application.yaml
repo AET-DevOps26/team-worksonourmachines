@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: server-communication
+  datasource:
+    url: ${COMMUNICATION_DB_URL:jdbc:postgresql://postgres:5432/communication}
+    username: ${COMMUNICATION_DB_USER:communication}
+    password: ${COMMUNICATION_DB_PASSWORD:communication}
+  flyway:
+    create-schemas: true
+    default-schema: communication
+    schemas: communication
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: communication
+
+server:
+  port: ${PORT:8083}

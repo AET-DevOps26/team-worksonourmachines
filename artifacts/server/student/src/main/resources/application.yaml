@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: server-student
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER:https://auth.tutormatch.localhost/realms/tutormatch}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
+  datasource:
+    url: ${STUDENT_DB_URL:jdbc:postgresql://postgres:5432/student}
+    username: ${STUDENT_DB_USER:student}
+    password: ${STUDENT_DB_PASSWORD:student}
+  flyway:
+    create-schemas: true
+    default-schema: student
+    schemas: student
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: student
+
+server:
+  port: ${PORT:8081}

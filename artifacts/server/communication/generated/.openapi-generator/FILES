@@ -1,0 +1,9 @@
+src/main/java/org/openapitools/api/CommunicationApiV1.java
+src/main/java/org/openapitools/model/MessagePage.java
+src/main/java/org/openapitools/model/SharedCommunicationChatMessage.java
+src/main/java/org/openapitools/model/SharedCommunicationConversationDetail.java
+src/main/java/org/openapitools/model/SharedCommunicationConversationPartner.java
+src/main/java/org/openapitools/model/SharedCommunicationConversationSummary.java
+src/main/java/org/openapitools/model/SharedCommunicationSendMessageRequest.java
+src/main/java/org/openapitools/model/SharedCommunicationStartConversationRequest.java
+src/main/java/org/openapitools/model/SharedErrorsErrorBody.java

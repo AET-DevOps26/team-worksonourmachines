@@ -15,4 +15,16 @@ auth.{$APP_HOSTNAME} {
 api.{$APP_HOSTNAME} {
 	tls internal
 	reverse_proxy api-ui:8080
+
+	handle /v1/students* {
+    	reverse_proxy server-student:8081
+    }
+
+    handle /v1/marketplace* {
+    	reverse_proxy server-marketplace:8082
+    }
+
+    handle /v1/communication* {
+    	reverse_proxy server-communication:8083
+    }
 }

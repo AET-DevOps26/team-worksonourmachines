@@ -176,7 +176,7 @@ enum MarketplaceVersions {
 @service(#{ title: "Marketplace API" })
 @server("https://marketplace.example.local", "Marketplace API")
 @versioned(MarketplaceVersions)
-@useAuth(KeycloakBearerAuth)
+@useAuth(KeycloakClientAuth)
 @route("/v1")
 namespace Marketplace {
   model ModulePage {
