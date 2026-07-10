@@ -4,13 +4,10 @@ import org.openapitools.api.StudentApiV1;
 import org.openapitools.model.SharedStudentStudentProfile;
 import org.openapitools.model.SharedStudentStudentProfileInput;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.worksonourmachines.student.profile.service.StudentProfileService;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 public class StudentProfileController implements StudentApiV1 {
@@ -27,8 +24,7 @@ public class StudentProfileController implements StudentApiV1 {
     }
 
     @Override
-    public ResponseEntity<SharedStudentStudentProfile> updateMyProfile(
-            @NotNull @Valid @RequestBody SharedStudentStudentProfileInput input) {
+    public ResponseEntity<SharedStudentStudentProfile> updateMyProfile(SharedStudentStudentProfileInput input) {
         return ResponseEntity.ok(studentProfileService.updateCurrentStudentProfile(input));
     }
 }
