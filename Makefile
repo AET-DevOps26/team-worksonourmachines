@@ -14,10 +14,11 @@ COMPOSE := $(CONTAINER) compose
 COMPOSE_APP := $(COMPOSE) -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docker-compose.dev.yml
 COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) -f $(ROOT_DIR)/docker-compose.tooling.yml
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
-SERVER_MVN := mvn -q -f $(SERVER_DIR)/pom.xml
-SERVER_FORMAT := $(SERVER_MVN) spotless:apply
-SERVER_LINT := $(SERVER_MVN) spotless:check
-SERVER_TEST := $(SERVER_MVN) test
+SERVER_MVN := $(RUN_TOOLING) server-tooling mvn -q
+SERVER_MICROSERVICES := communication,marketplace,student
+SERVER_FORMAT := $(SERVER_MVN) -pl $(SERVER_MICROSERVICES) spotless:apply
+SERVER_LINT := $(SERVER_MVN) -pl $(SERVER_MICROSERVICES) spotless:check
+SERVER_TEST := $(SERVER_MVN) -pl $(SERVER_MICROSERVICES) -am test
 
 
 .DEFAULT_GOAL := help
@@ -64,7 +65,7 @@ azure-vm-destroy: ## Delete all Terraform-managed Azure VM resources
 
 .PHONY: build-tooling-images
 build-tooling-images: ## Build all tooling images
-	@$(COMPOSE_TOOLING) build api-tooling client-web-tooling ai-tooling
+	@$(COMPOSE_TOOLING) build api-tooling client-web-tooling ai-tooling server-tooling
 
 .PHONY: api-generate
 api-generate: ## Generate the API specs and stubs
