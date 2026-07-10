@@ -14,7 +14,6 @@ import com.worksonourmachines.student.profile.mapper.StudentProfileMapper;
 import com.worksonourmachines.student.profile.persistence.entity.StudentProfileEntity;
 import com.worksonourmachines.student.profile.persistence.repository.StudentProfileRepository;
 
-import jakarta.validation.constraints.NotNull;
 
 @Service
 public class StudentProfileService {
@@ -41,7 +40,7 @@ public class StudentProfileService {
     }
 
     @Transactional
-    public SharedStudentStudentProfile updateCurrentStudentProfile(@NotNull SharedStudentStudentProfileInput input) {
+    public SharedStudentStudentProfile updateCurrentStudentProfile(SharedStudentStudentProfileInput input) {
         if (input == null
                 || isBlank(input.getBio())
                 || isBlank(input.getDisplayName())

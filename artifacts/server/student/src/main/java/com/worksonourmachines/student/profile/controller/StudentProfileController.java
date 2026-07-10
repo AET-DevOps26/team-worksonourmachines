@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.worksonourmachines.student.profile.service.StudentProfileService;
 
-
 @RestController
 public class StudentProfileController implements StudentApiV1 {
 
