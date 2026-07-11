@@ -10,6 +10,7 @@ import org.openapitools.model.SharedMarketplaceApproveApplicationResponse;
 import org.openapitools.model.SharedMarketplaceRejectApplicationRequest;
 import org.openapitools.model.SharedMarketplaceSubmitTutorApplicationRequest;
 import org.openapitools.model.SharedMarketplaceTutorApplication;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ import com.worksonourmachines.server.common.security.AuthenticatedUser;
 
 @Service
 public class MarketplaceTutorApplicationService {
+
+    private static final String PENDING_APPLICATION_UNIQUE_INDEX = "uq_tutor_applications_pending_user_module";
 
     private final AuthenticatedUser authenticatedUser;
     private final MarketplaceModuleRepository marketplaceModuleRepository;
@@ -85,7 +88,7 @@ public class MarketplaceTutorApplicationService {
                 userId,
                 moduleId,
                 MarketplaceTutorApplicationStatus.PENDING)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Application already pending.");
+            throw duplicatePendingApplication();
         }
         marketplaceTutorProfileRepository.findByUserId(userId)
                 .orElseGet(() -> createTutorProfile(userId, request));
@@ -97,7 +100,14 @@ public class MarketplaceTutorApplicationService {
                 request.getCertificateRef().trim(),
                 OffsetDateTime.now(ZoneOffset.UTC));
 
-        return marketplaceTutorApplicationMapper.toDto(marketplaceTutorApplicationRepository.save(application));
+        try {
+            return marketplaceTutorApplicationMapper.toDto(marketplaceTutorApplicationRepository.saveAndFlush(application));
+        } catch (DataIntegrityViolationException exception) {
+            if (isPendingApplicationUniquenessViolation(exception)) {
+                throw duplicatePendingApplication();
+            }
+            throw exception;
+        }
     }
 
     @Transactional
@@ -161,5 +171,21 @@ public class MarketplaceTutorApplicationService {
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tutor application not found.", exception);
         }
+    }
+
+    private static ResponseStatusException duplicatePendingApplication() {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Application already pending.");
+    }
+
+    private static boolean isPendingApplicationUniquenessViolation(Throwable exception) {
+        Throwable current = exception;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null && message.contains(PENDING_APPLICATION_UNIQUE_INDEX)) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 }

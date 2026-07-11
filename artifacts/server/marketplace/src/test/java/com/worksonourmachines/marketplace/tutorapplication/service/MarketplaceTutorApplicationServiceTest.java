@@ -24,6 +24,7 @@ import org.openapitools.model.SharedMarketplaceTutorAvailability;
 import org.openapitools.model.SharedMarketplaceTutorApplication;
 import org.openapitools.model.SharedMarketplaceTutorProfileInput;
 import org.openapitools.model.SharedMarketplaceWeekday;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -69,7 +70,7 @@ class MarketplaceTutorApplicationServiceTest {
                 MarketplaceTutorApplicationStatus.PENDING)).thenReturn(false);
         when(profileRepository.findByUserId(userId)).thenReturn(Optional.empty());
         when(profileRepository.save(any(MarketplaceTutorProfileEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(repository.save(any(MarketplaceTutorApplicationEntity.class))).thenAnswer(invocation -> {
+        when(repository.saveAndFlush(any(MarketplaceTutorApplicationEntity.class))).thenAnswer(invocation -> {
             MarketplaceTutorApplicationEntity application = invocation.getArgument(0);
             ReflectionTestUtils.setField(application, "id", applicationId);
             return application;
@@ -123,6 +124,31 @@ class MarketplaceTutorApplicationServiceTest {
                         "cert://intro.pdf")));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    }
+
+    @Test
+    void rejectsConcurrentDuplicatePendingTutorApplicationSubmissionFromDatabaseConstraint() {
+        UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111101");
+        UUID moduleId = UUID.fromString("11111111-1111-1111-1111-111111111201");
+        when(authenticatedUser.id()).thenReturn(userId);
+        when(moduleRepository.findById(moduleId)).thenReturn(Optional.of(module(moduleId)));
+        when(repository.existsByUserIdAndModule_IdAndStatus(
+                userId,
+                moduleId,
+                MarketplaceTutorApplicationStatus.PENDING)).thenReturn(false);
+        when(profileRepository.findByUserId(userId)).thenReturn(Optional.of(profile(userId)));
+        when(repository.saveAndFlush(any(MarketplaceTutorApplicationEntity.class))).thenThrow(
+                new DataIntegrityViolationException(
+                        "duplicate key value violates unique constraint \"uq_tutor_applications_pending_user_module\""));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.submitTutorApplication(new SharedMarketplaceSubmitTutorApplicationRequest(
+                        moduleId.toString(),
+                        "cert://intro.pdf")));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Application already pending.", exception.getReason());
     }
 
     @Test
@@ -262,6 +288,15 @@ class MarketplaceTutorApplicationServiceTest {
                 "Good for first-semester students.");
         ReflectionTestUtils.setField(module, "id", moduleId);
         return module;
+    }
+
+    private static MarketplaceTutorProfileEntity profile(UUID userId) {
+        return new MarketplaceTutorProfileEntity(
+                userId,
+                "Ada Lovelace",
+                "Tutor bio.",
+                25.0f,
+                false);
     }
 
     private static SharedMarketplaceTutorProfileInput profileInput() {

@@ -44,9 +44,9 @@ public class MarketplaceModuleService {
         int resolvedPageSize = pageSize == null ? 20 : pageSize;
         PageRequest pageable = PageRequest.of(resolvedPage - 1, resolvedPageSize, Sort.by("code").ascending());
 
-        Page<MarketplaceModuleEntity> modulesPage = q == null
+        Page<MarketplaceModuleEntity> modulesPage = normalizedQuery == null
                 ? marketplaceModuleRepository.findAll(pageable)
-                : marketplaceModuleRepository.findAllMatching(q, pageable);
+                : marketplaceModuleRepository.findAllMatching(normalizedQuery, pageable);
 
         return marketplaceModuleMapper.toPage(modulesPage, resolvedPage, resolvedPageSize);
     }

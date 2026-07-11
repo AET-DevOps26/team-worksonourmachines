@@ -38,6 +38,10 @@ CREATE INDEX IF NOT EXISTS idx_tutor_applications_status_submitted_at
 CREATE INDEX IF NOT EXISTS idx_tutor_applications_user_id
     ON marketplace.tutor_applications (user_id);
 
+CREATE UNIQUE INDEX IF NOT EXISTS uq_tutor_applications_pending_user_module
+    ON marketplace.tutor_applications (user_id, module_id)
+    WHERE status = 'PENDING';
+
 CREATE TABLE IF NOT EXISTS marketplace.tutor_profiles (
     id uuid PRIMARY KEY,
     user_id uuid NOT NULL UNIQUE,
