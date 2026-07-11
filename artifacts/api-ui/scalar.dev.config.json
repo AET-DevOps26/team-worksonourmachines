@@ -17,6 +17,16 @@
             "selectedScopes": ["openid", "basic", "profile", "email", "roles"]
           }
         }
+      },
+      "KeycloakAdminAuth": {
+        "flows": {
+          "authorizationCode": {
+            "x-scalar-client-id": "scalar-dev",
+            "x-scalar-redirect-uri": "https://api.tutormatch.localhost",
+            "x-usePkce": "SHA-256",
+            "selectedScopes": ["openid", "basic", "profile", "email", "roles"]
+          }
+        }
       }
     }
   },

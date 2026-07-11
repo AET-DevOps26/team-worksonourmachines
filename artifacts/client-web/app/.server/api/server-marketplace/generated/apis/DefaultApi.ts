@@ -186,7 +186,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (this.configuration && this.configuration.accessToken) {
             // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAdminAuth", ["openid", "basic", "profile", "email", "roles"]);
         }
 
 
@@ -240,7 +240,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (this.configuration && this.configuration.accessToken) {
             // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAdminAuth", ["openid", "basic", "profile", "email", "roles"]);
         }
 
 
@@ -433,7 +433,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (this.configuration && this.configuration.accessToken) {
             // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAdminAuth", ["openid", "basic", "profile", "email", "roles"]);
         }
 
 
@@ -481,7 +481,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (this.configuration && this.configuration.accessToken) {
             // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAdminAuth", ["openid", "basic", "profile", "email", "roles"]);
         }
 
 
@@ -733,7 +733,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (this.configuration && this.configuration.accessToken) {
             // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAdminAuth", ["openid", "basic", "profile", "email", "roles"]);
         }
 
 
@@ -849,7 +849,7 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (this.configuration && this.configuration.accessToken) {
             // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAdminAuth", ["openid", "basic", "profile", "email", "roles"]);
         }
 
 

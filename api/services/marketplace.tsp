@@ -267,6 +267,7 @@ namespace Marketplace {
   @doc("Returns tutor applications for admin review, optionally filtered by status.")
   @get
   @route("/admin/tutor-applications")
+  @useAuth(KeycloakAdminAuth)
   op listAdminTutorApplications(@query status?: ApplicationStatus):
     | TutorApplication[]
     | UnauthorizedError;
@@ -275,6 +276,7 @@ namespace Marketplace {
   @doc("Approves a pending tutor application and grants module coverage.")
   @post
   @route("/admin/tutor-applications/{id}/approve")
+  @useAuth(KeycloakAdminAuth)
   op approveTutorApplication(@path id: string):
     | ApproveApplicationResponse
     | NotFoundError
@@ -284,6 +286,7 @@ namespace Marketplace {
   @doc("Rejects a pending tutor application with an optional reason.")
   @post
   @route("/admin/tutor-applications/{id}/reject")
+  @useAuth(KeycloakAdminAuth)
   op rejectTutorApplication(
     @path id: string,
     @body body: RejectApplicationRequest,
@@ -293,12 +296,14 @@ namespace Marketplace {
   @doc("Returns all modules with topics for administration.")
   @get
   @route("/admin/modules")
+  @useAuth(KeycloakAdminAuth)
   op listAdminModules(): ModuleDetail[] | UnauthorizedError;
 
   @summary("Create module (admin)")
   @doc("Creates a new course module.")
   @post
   @route("/admin/modules")
+  @useAuth(KeycloakAdminAuth)
   op createAdminModule(@body body: AdminModuleInput):
     | ModuleDetail
     | BadRequestError
@@ -308,6 +313,7 @@ namespace Marketplace {
   @doc("Updates an existing module identified by code.")
   @put
   @route("/admin/modules/{code}")
+  @useAuth(KeycloakAdminAuth)
   op updateAdminModule(@path code: string, @body body: AdminModuleUpdateInput):
     | ModuleDetail
     | NotFoundError

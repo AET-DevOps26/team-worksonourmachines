@@ -27,3 +27,17 @@ model KeycloakAuth
     ],
     ["openid", "basic", "profile", "email", "roles"]
   >;
+
+@doc("Keycloak OAuth2 authorization code auth for admin login")
+model KeycloakAdminAuth
+  is OAuth2Auth<
+    [
+      {
+        type: OAuth2FlowType.authorizationCode;
+        authorizationUrl: "https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth";
+        tokenUrl: "https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token";
+        refreshUrl: "https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token";
+      }
+    ],
+    ["openid", "basic", "profile", "email", "roles"]
+  >;

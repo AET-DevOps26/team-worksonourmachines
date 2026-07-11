@@ -41,7 +41,7 @@ import type { ApproveTutorApplicationRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAdminAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -76,7 +76,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+[KeycloakAdminAuth accessCode](../README.md#KeycloakAdminAuth-accessCode)
 
 ### HTTP request headers
 
@@ -114,7 +114,7 @@ import type { CreateAdminModuleRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAdminAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -149,7 +149,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+[KeycloakAdminAuth accessCode](../README.md#KeycloakAdminAuth-accessCode)
 
 ### HTTP request headers
 
@@ -397,7 +397,7 @@ import type { ListAdminModulesRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAdminAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -424,7 +424,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+[KeycloakAdminAuth accessCode](../README.md#KeycloakAdminAuth-accessCode)
 
 ### HTTP request headers
 
@@ -461,7 +461,7 @@ import type { ListAdminTutorApplicationsRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAdminAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -496,7 +496,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+[KeycloakAdminAuth accessCode](../README.md#KeycloakAdminAuth-accessCode)
 
 ### HTTP request headers
 
@@ -780,7 +780,7 @@ import type { RejectTutorApplicationRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAdminAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -818,7 +818,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+[KeycloakAdminAuth accessCode](../README.md#KeycloakAdminAuth-accessCode)
 
 ### HTTP request headers
 
@@ -929,7 +929,7 @@ import type { UpdateAdminModuleRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    // To configure OAuth2 access token for authorization: KeycloakAdminAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -967,7 +967,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+[KeycloakAdminAuth accessCode](../README.md#KeycloakAdminAuth-accessCode)
 
 ### HTTP request headers
 
