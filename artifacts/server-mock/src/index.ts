@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express from 'express';
+import { communicationRouter } from './routes/communication.js';
 import { marketplaceRouter } from './routes/marketplace.js';
 import { studentRouter } from './routes/student.js';
 
@@ -15,6 +16,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/v1', studentRouter);
 app.use('/v1', marketplaceRouter);
+app.use('/v1', communicationRouter);
 
 app.listen(port, () => {
   console.log(`server-mock listening on port ${port}`);

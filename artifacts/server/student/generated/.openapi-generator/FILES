@@ -1,0 +1,5 @@
+src/main/java/org/openapitools/api/StudentApiV1.java
+src/main/java/org/openapitools/model/SharedErrorsErrorBody.java
+src/main/java/org/openapitools/model/SharedStudentStudentProfile.java
+src/main/java/org/openapitools/model/SharedStudentStudentProfileInput.java
+src/main/java/org/openapitools/model/SharedStudyFocusStudyFocus.java

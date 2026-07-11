@@ -83,12 +83,29 @@ export type TutorApplication = {
   rejectionReason?: string;
 };
 
+export type ChatMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
+  sentAt: string;
+};
+
+export type Conversation = {
+  id: string;
+  participantIds: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type State = {
   studentProfiles: Map<string, StudentProfile>;
   tutorProfiles: Map<string, TutorProfile>;
   applications: TutorApplication[];
   coverages: Map<string, TutorCoverage[]>;
   modules: ModuleDetail[];
+  conversations: Conversation[];
+  messages: ChatMessage[];
 };
 
 function defaultStudyFocus(): StudyFocus {
@@ -294,12 +311,41 @@ function createInitialState(): State {
     },
   ];
 
+  const convId = 'conv-lukas-anna';
+  const conversations: Conversation[] = [
+    {
+      id: convId,
+      participantIds: [USER_IDS.lukas, USER_IDS.anna],
+      createdAt: '2025-11-01T12:00:00Z',
+      updatedAt: '2025-11-02T09:30:00Z',
+    },
+  ];
+
+  const messages: ChatMessage[] = [
+    {
+      id: 'msg-1',
+      conversationId: convId,
+      senderId: USER_IDS.lukas,
+      content: 'Hi Anna, I need help with probability spaces.',
+      sentAt: '2025-11-01T12:05:00Z',
+    },
+    {
+      id: 'msg-2',
+      conversationId: convId,
+      senderId: USER_IDS.anna,
+      content: 'Sure! When would you like to start?',
+      sentAt: '2025-11-02T09:30:00Z',
+    },
+  ];
+
   return {
     studentProfiles,
     tutorProfiles,
     applications,
     coverages,
     modules,
+    conversations,
+    messages,
   };
 }
 
@@ -383,4 +429,16 @@ export function listPublishedTutors() {
 
 export function newId(prefix: string) {
   return `${prefix}-${randomUUID().slice(0, 8)}`;
+}
+
+export function displayNameForUser(userId: string): string {
+  const tutor = state.tutorProfiles.get(userId);
+  if (tutor) return tutor.displayName;
+  const student = state.studentProfiles.get(userId);
+  if (student) return student.displayName;
+  return 'User';
+}
+
+export function tutorIdForUser(userId: string): string | undefined {
+  return state.tutorProfiles.get(userId)?.id;
 }

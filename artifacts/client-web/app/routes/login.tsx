@@ -30,10 +30,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const session = sessionResult.isOk ? sessionResult.value : null;
     if (session) {
-        return redirect(safeRedirectPath(requestUrl.searchParams.get('redirectTo')));
+        return redirect(safeRedirectPath(requestUrl.searchParams.get('redirectTo') ?? '/dashboard'));
     }
 
-    const redirectTo = safeRedirectPath(requestUrl.searchParams.get('redirectTo'));
+    const redirectTo = safeRedirectPath(requestUrl.searchParams.get('redirectTo') ?? '/dashboard');
     const loginHref = redirectTo === '/' ? '/auth/login' : `/auth/login?redirectTo=${encodeURIComponent(redirectTo)}`;
     const registerHref = buildRegisterHref(redirectTo);
 

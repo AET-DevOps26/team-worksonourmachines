@@ -13,6 +13,10 @@ export function formatLocationLabel(location: SharedMarketplaceLocation): string
     return LOCATION_OPTIONS.find((option) => option.value === location)?.label ?? location;
 }
 
+export function formatLocations(locations: readonly SharedMarketplaceLocation[]): string {
+    return locations.map(formatLocationLabel).join(', ');
+}
+
 export function parseLocationsFromFormData(formData: FormData): SharedMarketplaceLocation[] {
     return LOCATION_OPTIONS.map((option) => option.value).filter(
         (location) => formData.get(`location_${location}`) === 'on',
@@ -38,4 +42,12 @@ export function TutorLocationFields({ locations }: TutorLocationFieldsProps) {
             ))}
         </div>
     );
+}
+
+export function TutorLocationFilterOptions() {
+    return LOCATION_OPTIONS.map((option) => (
+        <option key={option.value} value={option.value}>
+            {option.label}
+        </option>
+    ));
 }

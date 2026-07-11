@@ -9,11 +9,17 @@ using Shared.Errors;
 using Shared.Student;
 using Shared.Marketplace;
 
+@minLength(1)
+@pattern(".*\\S.*")
+scalar NonBlankString extends string;
+
 namespace Shared.Student {
   model StudentProfile {
-    displayName: string;
-    bio: string;
-    languages: string[];
+    displayName: NonBlankString;
+    bio: NonBlankString;
+
+    @minItems(1)
+    languages: NonBlankString[];
 
     @doc("Self-assessed strength in each study skill (1 = needs work, 5 = confident).")
     studyFocus?: Shared.StudyFocus.StudyFocus;
@@ -52,9 +58,9 @@ enum StudentVersions {
 }
 
 @service(#{ title: "Student API" })
-@server("https://student.example.local", "Student API")
+@server("https://api.tutormatch.localhost", "Student API")
 @versioned(StudentVersions)
-@useAuth(KeycloakBearerAuth)
+@useAuth(KeycloakAuth)
 @route("/v1")
 namespace Student {
   @summary("Get my student profile")

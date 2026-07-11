@@ -121,7 +121,13 @@ services:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
-      server-mock:
+#      server-mock:
+#        condition: service_started
+      server-communication:
+        condition: service_started
+      server-marketplace:
+        condition: service_started
+      server-student:
         condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:5173/ || exit 1"]
@@ -133,6 +139,8 @@ services:
   api-ui:
     <<: *hardening
     image: scalarapi/api-reference:latest
+    environment:
+      SPRING_CONFIG_ADDITIONAL_LOCATION: file:/app/server/application.yaml
     cap_add:
       - NET_BIND_SERVICE
     read_only: true
