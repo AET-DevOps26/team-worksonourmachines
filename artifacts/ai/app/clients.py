@@ -6,8 +6,8 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
-STUDENT_API_URL = os.getenv("STUDENT_API_URL", "http://server-mock:3000")
-MARKETPLACE_API_URL = os.getenv("MARKETPLACE_API_URL", "http://server-mock:3000")
+STUDENT_API_URL = os.getenv("STUDENT_API_URL", "http://server-student:8081")
+MARKETPLACE_API_URL = os.getenv("MARKETPLACE_API_URL", "http://server-marketplace:8082")
 
 
 def _auth_headers(authorization: str) -> dict:
