@@ -1,9 +1,12 @@
 package com.worksonourmachines.marketplace.tutorprofile.service;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 
 import org.openapitools.model.SharedMarketplaceLocation;
 import org.openapitools.model.SharedMarketplaceTutorApplication;
@@ -14,6 +17,10 @@ import org.openapitools.model.SharedMarketplaceTutorProfileInput;
 import org.openapitools.model.SharedMarketplaceTutorSort;
 import org.openapitools.model.SharedMarketplaceWeekday;
 import org.openapitools.model.TutorPage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -68,11 +75,8 @@ public class MarketplaceTutorProfileService {
         int resolvedPage = page == null ? 1 : Math.max(1, page);
         int resolvedPageSize = pageSize == null ? 20 : Math.max(1, Math.min(pageSize, 100));
 
-        List<MarketplaceTutorProfileEntity> filtered = marketplaceTutorProfileRepository
-                .findByPublishedTrueOrderByDisplayNameAsc()
-                .stream()
-                .filter(profile -> matchesFilters(
-                        profile,
+        Page<MarketplaceTutorProfileEntity> tutorPage = marketplaceTutorProfileRepository.findAll(
+                tutorSearchSpecification(
                         q,
                         moduleId,
                         topicId,
@@ -81,17 +85,14 @@ public class MarketplaceTutorProfileService {
                         minRate,
                         maxRate,
                         minRating,
-                        weekdays))
-                .sorted(comparator(sort))
-                .toList();
+                        weekdays),
+                PageRequest.of(resolvedPage - 1, resolvedPageSize, sort(sort)));
 
-        int from = Math.min((resolvedPage - 1) * resolvedPageSize, filtered.size());
-        int to = Math.min(from + resolvedPageSize, filtered.size());
         return marketplaceTutorProfileMapper.toPage(
-                filtered.subList(from, to),
+                tutorPage.getContent(),
                 resolvedPage,
                 resolvedPageSize,
-                filtered.size());
+                (int) tutorPage.getTotalElements());
     }
 
     @Transactional(readOnly = true)
@@ -121,8 +122,7 @@ public class MarketplaceTutorProfileService {
         return marketplaceTutorProfileMapper.toProfile(marketplaceTutorProfileRepository.save(profile));
     }
 
-    private boolean matchesFilters(
-            MarketplaceTutorProfileEntity profile,
+    private static Specification<MarketplaceTutorProfileEntity> tutorSearchSpecification(
             @Nullable String q,
             @Nullable String moduleId,
             @Nullable String topicId,
@@ -132,75 +132,96 @@ public class MarketplaceTutorProfileService {
             @Nullable Float maxRate,
             @Nullable Float minRating,
             @Nullable List<SharedMarketplaceWeekday> weekdays) {
-        if (moduleId != null && profile.getCoverages().stream()
-                .noneMatch(coverage -> coverage.getModule().getId().toString().equals(moduleId))) {
-            return false;
-        }
-        if (topicId != null && profile.getCoverages().stream()
-                .flatMap(coverage -> coverage.getModule().getTopics().stream())
-                .noneMatch(topic -> topic.getId().toString().equals(topicId))) {
-            return false;
-        }
-        if (languages != null && !languages.isEmpty() && !containsAllLanguages(profile, languages)) {
-            return false;
-        }
-        if (locations != null && !locations.isEmpty() && locations.stream()
-                .map(MarketplaceTutorLocation::fromDto)
-                .noneMatch(profile.getLocations()::contains)) {
-            return false;
-        }
-        if (minRate != null && profile.getHourlyRate() < minRate) {
-            return false;
-        }
-        if (maxRate != null && profile.getHourlyRate() > maxRate) {
-            return false;
-        }
-        if (minRating != null && 4.7f < minRating) {
-            return false;
-        }
-        if (weekdays != null && !weekdays.isEmpty() && weekdays.stream()
-                .map(MarketplaceTutorWeekday::fromDto)
-                .noneMatch(weekday -> profile.getAvailability().stream()
-                        .anyMatch(availability -> availability.getWeekday() == weekday
-                                && Boolean.TRUE.equals(availability.getAvailable())))) {
-            return false;
-        }
-        if (q != null && !q.isBlank()) {
-            String needle = q.toLowerCase(Locale.ROOT).trim();
-            String haystack = (
-                    profile.getDisplayName()
-                            + " "
-                            + profile.getBio()
-                            + " "
-                            + profile.getCoverages().stream()
-                                    .map(coverage -> coverage.getModule().getCode())
-                                    .reduce("", (left, right) -> left + " " + right))
-                    .toLowerCase(Locale.ROOT);
-            return haystack.contains(needle);
-        }
-        return true;
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.isTrue(root.get("published")));
+
+            UUID parsedModuleId = parseOptionalUuid(moduleId);
+            if (moduleId != null && parsedModuleId == null) {
+                return criteriaBuilder.disjunction();
+            }
+            if (parsedModuleId != null) {
+                var coverage = root.join("coverages");
+                var module = coverage.join("module");
+                predicates.add(criteriaBuilder.equal(module.get("id"), parsedModuleId));
+            }
+
+            UUID parsedTopicId = parseOptionalUuid(topicId);
+            if (topicId != null && parsedTopicId == null) {
+                return criteriaBuilder.disjunction();
+            }
+            if (parsedTopicId != null) {
+                var coverage = root.join("coverages");
+                var module = coverage.join("module");
+                var topic = module.join("topics");
+                predicates.add(criteriaBuilder.equal(topic.get("id"), parsedTopicId));
+            }
+
+            if (languages != null && !languages.isEmpty()) {
+                languages.stream()
+                        .map(language -> language.toLowerCase(Locale.ROOT).trim())
+                        .filter(language -> !language.isBlank())
+                        .forEach(language -> {
+                            var profileLanguage = root.join("languages");
+                            predicates.add(criteriaBuilder.equal(
+                                    criteriaBuilder.lower(profileLanguage.as(String.class)),
+                                    language));
+                        });
+            }
+
+            if (locations != null && !locations.isEmpty()) {
+                var profileLocation = root.join("locations");
+                predicates.add(profileLocation.in(locations.stream()
+                        .map(MarketplaceTutorLocation::fromDto)
+                        .toList()));
+            }
+
+            if (minRate != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("hourlyRate"), minRate));
+            }
+            if (maxRate != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("hourlyRate"), maxRate));
+            }
+            if (minRating != null && 4.7f < minRating) {
+                return criteriaBuilder.disjunction();
+            }
+
+            if (weekdays != null && !weekdays.isEmpty()) {
+                var availability = root.join("availability");
+                predicates.add(criteriaBuilder.and(
+                        availability.get("weekday").in(weekdays.stream()
+                                .map(MarketplaceTutorWeekday::fromDto)
+                                .toList()),
+                        criteriaBuilder.isTrue(availability.get("available"))));
+            }
+
+            if (q != null && !q.isBlank()) {
+                String needle = "%" + q.toLowerCase(Locale.ROOT).trim() + "%";
+                var coverage = root.join("coverages", JoinType.LEFT);
+                var module = coverage.join("module", JoinType.LEFT);
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("displayName")), needle),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("bio")), needle),
+                        criteriaBuilder.like(criteriaBuilder.lower(module.get("code")), needle)));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
+        };
     }
 
-    private boolean containsAllLanguages(MarketplaceTutorProfileEntity profile, List<String> languages) {
-        List<String> profileLanguages = profile.getLanguages().stream()
-                .map(language -> language.toLowerCase(Locale.ROOT))
-                .toList();
-        return languages.stream()
-                .map(language -> language.toLowerCase(Locale.ROOT))
-                .allMatch(profileLanguages::contains);
-    }
-
-    private Comparator<MarketplaceTutorProfileEntity> comparator(@Nullable SharedMarketplaceTutorSort sort) {
+    private static Sort sort(@Nullable SharedMarketplaceTutorSort sort) {
         if (sort == SharedMarketplaceTutorSort.RATE_ASC) {
-            return Comparator.comparing(MarketplaceTutorProfileEntity::getHourlyRate)
-                    .thenComparing(MarketplaceTutorProfileEntity::getDisplayName);
+            return Sort.by(
+                    Sort.Order.asc("hourlyRate"),
+                    Sort.Order.asc("displayName"));
         }
         if (sort == SharedMarketplaceTutorSort.RATE_DESC) {
-            return Comparator.comparing(MarketplaceTutorProfileEntity::getHourlyRate)
-                    .reversed()
-                    .thenComparing(MarketplaceTutorProfileEntity::getDisplayName);
+            return Sort.by(
+                    Sort.Order.desc("hourlyRate"),
+                    Sort.Order.asc("displayName"));
         }
-        return Comparator.comparing(MarketplaceTutorProfileEntity::getDisplayName);
+        return Sort.by(Sort.Order.asc("displayName"));
     }
 
     private static void validateProfileInput(SharedMarketplaceTutorProfileInput input) {
@@ -214,6 +235,18 @@ public class MarketplaceTutorProfileService {
             return UUID.fromString(id);
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tutor not found.", exception);
+        }
+    }
+
+    @Nullable
+    private static UUID parseOptionalUuid(@Nullable String id) {
+        if (id == null) {
+            return null;
+        }
+        try {
+            return UUID.fromString(id);
+        } catch (IllegalArgumentException exception) {
+            return null;
         }
     }
 }
