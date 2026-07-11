@@ -65,8 +65,8 @@ public class MarketplaceTutorProfileService {
             @Nullable Float minRating,
             @Nullable List<SharedMarketplaceWeekday> weekdays,
             @Nullable SharedMarketplaceTutorSort sort) {
-        int resolvedPage = page == null ? 1 : page;
-        int resolvedPageSize = pageSize == null ? 20 : pageSize;
+        int resolvedPage = page == null ? 1 : Math.max(1, page);
+        int resolvedPageSize = pageSize == null ? 20 : Math.max(1, Math.min(pageSize, 100));
 
         List<MarketplaceTutorProfileEntity> filtered = marketplaceTutorProfileRepository
                 .findByPublishedTrueOrderByDisplayNameAsc()

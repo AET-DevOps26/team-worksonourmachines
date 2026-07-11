@@ -160,7 +160,7 @@ public class MarketplaceTutorApplicationService {
     private static UUID parseModuleId(String moduleId) {
         try {
             return UUID.fromString(moduleId);
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | NullPointerException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid module id.", exception);
         }
     }
