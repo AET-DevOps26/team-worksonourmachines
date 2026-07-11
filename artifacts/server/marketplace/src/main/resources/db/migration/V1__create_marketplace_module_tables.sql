@@ -86,6 +86,8 @@ CREATE TABLE IF NOT EXISTS marketplace.tutor_coverages (
     proficiency_level varchar(64) NOT NULL,
     UNIQUE (profile_id, module_id)
 );
+CREATE INDEX IF NOT EXISTS idx_tutor_coverages_module_id
+    ON marketplace.tutor_coverages (module_id);
 
 CREATE INDEX IF NOT EXISTS idx_tutor_profiles_published_display_name
     ON marketplace.tutor_profiles (published, display_name);
