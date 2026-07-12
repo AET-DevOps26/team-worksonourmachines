@@ -1,6 +1,7 @@
 package com.worksonourmachines.student.profile.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -226,6 +227,73 @@ class StudentProfileControllerTest {
                 .andExpect(jsonPath("$.message").value("Access is unauthorized."));
     }
 
+    @Test
+    void updateGoalReturnsUpdatedGoal() throws Exception {
+        authenticateStudent();
+        String goalId = "22222222-2222-2222-2222-222222222201";
+        SharedStudentLearningGoal goal = new SharedStudentLearningGoal(
+                goalId,
+                "11111111-1111-1111-1111-111111111299",
+                "Prepare for the advanced distributed systems exam.",
+                OffsetDateTime.parse("2026-10-31T12:00:00Z"),
+                5,
+                List.of(SharedMarketplaceLocation.GARCHING));
+        when(learningGoalService.updateGoal(eq(goalId), any())).thenReturn(goal);
+
+        this.mockMvc.perform(put(updateGoalPath(goalId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validGoalInputJson()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(goalId))
+                .andExpect(jsonPath("$.moduleId").value("11111111-1111-1111-1111-111111111299"))
+                .andExpect(jsonPath("$.selfAssessedLevel").value(5))
+                .andExpect(jsonPath("$.locations[0]").value("garching"));
+    }
+
+    @Test
+    void updateGoalWithInvalidBodyReturnsBadRequestErrorBody() throws Exception {
+        authenticateStudent();
+
+        this.mockMvc.perform(put(updateGoalPath("22222222-2222-2222-2222-222222222201"))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validGoalInputJson().replace("\"selfAssessedLevel\": 4", "\"selfAssessedLevel\": 6")))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("bad_request"))
+                .andExpect(jsonPath("$.message").value("The server could not understand the request due to invalid syntax."));
+    }
+
+    @Test
+    void updateGoalNotFoundReturnsStandardErrorBody() throws Exception {
+        authenticateStudent();
+        String goalId = "22222222-2222-2222-2222-222222222299";
+        when(learningGoalService.updateGoal(eq(goalId), any()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        this.mockMvc.perform(put(updateGoalPath(goalId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validGoalInputJson()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("not_found"))
+                .andExpect(jsonPath("$.message").value("The requested resource was not found."));
+    }
+
+    @Test
+    void updateGoalWithoutBearerTokenReturnsUnauthorizedErrorBody() throws Exception {
+        this.mockMvc.perform(put(updateGoalPath("22222222-2222-2222-2222-222222222201"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validGoalInputJson()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("unauthorized"))
+                .andExpect(jsonPath("$.message").value("Access is unauthorized."));
+    }
+
     private void authenticateStudent() {
         when(this.jwtDecoder.decode("student-token")).thenReturn(Jwt.withTokenValue("student-token")
                 .header("alg", "none")
@@ -236,6 +304,10 @@ class StudentProfileControllerTest {
 
     private static String goalPath(String id) {
         return StudentApiV1.PATH_GET_GOAL.replace("{id}", id);
+    }
+
+    private static String updateGoalPath(String id) {
+        return StudentApiV1.PATH_UPDATE_GOAL.replace("{id}", id);
     }
 
     private static String validGoalInputJson() {

@@ -56,6 +56,17 @@ public class LearningGoalService {
                 learningGoalMapper.toCreateEntity(studentId, input)));
     }
 
+    @Transactional
+    public SharedStudentLearningGoal updateGoal(String id, SharedStudentLearningGoalInput input) {
+        validateInput(input);
+        UUID goalId = parseGoalId(id);
+        UUID studentId = authenticatedUser.id();
+        var goal = learningGoalRepository.findByIdAndStudentId(goalId, studentId)
+                .orElseThrow(LearningGoalService::notFound);
+        learningGoalMapper.updateEntity(goal, input);
+        return learningGoalMapper.toDto(learningGoalRepository.save(goal));
+    }
+
     private static void validateInput(SharedStudentLearningGoalInput input) {
         if (input == null
                 || isBlank(input.getModuleId())

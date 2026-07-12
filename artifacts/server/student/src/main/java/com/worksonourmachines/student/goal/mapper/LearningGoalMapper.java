@@ -25,6 +25,17 @@ public class LearningGoalMapper {
                         .toList());
     }
 
+    public void updateEntity(LearningGoalEntity entity, SharedStudentLearningGoalInput input) {
+        entity.setModuleId(input.getModuleId().trim());
+        entity.setDescription(input.getDescription().trim());
+        entity.setTargetDate(input.getTargetDate());
+        entity.setSelfAssessedLevel(input.getSelfAssessedLevel());
+        entity.setBudgetEur(input.getBudgetEur());
+        entity.replaceLocations(input.getLocations().stream()
+                .map(LearningGoalLocation::fromDto)
+                .toList());
+    }
+
     public SharedStudentLearningGoal toDto(LearningGoalEntity entity) {
         SharedStudentLearningGoal goal = new SharedStudentLearningGoal(
                 entity.getId().toString(),

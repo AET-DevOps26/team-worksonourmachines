@@ -92,23 +92,48 @@ public class LearningGoalEntity {
         return moduleId;
     }
 
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public OffsetDateTime getTargetDate() {
         return targetDate;
     }
 
+    public void setTargetDate(OffsetDateTime targetDate) {
+        this.targetDate = targetDate;
+    }
+
     public Integer getSelfAssessedLevel() {
         return selfAssessedLevel;
+    }
+
+    public void setSelfAssessedLevel(Integer selfAssessedLevel) {
+        this.selfAssessedLevel = selfAssessedLevel;
     }
 
     public Integer getBudgetEur() {
         return budgetEur;
     }
 
+    public void setBudgetEur(Integer budgetEur) {
+        this.budgetEur = budgetEur;
+    }
+
     public List<LearningGoalLocation> getLocations() {
         return locations;
+    }
+
+    public void replaceLocations(List<LearningGoalLocation> locations) {
+        this.locations.clear();
+        this.locations.addAll(locations);
     }
 }

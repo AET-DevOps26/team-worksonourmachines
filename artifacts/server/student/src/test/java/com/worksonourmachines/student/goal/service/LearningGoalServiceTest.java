@@ -1,6 +1,7 @@
 package com.worksonourmachines.student.goal.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -140,6 +141,57 @@ class LearningGoalServiceTest {
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> service.createGoal(input));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verifyNoInteractions(authenticatedUser, repository);
+    }
+
+    @Test
+    void updatesGoalOwnedByAuthenticatedStudent() {
+        LearningGoalEntity entity = goal();
+        SharedStudentLearningGoalInput input = new SharedStudentLearningGoalInput(
+                " 11111111-1111-1111-1111-111111111299 ",
+                " Prepare for the advanced distributed systems exam. ",
+                OffsetDateTime.parse("2026-10-31T12:00:00Z"),
+                5,
+                List.of(SharedMarketplaceLocation.GARCHING));
+        when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(repository.findByIdAndStudentId(GOAL_ID, STUDENT_ID)).thenReturn(Optional.of(entity));
+        when(repository.save(entity)).thenReturn(entity);
+
+        SharedStudentLearningGoal result = service.updateGoal(GOAL_ID.toString(), input);
+
+        assertEquals(GOAL_ID.toString(), result.getId());
+        assertEquals(STUDENT_ID, entity.getStudentId());
+        assertEquals("11111111-1111-1111-1111-111111111299", result.getModuleId());
+        assertEquals("Prepare for the advanced distributed systems exam.", result.getDescription());
+        assertEquals(OffsetDateTime.parse("2026-10-31T12:00:00Z"), result.getTargetDate());
+        assertEquals(5, result.getSelfAssessedLevel());
+        assertNull(result.getBudgetEur());
+        assertEquals(List.of(SharedMarketplaceLocation.GARCHING), result.getLocations());
+        verify(repository).save(entity);
+    }
+
+    @Test
+    void returnsNotFoundWhenUpdatingMissingOrForeignGoal() {
+        when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(repository.findByIdAndStudentId(GOAL_ID, STUDENT_ID)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.updateGoal(GOAL_ID.toString(), goalInput()));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+    }
+
+    @Test
+    void returnsBadRequestForInvalidUpdateInputWithoutReadingOrWriting() {
+        SharedStudentLearningGoalInput input = goalInput();
+        input.setSelfAssessedLevel(6);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.updateGoal(GOAL_ID.toString(), input));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         verifyNoInteractions(authenticatedUser, repository);

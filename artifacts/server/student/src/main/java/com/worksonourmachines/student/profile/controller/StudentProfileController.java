@@ -55,7 +55,7 @@ public class StudentProfileController implements StudentApiV1 {
 
     @Override
     public ResponseEntity<SharedStudentLearningGoal> updateGoal(String id, SharedStudentLearningGoalInput sharedStudentLearningGoalInput) {
-        return null;
+        return ResponseEntity.ok(learningGoalService.updateGoal(id, sharedStudentLearningGoalInput));
     }
 
     @Override
