@@ -17,6 +17,28 @@ CREATE TABLE IF NOT EXISTS student.student_profile_languages (
     PRIMARY KEY (student_id, position)
 );
 
+CREATE TABLE IF NOT EXISTS student.learning_goals (
+    id uuid PRIMARY KEY,
+    student_id uuid NOT NULL,
+    module_id varchar(255) NOT NULL,
+    description text NOT NULL,
+    target_date timestamp with time zone NOT NULL,
+    self_assessed_level integer NOT NULL CHECK (self_assessed_level BETWEEN 1 AND 5),
+    budget_eur integer CHECK (budget_eur >= 0)
+);
+
+CREATE INDEX IF NOT EXISTS learning_goals_student_id_idx
+    ON student.learning_goals (student_id);
+
+CREATE TABLE IF NOT EXISTS student.learning_goal_locations (
+    goal_id uuid NOT NULL REFERENCES student.learning_goals(id) ON DELETE CASCADE,
+    position integer NOT NULL,
+    location varchar(32) NOT NULL CHECK (
+        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STAUBING', 'OTTOBRUN')
+    ),
+    PRIMARY KEY (goal_id, position)
+);
+
 INSERT INTO student.student_profiles (
     student_id,
     display_name,

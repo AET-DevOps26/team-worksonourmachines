@@ -8,6 +8,7 @@ import org.openapitools.model.SharedStudentStudentProfileInput;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.worksonourmachines.student.goal.service.LearningGoalService;
 import com.worksonourmachines.student.profile.service.StudentProfileService;
 
 import java.util.List;
@@ -16,9 +17,13 @@ import java.util.List;
 public class StudentProfileController implements StudentApiV1 {
 
     private final StudentProfileService studentProfileService;
+    private final LearningGoalService learningGoalService;
 
-    public StudentProfileController(StudentProfileService studentProfileService) {
+    public StudentProfileController(
+            StudentProfileService studentProfileService,
+            LearningGoalService learningGoalService) {
         this.studentProfileService = studentProfileService;
+        this.learningGoalService = learningGoalService;
     }
 
     @Override
@@ -33,7 +38,7 @@ public class StudentProfileController implements StudentApiV1 {
 
     @Override
     public ResponseEntity<SharedStudentLearningGoal> getGoal(String id) {
-        return null;
+        return ResponseEntity.ok(learningGoalService.getGoal(id));
     }
 
     @Override
