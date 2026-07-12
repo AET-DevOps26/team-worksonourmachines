@@ -3,7 +3,12 @@ src/openapi_server/apis/default_api.py
 src/openapi_server/apis/default_api_base.py
 src/openapi_server/impl/__init__.py
 src/openapi_server/models/__init__.py
-src/openapi_server/models/chat200_response.py
-src/openapi_server/models/chat_request.py
 src/openapi_server/models/extra_models.py
+src/openapi_server/models/shared_ai_generate_plan_request.py
+src/openapi_server/models/shared_ai_generate_plan_response.py
+src/openapi_server/models/shared_ai_plan_milestone.py
+src/openapi_server/models/shared_ai_plan_suggestion.py
+src/openapi_server/models/shared_ai_plan_tier.py
+src/openapi_server/models/shared_ai_proposed_tutor.py
+src/openapi_server/models/shared_errors_error_body.py
 src/openapi_server/security_api.py
