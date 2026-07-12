@@ -4,11 +4,11 @@ info:
   version: v1
 tags: []
 paths:
-  /v1/chat:
+  /v1/plan:
     post:
-      operationId: chat
-      summary: Chat with AI
-      description: Sends a prompt to the AI service and returns a generated response.
+      operationId: generatePlan
+      summary: Generate study plan
+      description: Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything.
       parameters: []
       responses:
         '200':
@@ -16,24 +16,131 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/Shared.Ai.GeneratePlanResponse'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                prompt:
-                  type: string
-              required:
-                - prompt
-components: {}
+              $ref: '#/components/schemas/Shared.Ai.GeneratePlanRequest'
+security:
+  - KeycloakBearerAuth: []
+components:
+  schemas:
+    Shared.Errors.ErrorBody:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    Shared.Ai.PlanTier:
+      type: string
+      enum:
+        - cheapest
+        - within_budget
+        - best_quality
+    Shared.Ai.PlanMilestone:
+      type: object
+      required:
+        - title
+        - dueDate
+        - topicId
+        - tutorId
+        - estimatedCost
+      properties:
+        title:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        topicId:
+          type: string
+        tutorId:
+          type: string
+        estimatedCost:
+          type: integer
+          format: int32
+          description: Estimated cost in EUR (whole euros).
+    Shared.Ai.ProposedTutor:
+      type: object
+      required:
+        - id
+        - displayName
+        - hourlyRate
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        hourlyRate:
+          type: integer
+          format: int32
+          description: Hourly rate in EUR (whole euros).
+    Shared.Ai.PlanSuggestion:
+      type: object
+      required:
+        - tier
+        - description
+        - totalEstimatedCost
+        - proposedTutors
+        - milestones
+      properties:
+        tier:
+          $ref: '#/components/schemas/Shared.Ai.PlanTier'
+        description:
+          type: string
+        totalEstimatedCost:
+          type: integer
+          format: int32
+          description: Total estimated cost in EUR (whole euros).
+        proposedTutors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Ai.ProposedTutor'
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Ai.PlanMilestone'
+    Shared.Ai.GeneratePlanRequest:
+      type: object
+      required:
+        - learningGoalId
+      properties:
+        learningGoalId:
+          type: string
+    Shared.Ai.GeneratePlanResponse:
+      type: object
+      required:
+        - learningGoalId
+        - suggestions
+      properties:
+        learningGoalId:
+          type: string
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Ai.PlanSuggestion'
+  securitySchemes:
+    KeycloakBearerAuth:
+      type: http
+      scheme: Bearer
+      description: Keycloak access token issued to the BFF client
 servers:
   - url: https://ai.example.local
     description: AI API
