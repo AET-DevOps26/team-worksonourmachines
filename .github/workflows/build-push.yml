@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/genai-plan-generation-impl
   workflow_dispatch:
 
 env:
