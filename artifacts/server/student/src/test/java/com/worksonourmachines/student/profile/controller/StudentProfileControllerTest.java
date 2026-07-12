@@ -145,6 +145,36 @@ class StudentProfileControllerTest {
                 .andExpect(jsonPath("$.message").value("The requested resource was not found."));
     }
 
+    @Test
+    void listMyGoalsReturnsAuthenticatedStudentsGoals() throws Exception {
+        authenticateStudent();
+        SharedStudentLearningGoal goal = new SharedStudentLearningGoal(
+                "22222222-2222-2222-2222-222222222201",
+                "11111111-1111-1111-1111-111111111201",
+                "Prepare for the distributed systems exam.",
+                OffsetDateTime.parse("2026-09-30T12:00:00Z"),
+                4,
+                List.of(SharedMarketplaceLocation.ONLINE));
+        when(learningGoalService.listMyGoals()).thenReturn(List.of(goal));
+
+        this.mockMvc.perform(get(StudentApiV1.PATH_LIST_MY_GOALS)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value("22222222-2222-2222-2222-222222222201"))
+                .andExpect(jsonPath("$[0].description").value("Prepare for the distributed systems exam."));
+    }
+
+    @Test
+    void listMyGoalsWithoutBearerTokenReturnsUnauthorizedErrorBody() throws Exception {
+        this.mockMvc.perform(get(StudentApiV1.PATH_LIST_MY_GOALS))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("unauthorized"))
+                .andExpect(jsonPath("$.message").value("Access is unauthorized."));
+    }
+
     private void authenticateStudent() {
         when(this.jwtDecoder.decode("student-token")).thenReturn(Jwt.withTokenValue("student-token")
                 .header("alg", "none")

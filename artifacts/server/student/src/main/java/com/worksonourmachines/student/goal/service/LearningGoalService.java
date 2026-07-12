@@ -1,5 +1,6 @@
 package com.worksonourmachines.student.goal.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.openapitools.model.SharedStudentLearningGoal;
@@ -35,6 +36,14 @@ public class LearningGoalService {
         return learningGoalRepository.findByIdAndStudentId(goalId, studentId)
                 .map(learningGoalMapper::toDto)
                 .orElseThrow(LearningGoalService::notFound);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SharedStudentLearningGoal> listMyGoals() {
+        UUID studentId = authenticatedUser.id();
+        return learningGoalRepository.findAllByStudentIdOrderByTargetDateAscIdAsc(studentId).stream()
+                .map(learningGoalMapper::toDto)
+                .toList();
     }
 
     private static UUID parseGoalId(String id) {

@@ -75,16 +75,56 @@ class LearningGoalServiceTest {
         verifyNoInteractions(authenticatedUser, repository);
     }
 
+    @Test
+    void listsAuthenticatedStudentsGoalsInRepositoryOrder() {
+        LearningGoalEntity firstGoal = goal(
+                GOAL_ID,
+                "2026-09-30T12:00:00Z",
+                "Prepare for the distributed systems exam.");
+        UUID secondGoalId = UUID.fromString("22222222-2222-2222-2222-222222222202");
+        LearningGoalEntity secondGoal = goal(
+                secondGoalId,
+                "2026-10-15T12:00:00Z",
+                "Prepare for the databases exam.");
+        when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(repository.findAllByStudentIdOrderByTargetDateAscIdAsc(STUDENT_ID))
+                .thenReturn(List.of(firstGoal, secondGoal));
+
+        List<SharedStudentLearningGoal> result = service.listMyGoals();
+
+        assertEquals(List.of(GOAL_ID.toString(), secondGoalId.toString()), result.stream()
+                .map(SharedStudentLearningGoal::getId)
+                .toList());
+        verify(repository).findAllByStudentIdOrderByTargetDateAscIdAsc(STUDENT_ID);
+    }
+
+    @Test
+    void listsEmptyCollectionWhenAuthenticatedStudentHasNoGoals() {
+        when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(repository.findAllByStudentIdOrderByTargetDateAscIdAsc(STUDENT_ID)).thenReturn(List.of());
+
+        List<SharedStudentLearningGoal> result = service.listMyGoals();
+
+        assertEquals(List.of(), result);
+    }
+
     private static LearningGoalEntity goal() {
+        return goal(
+                GOAL_ID,
+                "2026-09-30T12:00:00Z",
+                "Prepare for the distributed systems exam.");
+    }
+
+    private static LearningGoalEntity goal(UUID id, String targetDate, String description) {
         LearningGoalEntity entity = new LearningGoalEntity(
                 STUDENT_ID,
                 "11111111-1111-1111-1111-111111111201",
-                "Prepare for the distributed systems exam.",
-                OffsetDateTime.parse("2026-09-30T12:00:00Z"),
+                description,
+                OffsetDateTime.parse(targetDate),
                 4,
                 120,
                 List.of(LearningGoalLocation.ONLINE, LearningGoalLocation.MUNICH));
-        ReflectionTestUtils.setField(entity, "id", GOAL_ID);
+        ReflectionTestUtils.setField(entity, "id", id);
         return entity;
     }
 }

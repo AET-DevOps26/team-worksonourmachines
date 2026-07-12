@@ -1,5 +1,6 @@
 package com.worksonourmachines.student.goal.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,4 +13,7 @@ public interface LearningGoalRepository extends JpaRepository<LearningGoalEntity
 
     @EntityGraph(attributePaths = "locations")
     Optional<LearningGoalEntity> findByIdAndStudentId(UUID id, UUID studentId);
+
+    @EntityGraph(attributePaths = "locations")
+    List<LearningGoalEntity> findAllByStudentIdOrderByTargetDateAscIdAsc(UUID studentId);
 }
