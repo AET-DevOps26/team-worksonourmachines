@@ -18,10 +18,22 @@ from fastapi.security.api_key import APIKeyCookie, APIKeyHeader, APIKeyQuery  # 
 
 from openapi_server.models.extra_models import TokenModel
 
+oauth2_code = OAuth2AuthorizationCodeBearer(
+    authorizationUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth",
+    tokenUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token",
+    refreshUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token",
+    scopes={
+        "openid": "",
+        "basic": "",
+        "profile": "",
+        "email": "",
+        "roles": "",
+    }
+)
 
 
-def get_token_KeycloakClientAuth(
-    security_scopes: SecurityScopes, token: str = Depends(oauth2_)
+def get_token_KeycloakAuth(
+    security_scopes: SecurityScopes, token: str = Depends(oauth2_code)
 ) -> TokenModel:
     """
     Validate and decode token.
@@ -35,7 +47,7 @@ def get_token_KeycloakClientAuth(
     ...
 
 
-def validate_scope_KeycloakClientAuth(
+def validate_scope_KeycloakAuth(
     required_scopes: SecurityScopes, token_scopes: List[str]
 ) -> bool:
     """

@@ -26,7 +26,7 @@ from openapi_server.models.extra_models import TokenModel  # noqa: F401
 from openapi_server.models.shared_ai_generate_plan_request import SharedAiGeneratePlanRequest
 from openapi_server.models.shared_ai_generate_plan_response import SharedAiGeneratePlanResponse
 from openapi_server.models.shared_errors_error_body import SharedErrorsErrorBody
-from openapi_server.security_api import get_token_KeycloakClientAuth
+from openapi_server.security_api import get_token_KeycloakAuth
 
 router = APIRouter()
 
@@ -48,8 +48,8 @@ for _, name, _ in pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + "."):
 )
 async def generate_plan(
     shared_ai_generate_plan_request: SharedAiGeneratePlanRequest = Body(None, description=""),
-    token_KeycloakClientAuth: TokenModel = Security(
-        get_token_KeycloakClientAuth, scopes=["openid", "profile", "email", "roles"]
+    token_KeycloakAuth: TokenModel = Security(
+        get_token_KeycloakAuth, scopes=["openid", "basic", "profile", "email", "roles"]
     ),
 ) -> SharedAiGeneratePlanResponse:
     """Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything."""
