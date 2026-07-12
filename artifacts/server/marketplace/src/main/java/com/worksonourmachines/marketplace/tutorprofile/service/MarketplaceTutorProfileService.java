@@ -159,15 +159,12 @@ public class MarketplaceTutorProfileService {
             }
 
             if (languages != null && !languages.isEmpty()) {
-                languages.stream()
-                        .map(language -> language.toLowerCase(Locale.ROOT).trim())
-                        .filter(language -> !language.isBlank())
-                        .forEach(language -> {
-                            var profileLanguage = root.join("languages");
-                            predicates.add(criteriaBuilder.equal(
-                                    criteriaBuilder.lower(profileLanguage.as(String.class)),
-                                    language));
-                        });
+                var profileLanguage = root.join("languages");
+                predicates.add(criteriaBuilder.lower(profileLanguage.as(String.class))
+                        .in(languages.stream()
+                                .map(language -> language.toLowerCase(Locale.ROOT).trim())
+                                .filter(language -> !language.isBlank())
+                                .toList()));
             }
 
             if (locations != null && !locations.isEmpty()) {
@@ -183,10 +180,10 @@ public class MarketplaceTutorProfileService {
             if (maxRate != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("hourlyRate"), maxRate));
             }
-            if (minRating != null && 4.7f < minRating) {
-//                TODO: add rating into TypeSpec & the filtering logic here
-                return criteriaBuilder.conjunction();
-            }
+//          TODO: add rating into TypeSpec & the filtering logic here
+//            if (minRating != null && 4.7f < minRating) {
+//                return criteriaBuilder.conjunction();
+//            }
 
             if (weekdays != null && !weekdays.isEmpty()) {
                 var availability = root.join("availability");
