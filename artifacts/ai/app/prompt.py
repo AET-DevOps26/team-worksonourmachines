@@ -15,8 +15,10 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
             f" conceptual understanding: {tsf.get('conceptualUnderstanding', '?')},"
             f" problem solving: {tsf.get('problemSolving', '?')}"
         )
+        difficulty = t.get("difficultyHint", "unknown")
         topics_lines.append(
-            f"- {t['name']} (difficulty: {t.get('difficultyHint', 'unknown')})\n"
+            f"- [{t['id']}] {t['name']} (difficulty: {difficulty})\n"
+            f"  Description: {t.get('description', '')}\n"
             f"  Study demands — {demands}"
         )
     topics_block = "\n".join(topics_lines) or "No topics available."
@@ -108,7 +110,10 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         rule_prioritise,
         "- Minimise the number of distinct tutors across the plan.",
         f"- All milestone dueDates must fall before {target_date}.",
-        "- Generate one milestone per topic, spaced evenly before target date.",
+        "- Generate exactly one milestone per topic listed above,"
+        " using the topic's id as topicId.",
+        '- Milestone title should reflect the topic name (e.g. "Study: <topic name>").',
+        "- Space milestones evenly between today and the target date.",
         "- Do not suggest booking or transactions.",
         "- estimatedCost per milestone = sessionDurationHours × tutorHourlyRate.",
         "- totalEstimatedCost = sum of all milestone estimatedCosts.",

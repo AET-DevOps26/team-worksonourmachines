@@ -30,11 +30,14 @@ oauth2_application = OAuth2(
     },)))
 
 
+bearer_scheme = HTTPBearer()
+
+
 def get_token_KeycloakClientAuth(
-    security_scopes: SecurityScopes, token: str = Depends(
-oauth2_application)
+    security_scopes: SecurityScopes,
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> TokenModel:
-    return TokenModel(sub=token)
+    return TokenModel(sub=credentials.credentials)
 
 
 def validate_scope_KeycloakClientAuth(

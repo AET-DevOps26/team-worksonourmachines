@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 KEYCLOAK_TOKEN_URL = os.getenv(
     "KEYCLOAK_TOKEN_URL",
-    "http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token",
+    "https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token",
 )
 AI_CLIENT_ID = os.getenv("AI_CLIENT_ID", "server-ai")
 AI_CLIENT_SECRET = os.getenv("AI_CLIENT_SECRET", "")
@@ -14,7 +14,7 @@ AI_CLIENT_SECRET = os.getenv("AI_CLIENT_SECRET", "")
 async def exchange_token(authorization: str) -> str:
     """Exchange a student JWT for one issued to the AI client, preserving sub."""
     raw_token = authorization.removeprefix("Bearer ").strip()
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         response = await client.post(
             KEYCLOAK_TOKEN_URL,
             data={

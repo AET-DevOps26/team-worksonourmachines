@@ -50,8 +50,7 @@ async def get_student_profile(authorization: str) -> dict:
 
 
 async def get_module(module_id: str, authorization: str) -> dict:
-    # The marketplace GET /v1/modules/{code} expects a code string, but learning goals
-    # store moduleId as a UUID. We fetch the full list and match by id instead.
+    # Two-step: list to resolve UUID → code, then fetch by code to get topics.
     url = f"{MARKETPLACE_API_URL}/v1/modules"
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -60,10 +59,19 @@ async def get_module(module_id: str, authorization: str) -> dict:
     _raise_for_status(response, f"get_module module_id={module_id}")
     data = response.json()
     items = data.get("items", data) if isinstance(data, dict) else data
-    for item in items:
-        if item.get("id") == module_id:
-            return item
-    raise HTTPException(status_code=404, detail=f"Module {module_id} not found")
+    summary = next((item for item in items if item.get("id") == module_id), None)
+    if summary is None:
+        raise HTTPException(status_code=404, detail=f"Module {module_id} not found")
+    code = summary.get("code")
+    if not code:
+        return summary
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{MARKETPLACE_API_URL}/v1/modules/{code}",
+            headers=_auth_headers(authorization),
+        )
+    _raise_for_status(response, f"get_module code={code}")
+    return response.json()
 
 
 async def list_tutors(
