@@ -376,6 +376,6 @@ components:
             roles: ''
       description: Keycloak OAuth2 authorization code auth for user login
 servers:
-  - url: https://student.example.local
+  - url: https://api.tutormatch.localhost
     description: Student API
     variables: {}
