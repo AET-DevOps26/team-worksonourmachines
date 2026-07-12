@@ -20,6 +20,16 @@ import {
     SharedErrorsErrorBodyToJSON,
 } from '../models/SharedErrorsErrorBody';
 import {
+    type SharedStudentLearningGoal,
+    SharedStudentLearningGoalFromJSON,
+    SharedStudentLearningGoalToJSON,
+} from '../models/SharedStudentLearningGoal';
+import {
+    type SharedStudentLearningGoalInput,
+    SharedStudentLearningGoalInputFromJSON,
+    SharedStudentLearningGoalInputToJSON,
+} from '../models/SharedStudentLearningGoalInput';
+import {
     type SharedStudentStudentProfile,
     SharedStudentStudentProfileFromJSON,
     SharedStudentStudentProfileToJSON,
@@ -30,6 +40,23 @@ import {
     SharedStudentStudentProfileInputToJSON,
 } from '../models/SharedStudentStudentProfileInput';
 
+export interface CreateGoalRequest {
+    sharedStudentLearningGoalInput: SharedStudentLearningGoalInput;
+}
+
+export interface DeleteGoalRequest {
+    id: string;
+}
+
+export interface GetGoalRequest {
+    id: string;
+}
+
+export interface UpdateGoalRequest {
+    id: string;
+    sharedStudentLearningGoalInput: SharedStudentLearningGoalInput;
+}
+
 export interface UpdateMyProfileRequest {
     sharedStudentStudentProfileInput: SharedStudentStudentProfileInput;
 }
@@ -38,6 +65,157 @@ export interface UpdateMyProfileRequest {
  * 
  */
 export class DefaultApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for createGoal without sending the request
+     */
+    async createGoalRequestOpts(requestParameters: CreateGoalRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sharedStudentLearningGoalInput'] == null) {
+            throw new runtime.RequiredError(
+                'sharedStudentLearningGoalInput',
+                'Required parameter "sharedStudentLearningGoalInput" was null or undefined when calling createGoal().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/students/me/goals`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedStudentLearningGoalInputToJSON(requestParameters['sharedStudentLearningGoalInput']),
+        };
+    }
+
+    /**
+     * Create a learning goal
+     */
+    async createGoalRaw(requestParameters: CreateGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentLearningGoal>> {
+        const requestOptions = await this.createGoalRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedStudentLearningGoalFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a learning goal
+     */
+    async createGoal(requestParameters: CreateGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentLearningGoal> {
+        const response = await this.createGoalRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for deleteGoal without sending the request
+     */
+    async deleteGoalRequestOpts(requestParameters: DeleteGoalRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteGoal().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/students/me/goals/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Delete a learning goal
+     */
+    async deleteGoalRaw(requestParameters: DeleteGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteGoalRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete a learning goal
+     */
+    async deleteGoal(requestParameters: DeleteGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteGoalRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for getGoal without sending the request
+     */
+    async getGoalRequestOpts(requestParameters: GetGoalRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getGoal().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/students/me/goals/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get a learning goal
+     */
+    async getGoalRaw(requestParameters: GetGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentLearningGoal>> {
+        const requestOptions = await this.getGoalRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedStudentLearningGoalFromJSON(jsonValue));
+    }
+
+    /**
+     * Get a learning goal
+     */
+    async getGoal(requestParameters: GetGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentLearningGoal> {
+        const response = await this.getGoalRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for getMyProfile without sending the request
@@ -80,6 +258,108 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async getMyProfile(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentStudentProfile> {
         const response = await this.getMyProfileRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listMyGoals without sending the request
+     */
+    async listMyGoalsRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/students/me/goals`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * List my learning goals
+     */
+    async listMyGoalsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SharedStudentLearningGoal>>> {
+        const requestOptions = await this.listMyGoalsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SharedStudentLearningGoalFromJSON));
+    }
+
+    /**
+     * List my learning goals
+     */
+    async listMyGoals(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<SharedStudentLearningGoal>> {
+        const response = await this.listMyGoalsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for updateGoal without sending the request
+     */
+    async updateGoalRequestOpts(requestParameters: UpdateGoalRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateGoal().'
+            );
+        }
+
+        if (requestParameters['sharedStudentLearningGoalInput'] == null) {
+            throw new runtime.RequiredError(
+                'sharedStudentLearningGoalInput',
+                'Required parameter "sharedStudentLearningGoalInput" was null or undefined when calling updateGoal().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/students/me/goals/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SharedStudentLearningGoalInputToJSON(requestParameters['sharedStudentLearningGoalInput']),
+        };
+    }
+
+    /**
+     * Update a learning goal
+     */
+    async updateGoalRaw(requestParameters: UpdateGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentLearningGoal>> {
+        const requestOptions = await this.updateGoalRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedStudentLearningGoalFromJSON(jsonValue));
+    }
+
+    /**
+     * Update a learning goal
+     */
+    async updateGoal(requestParameters: UpdateGoalRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentLearningGoal> {
+        const response = await this.updateGoalRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

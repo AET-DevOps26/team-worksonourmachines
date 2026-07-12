@@ -5,8 +5,8 @@ const LOCATION_OPTIONS: { value: SharedMarketplaceLocation; label: string }[] = 
     { label: 'Garching', value: 'garching' },
     { label: 'Munich', value: 'munich' },
     { label: 'Weihenstephan', value: 'weihenstephan' },
-    { label: 'Straubing', value: 'staubing' },
-    { label: 'Ottobrunn', value: 'ottobrun' },
+    { label: 'Straubing', value: 'straubing' },
+    { label: 'Ottobrunn', value: 'ottobrunn' },
 ];
 
 export function formatLocationLabel(location: SharedMarketplaceLocation): string {

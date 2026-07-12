@@ -1,8 +1,8 @@
-package com.worksonourmachines.marketplace.tutorprofile.persistence.entity;
+package com.worksonourmachines.student.goal.persistence.entity;
 
 import org.openapitools.model.SharedMarketplaceLocation;
 
-public enum MarketplaceTutorLocation {
+public enum LearningGoalLocation {
     ONLINE,
     GARCHING,
     MUNICH,
@@ -14,7 +14,7 @@ public enum MarketplaceTutorLocation {
         return SharedMarketplaceLocation.fromValue(name().toLowerCase());
     }
 
-    public static MarketplaceTutorLocation fromDto(SharedMarketplaceLocation location) {
-        return MarketplaceTutorLocation.valueOf(location.name());
+    public static LearningGoalLocation fromDto(SharedMarketplaceLocation location) {
+        return LearningGoalLocation.valueOf(location.name());
     }
 }

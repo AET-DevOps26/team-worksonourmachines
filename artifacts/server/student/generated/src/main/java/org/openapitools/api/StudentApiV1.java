@@ -6,6 +6,8 @@
 package org.openapitools.api;
 
 import org.openapitools.model.SharedErrorsErrorBody;
+import org.openapitools.model.SharedStudentLearningGoal;
+import org.openapitools.model.SharedStudentLearningGoalInput;
 import org.openapitools.model.SharedStudentStudentProfile;
 import org.openapitools.model.SharedStudentStudentProfileInput;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,64 @@ import jakarta.annotation.Generated;
 @Validated
 public interface StudentApiV1 {
 
+    String PATH_CREATE_GOAL = "/v1/students/me/goals";
+    /**
+     * POST /v1/students/me/goals : Create a learning goal
+     *
+     * @param sharedStudentLearningGoalInput  (required)
+     * @return The request has succeeded and a new resource has been created as a result. (status code 201)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = StudentApiV1.PATH_CREATE_GOAL,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    ResponseEntity<SharedStudentLearningGoal> createGoal(
+         @Valid @RequestBody SharedStudentLearningGoalInput sharedStudentLearningGoalInput
+    );
+
+
+    String PATH_DELETE_GOAL = "/v1/students/me/goals/{id}";
+    /**
+     * DELETE /v1/students/me/goals/{id} : Delete a learning goal
+     *
+     * @param id  (required)
+     * @return There is no content to send for this request, but the headers may be useful.  (status code 204)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = StudentApiV1.PATH_DELETE_GOAL,
+        produces = { "application/json" }
+    )
+    ResponseEntity<Void> deleteGoal(
+         @PathVariable("id") String id
+    );
+
+
+    String PATH_GET_GOAL = "/v1/students/me/goals/{id}";
+    /**
+     * GET /v1/students/me/goals/{id} : Get a learning goal
+     *
+     * @param id  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = StudentApiV1.PATH_GET_GOAL,
+        produces = { "application/json" }
+    )
+    ResponseEntity<SharedStudentLearningGoal> getGoal(
+         @PathVariable("id") String id
+    );
+
+
     String PATH_GET_MY_PROFILE = "/v1/students/me";
     /**
      * GET /v1/students/me : Get my student profile
@@ -39,6 +99,46 @@ public interface StudentApiV1 {
     )
     ResponseEntity<SharedStudentStudentProfile> getMyProfile(
         
+    );
+
+
+    String PATH_LIST_MY_GOALS = "/v1/students/me/goals";
+    /**
+     * GET /v1/students/me/goals : List my learning goals
+     *
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = StudentApiV1.PATH_LIST_MY_GOALS,
+        produces = { "application/json" }
+    )
+    ResponseEntity<List<SharedStudentLearningGoal>> listMyGoals(
+        
+    );
+
+
+    String PATH_UPDATE_GOAL = "/v1/students/me/goals/{id}";
+    /**
+     * PUT /v1/students/me/goals/{id} : Update a learning goal
+     *
+     * @param id  (required)
+     * @param sharedStudentLearningGoalInput  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = StudentApiV1.PATH_UPDATE_GOAL,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    ResponseEntity<SharedStudentLearningGoal> updateGoal(
+         @PathVariable("id") String id,
+         @Valid @RequestBody SharedStudentLearningGoalInput sharedStudentLearningGoalInput
     );
 
 

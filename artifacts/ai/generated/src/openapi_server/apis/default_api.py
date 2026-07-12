@@ -23,9 +23,10 @@ from fastapi import (  # noqa: F401
 )
 
 from openapi_server.models.extra_models import TokenModel  # noqa: F401
-from openapi_server.models.chat200_response import Chat200Response
-from openapi_server.models.chat_request import ChatRequest
-
+from openapi_server.models.shared_ai_generate_plan_request import SharedAiGeneratePlanRequest
+from openapi_server.models.shared_ai_generate_plan_response import SharedAiGeneratePlanResponse
+from openapi_server.models.shared_errors_error_body import SharedErrorsErrorBody
+from openapi_server.security_api import get_token_KeycloakClientAuth
 
 router = APIRouter()
 
@@ -35,18 +36,23 @@ for _, name, _ in pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + "."):
 
 
 @router.post(
-    "/v1/chat",
+    "/v1/plan",
     responses={
-        200: {"model": Chat200Response, "description": "The request has succeeded."},
+        200: {"model": SharedAiGeneratePlanResponse, "description": "The request has succeeded."},
+        401: {"model": SharedErrorsErrorBody, "description": "Access is unauthorized."},
+        404: {"model": SharedErrorsErrorBody, "description": "The server cannot find the requested resource."},
     },
     tags=["default"],
-    summary="Chat with AI",
+    summary="Generate study plan",
     response_model_by_alias=True,
 )
-async def chat(
-    chat_request: ChatRequest = Body(None, description=""),
-) -> Chat200Response:
-    """Sends a prompt to the AI service and returns a generated response."""
+async def generate_plan(
+    shared_ai_generate_plan_request: SharedAiGeneratePlanRequest = Body(None, description=""),
+    token_KeycloakClientAuth: TokenModel = Security(
+        get_token_KeycloakClientAuth, scopes=["openid", "profile", "email", "roles"]
+    ),
+) -> SharedAiGeneratePlanResponse:
+    """Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything."""
     if not BaseDefaultApi.subclasses:
         raise HTTPException(status_code=500, detail="Not implemented")
-    return await BaseDefaultApi.subclasses[0]().chat(chat_request)
+    return await BaseDefaultApi.subclasses[0]().generate_plan(shared_ai_generate_plan_request)

@@ -2,9 +2,10 @@
 
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 
-from openapi_server.models.chat200_response import Chat200Response
-from openapi_server.models.chat_request import ChatRequest
-
+from openapi_server.models.shared_ai_generate_plan_request import SharedAiGeneratePlanRequest
+from openapi_server.models.shared_ai_generate_plan_response import SharedAiGeneratePlanResponse
+from openapi_server.models.shared_errors_error_body import SharedErrorsErrorBody
+from openapi_server.security_api import get_token_KeycloakClientAuth
 
 class BaseDefaultApi:
     subclasses: ClassVar[Tuple] = ()
@@ -12,9 +13,9 @@ class BaseDefaultApi:
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         BaseDefaultApi.subclasses = BaseDefaultApi.subclasses + (cls,)
-    async def chat(
+    async def generate_plan(
         self,
-        chat_request: ChatRequest,
-    ) -> Chat200Response:
-        """Sends a prompt to the AI service and returns a generated response."""
+        shared_ai_generate_plan_request: SharedAiGeneratePlanRequest,
+    ) -> SharedAiGeneratePlanResponse:
+        """Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything."""
         ...

@@ -1,7 +1,6 @@
 import "../shared/errors.tsp";
 import "../shared/security.tsp";
 
-using Http;
 using TypeSpec.Http;
 using TypeSpec.Versioning;
 using Shared.Errors;
