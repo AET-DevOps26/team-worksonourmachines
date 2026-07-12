@@ -1,6 +1,12 @@
 spring:
   application:
     name: server-marketplace
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER:https://auth.tutormatch.localhost/realms/tutormatch}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
   datasource:
     url: ${MARKETPLACE_DB_URL:jdbc:postgresql://postgres:5432/marketplace}
     username: ${MARKETPLACE_DB_USER:marketplace}
