@@ -184,7 +184,8 @@ public class MarketplaceTutorProfileService {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("hourlyRate"), maxRate));
             }
             if (minRating != null && 4.7f < minRating) {
-                return criteriaBuilder.disjunction();
+//                TODO: add rating into TypeSpec & the filtering logic here
+                return criteriaBuilder.conjunction();
             }
 
             if (weekdays != null && !weekdays.isEmpty()) {
