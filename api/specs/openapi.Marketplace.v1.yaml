@@ -25,6 +25,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      security:
+        - KeycloakAdminAuth:
+            - openid
+            - basic
+            - profile
+            - email
+            - roles
     post:
       operationId: createAdminModule
       summary: Create module (admin)
@@ -55,6 +62,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Shared.Marketplace.AdminModuleInput'
+      security:
+        - KeycloakAdminAuth:
+            - openid
+            - basic
+            - profile
+            - email
+            - roles
   /v1/admin/modules/{code}:
     put:
       operationId: updateAdminModule
@@ -91,6 +105,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Shared.Marketplace.AdminModuleUpdateInput'
+      security:
+        - KeycloakAdminAuth:
+            - openid
+            - basic
+            - profile
+            - email
+            - roles
   /v1/admin/tutor-applications:
     get:
       operationId: listAdminTutorApplications
@@ -118,6 +139,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      security:
+        - KeycloakAdminAuth:
+            - openid
+            - basic
+            - profile
+            - email
+            - roles
   /v1/admin/tutor-applications/{id}/approve:
     post:
       operationId: approveTutorApplication
@@ -148,6 +176,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+      security:
+        - KeycloakAdminAuth:
+            - openid
+            - basic
+            - profile
+            - email
+            - roles
   /v1/admin/tutor-applications/{id}/reject:
     post:
       operationId: rejectTutorApplication
@@ -184,6 +219,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Shared.Marketplace.RejectApplicationRequest'
+      security:
+        - KeycloakAdminAuth:
+            - openid
+            - basic
+            - profile
+            - email
+            - roles
   /v1/modules:
     get:
       operationId: listModules
@@ -463,8 +505,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
 security:
-  - KeycloakClientAuth:
+  - KeycloakAuth:
       - openid
+      - basic
       - profile
       - email
       - roles
@@ -965,18 +1008,35 @@ components:
           type: integer
           format: int32
   securitySchemes:
-    KeycloakClientAuth:
+    KeycloakAuth:
       type: oauth2
       flows:
-        clientCredentials:
+        authorizationCode:
+          authorizationUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth
           tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          refreshUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
           scopes:
             openid: ''
+            basic: ''
             profile: ''
             email: ''
             roles: ''
-      description: Keycloak OAuth2 client credentials auth for Scalar/API testing
+      description: Keycloak OAuth2 authorization code auth for user login
+    KeycloakAdminAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth
+          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          refreshUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          scopes:
+            openid: ''
+            basic: ''
+            profile: ''
+            email: ''
+            roles: ''
+      description: Keycloak OAuth2 authorization code auth for admin login
 servers:
-  - url: https://marketplace.example.local
+  - url: https://api.tutormatch.localhost
     description: Marketplace API
     variables: {}
