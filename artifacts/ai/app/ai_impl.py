@@ -6,17 +6,21 @@ import time
 from fastapi import HTTPException
 from langchain_core.messages import HumanMessage
 from openapi_server.apis.default_api_base import BaseDefaultApi
-from openapi_server.models.generate_plan_request import GeneratePlanRequest
-from openapi_server.models.generate_plan_response import (
-    GeneratePlanResponse,
-    PlanMilestone,
-    PlanSuggestion,
-    ProposedTutor,
+from openapi_server.models.shared_ai_generate_plan_request import (
+    SharedAiGeneratePlanRequest,
 )
+from openapi_server.models.shared_ai_generate_plan_response import (
+    SharedAiGeneratePlanResponse,
+)
+from openapi_server.models.shared_ai_plan_milestone import SharedAiPlanMilestone
+from openapi_server.models.shared_ai_plan_suggestion import SharedAiPlanSuggestion
+from openapi_server.models.shared_ai_proposed_tutor import SharedAiProposedTutor
+from pydantic import ValidationError
 
 from app.clients import get_learning_goal, get_module, get_student_profile, list_tutors
 from app.llm import get_llm, get_llm_info
 from app.prompt import build_prompt
+from app.token_exchange import exchange_token
 
 logger = logging.getLogger(__name__)
 
@@ -31,21 +35,33 @@ def _extract_json(text: str) -> dict:
     return json.loads(candidate)
 
 
-def _map_response(data: dict) -> GeneratePlanResponse:
+def _map_response(data: dict) -> SharedAiGeneratePlanResponse:
     suggestions = []
     for s in data.get("suggestions", []):
-        tutors = [ProposedTutor.from_dict(t) for t in s.get("proposedTutors", [])]
-        milestones = [PlanMilestone.from_dict(m) for m in s.get("milestones", [])]
+        tutors = [
+            SharedAiProposedTutor.from_dict(
+                {**t, "hourlyRate": int(t["hourlyRate"])} if "hourlyRate" in t else t
+            )
+            for t in s.get("proposedTutors", [])
+        ]
+        milestones = [
+            SharedAiPlanMilestone.from_dict(
+                {**m, "estimatedCost": int(m["estimatedCost"])}
+                if "estimatedCost" in m
+                else m
+            )
+            for m in s.get("milestones", [])
+        ]
         suggestions.append(
-            PlanSuggestion(
+            SharedAiPlanSuggestion(
                 tier=s["tier"],
                 description=s.get("description", ""),
-                totalEstimatedCost=s.get("totalEstimatedCost", 0),
+                totalEstimatedCost=int(s.get("totalEstimatedCost", 0)),
                 proposedTutors=tutors,
                 milestones=milestones,
             )
         )
-    return GeneratePlanResponse(
+    return SharedAiGeneratePlanResponse(
         learningGoalId=data["learningGoalId"],
         suggestions=suggestions,
     )
@@ -53,14 +69,17 @@ def _map_response(data: dict) -> GeneratePlanResponse:
 
 class DefaultApiImpl(BaseDefaultApi):
     async def generate_plan(
-        self, body: GeneratePlanRequest, authorization: str
-    ) -> GeneratePlanResponse:
-        goal_id = body.learning_goal_id
+        self,
+        shared_ai_generate_plan_request: SharedAiGeneratePlanRequest,
+        authorization: str = "",
+    ) -> SharedAiGeneratePlanResponse:
+        goal_id = shared_ai_generate_plan_request.learning_goal_id
         llm_info = get_llm_info()
         start = time.perf_counter()
 
-        goal = await get_learning_goal(goal_id, authorization)
-        student = await get_student_profile(authorization)
+        student_token = await exchange_token(authorization)
+        goal = await get_learning_goal(goal_id, student_token)
+        student = await get_student_profile(student_token)
         module = await get_module(goal["moduleId"], authorization)
         tutors = await list_tutors(
             module_id=goal["moduleId"],
@@ -111,9 +130,9 @@ class DefaultApiImpl(BaseDefaultApi):
         # not support tool use depending on the loaded model, so we fall back to plain
         # text generation + fence stripping + one retry for those cases.
         llm = get_llm()
-        if get_llm_info()["provider"] in ("openai", "logos"):
-            structured = llm.with_structured_output(GeneratePlanResponse)
-            result: GeneratePlanResponse = await structured.ainvoke(
+        if get_llm_info()["provider"] in ("openai",):
+            structured = llm.with_structured_output(SharedAiGeneratePlanResponse)
+            result: SharedAiGeneratePlanResponse = await structured.ainvoke(
                 [HumanMessage(content=prompt)]
             )
             latency_ms = round((time.perf_counter() - start) * 1000, 1)
@@ -163,13 +182,24 @@ class DefaultApiImpl(BaseDefaultApi):
             latency_ms,
             goal_id,
         )
-        return _map_response(data)
+        try:
+            return _map_response(data)
+        except (ValidationError, KeyError) as exc:
+            logger.error(
+                "generate_plan response mapping failed goal_id=%s error=%s",
+                goal_id,
+                exc,
+            )
+            raise HTTPException(
+                status_code=500,
+                detail="LLM response did not match the expected schema",
+            ) from exc
 
     async def _invoke_llm(self, prompt: str, goal_id: str, attempt: int = 1):
         llm_info = get_llm_info()
         try:
             return await get_llm().ainvoke([HumanMessage(content=prompt)])
-        except Exception:
+        except Exception as exc:
             logger.exception(
                 "generate_plan llm failed provider=%s model=%s goal_id=%s attempt=%s",
                 llm_info["provider"],
@@ -177,4 +207,7 @@ class DefaultApiImpl(BaseDefaultApi):
                 goal_id,
                 attempt,
             )
-            raise
+            raise HTTPException(
+                status_code=502,
+                detail=f"LLM request failed: {exc}",
+            ) from exc

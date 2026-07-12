@@ -34,6 +34,7 @@ def _raise_for_status(response: httpx.Response, context: str) -> None:
 
 async def get_learning_goal(goal_id: str, authorization: str) -> dict:
     url = f"{STUDENT_API_URL}/v1/students/me/goals/{goal_id}"
+    print({goal_id})
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=_auth_headers(authorization))
     _raise_for_status(response, f"get_learning_goal goal_id={goal_id}")
@@ -49,11 +50,20 @@ async def get_student_profile(authorization: str) -> dict:
 
 
 async def get_module(module_id: str, authorization: str) -> dict:
-    url = f"{MARKETPLACE_API_URL}/v1/modules/{module_id}"
+    # The marketplace GET /v1/modules/{code} expects a code string, but learning goals
+    # store moduleId as a UUID. We fetch the full list and match by id instead.
+    url = f"{MARKETPLACE_API_URL}/v1/modules"
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=_auth_headers(authorization))
+        response = await client.get(
+            url, params={"pageSize": 100}, headers=_auth_headers(authorization)
+        )
     _raise_for_status(response, f"get_module module_id={module_id}")
-    return response.json()
+    data = response.json()
+    items = data.get("items", data) if isinstance(data, dict) else data
+    for item in items:
+        if item.get("id") == module_id:
+            return item
+    raise HTTPException(status_code=404, detail=f"Module {module_id} not found")
 
 
 async def list_tutors(
@@ -74,8 +84,6 @@ async def list_tutors(
     params: dict = {"moduleId": module_id}
     if languages:
         params["languages"] = languages
-    if locations:
-        params["locations"] = [loc.lower() for loc in locations]
     url = f"{MARKETPLACE_API_URL}/v1/tutors"
     async with httpx.AsyncClient() as client:
         response = await client.get(

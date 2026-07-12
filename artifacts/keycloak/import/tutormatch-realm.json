@@ -114,6 +114,24 @@
       "serviceAccountsEnabled": false
     },
     {
+      "clientId": "server-ai",
+      "name": "TUtorMatch AI Service",
+      "description": "Service account for the AI backend; uses token exchange to act on behalf of students with read-only access.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "server-ai-dev-secret",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": ["profile", "roles", "basic", "email"],
+      "attributes": {
+        "standard.token.exchange.enabled": "true"
+      }
+    },
+    {
       "id" : "d8854ec4-8e9d-4d35-a111-776bf1dbe001",
       "clientId" : "scalar-dev",
       "name" : "Scalar Dev API Client",
@@ -174,6 +192,12 @@
       "serviceAccountClientId": "scalar-dev",
       "enabled": true,
       "realmRoles": ["student"]
+    },
+    {
+      "username": "service-account-server-ai",
+      "serviceAccountClientId": "server-ai",
+      "enabled": true,
+      "realmRoles": []
     },
     {
       "username": "service-account-server-marketplace-admin",

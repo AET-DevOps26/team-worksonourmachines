@@ -55,4 +55,4 @@ async def generate_plan(
     """Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything."""
     if not BaseDefaultApi.subclasses:
         raise HTTPException(status_code=500, detail="Not implemented")
-    return await BaseDefaultApi.subclasses[0]().generate_plan(shared_ai_generate_plan_request)
+    return await BaseDefaultApi.subclasses[0]().generate_plan(shared_ai_generate_plan_request, f"Bearer {token_KeycloakAuth.sub}")

@@ -35,16 +35,7 @@ oauth2_code = OAuth2AuthorizationCodeBearer(
 def get_token_KeycloakAuth(
     security_scopes: SecurityScopes, token: str = Depends(oauth2_code)
 ) -> TokenModel:
-    """
-    Validate and decode token.
-
-    :param token Token provided by Authorization header
-    :type token: str
-    :return: Decoded token information or None if token is invalid
-    :rtype: TokenModel | None
-    """
-
-    ...
+    return TokenModel(sub=token)
 
 
 def validate_scope_KeycloakAuth(

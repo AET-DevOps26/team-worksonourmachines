@@ -171,6 +171,9 @@ services:
       LLM_API_KEY: ${LLM_API_KEY:-not-required}
       STUDENT_API_URL: http://server-student:8081
       MARKETPLACE_API_URL: http://server-marketplace:8082
+      KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token
+      AI_CLIENT_ID: server-ai
+      AI_CLIENT_SECRET: server-ai-dev-secret
     depends_on:
       server-student:
         condition: service_started

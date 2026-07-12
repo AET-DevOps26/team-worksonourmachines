@@ -1,7 +1,9 @@
 def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
     languages = ", ".join(student.get("languages", []))
     locations = ", ".join(goal.get("locations", []))
-    budget = goal.get("budgetEur", "not specified")
+    budget = (
+        goal.get("budgetEur") if goal.get("budgetEur") is not None else "not specified"
+    )
     sf = student.get("studyFocus") or {}
 
     topics_lines = []
@@ -52,7 +54,7 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         " background information only."
     )
     within_budget = (
-        f"2. **within_budget** — stay within €{budget} while preferring"
+        f"2. **within_budget** — stay within €{budget} total while preferring"
         " higher-rated tutors. If the budget is infeasible set description"
         ' to "This budget is infeasible" and return empty arrays.'
     )
@@ -86,7 +88,7 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         f"- Course: {module_title} ({module_code})",
         f"- Description (context only): {goal.get('description', '')}",
         f"- Target date: {target_date}",
-        f"- Budget: €{budget}",
+        f"- Budget: €{budget} total across all sessions combined",
         f"- Self-assessed level: {goal.get('selfAssessedLevel', 'not specified')}",
         f"- Preferred locations: {locations or 'not specified'}",
         "",
@@ -108,6 +110,8 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         f"- All milestone dueDates must fall before {target_date}.",
         "- Generate one milestone per topic, spaced evenly before target date.",
         "- Do not suggest booking or transactions.",
+        "- estimatedCost per milestone = sessionDurationHours × tutorHourlyRate.",
+        "- totalEstimatedCost = sum of all milestone estimatedCosts.",
         "",
         "## Output format",
         "Return a JSON object — no prose, no markdown fences:",
