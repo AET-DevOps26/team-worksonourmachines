@@ -2,6 +2,7 @@ package com.worksonourmachines.student.goal.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.SharedMarketplaceLocation;
 import org.openapitools.model.SharedStudentLearningGoal;
+import org.openapitools.model.SharedStudentLearningGoalInput;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -106,6 +108,59 @@ class LearningGoalServiceTest {
         List<SharedStudentLearningGoal> result = service.listMyGoals();
 
         assertEquals(List.of(), result);
+    }
+
+    @Test
+    void createsGoalForAuthenticatedStudent() {
+        SharedStudentLearningGoalInput input = goalInput();
+        when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(repository.save(any(LearningGoalEntity.class))).thenAnswer(invocation -> {
+            LearningGoalEntity entity = invocation.getArgument(0);
+            ReflectionTestUtils.setField(entity, "id", GOAL_ID);
+            return entity;
+        });
+
+        SharedStudentLearningGoal result = service.createGoal(input);
+
+        assertEquals(GOAL_ID.toString(), result.getId());
+        assertEquals(STUDENT_ID, capturedSavedGoal().getStudentId());
+        assertEquals("11111111-1111-1111-1111-111111111201", result.getModuleId());
+        assertEquals("Prepare for the distributed systems exam.", result.getDescription());
+        assertEquals(OffsetDateTime.parse("2026-09-30T12:00:00Z"), result.getTargetDate());
+        assertEquals(4, result.getSelfAssessedLevel());
+        assertEquals(120, result.getBudgetEur());
+        assertEquals(List.of(SharedMarketplaceLocation.ONLINE, SharedMarketplaceLocation.MUNICH), result.getLocations());
+    }
+
+    @Test
+    void returnsBadRequestForInvalidCreateInputWithoutWriting() {
+        SharedStudentLearningGoalInput input = goalInput();
+        input.setDescription(" ");
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.createGoal(input));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verifyNoInteractions(authenticatedUser, repository);
+    }
+
+    private LearningGoalEntity capturedSavedGoal() {
+        org.mockito.ArgumentCaptor<LearningGoalEntity> captor =
+                org.mockito.ArgumentCaptor.forClass(LearningGoalEntity.class);
+        verify(repository).save(captor.capture());
+        return captor.getValue();
+    }
+
+    private static SharedStudentLearningGoalInput goalInput() {
+        SharedStudentLearningGoalInput input = new SharedStudentLearningGoalInput(
+                " 11111111-1111-1111-1111-111111111201 ",
+                " Prepare for the distributed systems exam. ",
+                OffsetDateTime.parse("2026-09-30T12:00:00Z"),
+                4,
+                List.of(SharedMarketplaceLocation.ONLINE, SharedMarketplaceLocation.MUNICH));
+        input.setBudgetEur(120);
+        return input;
     }
 
     private static LearningGoalEntity goal() {

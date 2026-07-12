@@ -1,9 +1,11 @@
 package com.worksonourmachines.student.goal.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.openapitools.model.SharedStudentLearningGoal;
+import org.openapitools.model.SharedStudentLearningGoalInput;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,29 @@ public class LearningGoalService {
                 .toList();
     }
 
+    @Transactional
+    public SharedStudentLearningGoal createGoal(SharedStudentLearningGoalInput input) {
+        validateInput(input);
+        UUID studentId = authenticatedUser.id();
+        return learningGoalMapper.toDto(learningGoalRepository.save(
+                learningGoalMapper.toCreateEntity(studentId, input)));
+    }
+
+    private static void validateInput(SharedStudentLearningGoalInput input) {
+        if (input == null
+                || isBlank(input.getModuleId())
+                || isBlank(input.getDescription())
+                || input.getTargetDate() == null
+                || input.getSelfAssessedLevel() == null
+                || input.getSelfAssessedLevel() < 1
+                || input.getSelfAssessedLevel() > 5
+                || (input.getBudgetEur() != null && input.getBudgetEur() < 0)
+                || input.getLocations() == null
+                || input.getLocations().stream().anyMatch(Objects::isNull)) {
+            throw badRequest();
+        }
+    }
+
     private static UUID parseGoalId(String id) {
         try {
             UUID goalId = UUID.fromString(id);
@@ -60,5 +85,13 @@ public class LearningGoalService {
 
     private static ResponseStatusException notFound() {
         return new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    private static ResponseStatusException badRequest() {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

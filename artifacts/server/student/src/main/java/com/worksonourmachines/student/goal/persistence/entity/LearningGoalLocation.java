@@ -13,4 +13,8 @@ public enum LearningGoalLocation {
     public SharedMarketplaceLocation toDto() {
         return SharedMarketplaceLocation.fromValue(name().toLowerCase());
     }
+
+    public static LearningGoalLocation fromDto(SharedMarketplaceLocation location) {
+        return LearningGoalLocation.valueOf(location.name());
+    }
 }

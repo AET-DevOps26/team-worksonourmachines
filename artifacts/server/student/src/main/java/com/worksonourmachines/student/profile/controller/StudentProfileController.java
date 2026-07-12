@@ -5,6 +5,7 @@ import org.openapitools.model.SharedStudentLearningGoal;
 import org.openapitools.model.SharedStudentLearningGoalInput;
 import org.openapitools.model.SharedStudentStudentProfile;
 import org.openapitools.model.SharedStudentStudentProfileInput;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,8 @@ public class StudentProfileController implements StudentApiV1 {
 
     @Override
     public ResponseEntity<SharedStudentLearningGoal> createGoal(SharedStudentLearningGoalInput sharedStudentLearningGoalInput) {
-        return null;
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(learningGoalService.createGoal(sharedStudentLearningGoalInput));
     }
 
     @Override

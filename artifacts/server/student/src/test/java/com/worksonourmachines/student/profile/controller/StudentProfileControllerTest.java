@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -175,6 +176,56 @@ class StudentProfileControllerTest {
                 .andExpect(jsonPath("$.message").value("Access is unauthorized."));
     }
 
+    @Test
+    void createGoalReturnsCreatedGoal() throws Exception {
+        authenticateStudent();
+        SharedStudentLearningGoal goal = new SharedStudentLearningGoal(
+                "22222222-2222-2222-2222-222222222201",
+                "11111111-1111-1111-1111-111111111201",
+                "Prepare for the distributed systems exam.",
+                OffsetDateTime.parse("2026-09-30T12:00:00Z"),
+                4,
+                List.of(SharedMarketplaceLocation.ONLINE));
+        goal.setBudgetEur(120);
+        when(learningGoalService.createGoal(any())).thenReturn(goal);
+
+        this.mockMvc.perform(post(StudentApiV1.PATH_CREATE_GOAL)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validGoalInputJson()))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("22222222-2222-2222-2222-222222222201"))
+                .andExpect(jsonPath("$.moduleId").value("11111111-1111-1111-1111-111111111201"))
+                .andExpect(jsonPath("$.budgetEur").value(120))
+                .andExpect(jsonPath("$.locations[0]").value("online"));
+    }
+
+    @Test
+    void createGoalWithInvalidBodyReturnsBadRequestErrorBody() throws Exception {
+        authenticateStudent();
+
+        this.mockMvc.perform(post(StudentApiV1.PATH_CREATE_GOAL)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validGoalInputJson().replace("\"selfAssessedLevel\": 4", "\"selfAssessedLevel\": 6")))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("bad_request"))
+                .andExpect(jsonPath("$.message").value("The server could not understand the request due to invalid syntax."));
+    }
+
+    @Test
+    void createGoalWithoutBearerTokenReturnsUnauthorizedErrorBody() throws Exception {
+        this.mockMvc.perform(post(StudentApiV1.PATH_CREATE_GOAL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validGoalInputJson()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("unauthorized"))
+                .andExpect(jsonPath("$.message").value("Access is unauthorized."));
+    }
+
     private void authenticateStudent() {
         when(this.jwtDecoder.decode("student-token")).thenReturn(Jwt.withTokenValue("student-token")
                 .header("alg", "none")
@@ -185,6 +236,19 @@ class StudentProfileControllerTest {
 
     private static String goalPath(String id) {
         return StudentApiV1.PATH_GET_GOAL.replace("{id}", id);
+    }
+
+    private static String validGoalInputJson() {
+        return """
+                {
+                  "moduleId": "11111111-1111-1111-1111-111111111201",
+                  "description": "Prepare for the distributed systems exam.",
+                  "targetDate": "2026-09-30T12:00:00Z",
+                  "selfAssessedLevel": 4,
+                  "budgetEur": 120,
+                  "locations": ["online"]
+                }
+                """;
     }
 
     @TestConfiguration
