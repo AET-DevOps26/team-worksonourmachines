@@ -16,7 +16,7 @@ export type Weekday =
   | 'saturday'
   | 'sunday';
 
-export type Location = 'online' | 'garching' | 'munich' | 'weihenstephan' | 'staubing' | 'ottobrun';
+export type Location = 'online' | 'garching' | 'munich' | 'weihenstephan' | 'straubing' | 'ottobrunn';
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
 
 export type StudyFocus = {

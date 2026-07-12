@@ -221,8 +221,8 @@ components:
         - garching
         - munich
         - weihenstephan
-        - staubing
-        - ottobrun
+        - straubing
+        - ottobrunn
     Shared.Student.LearningGoal:
       type: object
       required:

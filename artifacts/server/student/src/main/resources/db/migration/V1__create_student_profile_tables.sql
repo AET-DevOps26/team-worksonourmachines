@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS student.learning_goal_locations (
     goal_id uuid NOT NULL REFERENCES student.learning_goals(id) ON DELETE CASCADE,
     position integer NOT NULL,
     location varchar(32) NOT NULL CHECK (
-        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STAUBING', 'OTTOBRUN')
+        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STRAUBING', 'OTTOBRUNN')
     ),
     PRIMARY KEY (goal_id, position)
 );

@@ -29,9 +29,9 @@ public enum SharedMarketplaceLocation {
   
   WEIHENSTEPHAN("weihenstephan"),
   
-  STAUBING("staubing"),
+  STRAUBING("straubing"),
   
-  OTTOBRUN("ottobrun");
+  OTTOBRUNN("ottobrunn");
 
   private final String value;
 
