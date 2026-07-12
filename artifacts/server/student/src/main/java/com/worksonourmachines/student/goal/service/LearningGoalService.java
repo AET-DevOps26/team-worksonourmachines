@@ -67,6 +67,15 @@ public class LearningGoalService {
         return learningGoalMapper.toDto(learningGoalRepository.save(goal));
     }
 
+    @Transactional
+    public void deleteGoal(String id) {
+        UUID goalId = parseGoalId(id);
+        UUID studentId = authenticatedUser.id();
+        var goal = learningGoalRepository.findByIdAndStudentId(goalId, studentId)
+                .orElseThrow(LearningGoalService::notFound);
+        learningGoalRepository.delete(goal);
+    }
+
     private static void validateInput(SharedStudentLearningGoalInput input) {
         if (input == null
                 || isBlank(input.getModuleId())

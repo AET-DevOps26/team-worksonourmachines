@@ -35,7 +35,8 @@ public class StudentProfileController implements StudentApiV1 {
 
     @Override
     public ResponseEntity<Void> deleteGoal(String id) {
-        return null;
+        learningGoalService.deleteGoal(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override

@@ -2,8 +2,10 @@ package com.worksonourmachines.student.profile.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -294,6 +296,40 @@ class StudentProfileControllerTest {
                 .andExpect(jsonPath("$.message").value("Access is unauthorized."));
     }
 
+    @Test
+    void deleteGoalReturnsNoContent() throws Exception {
+        authenticateStudent();
+
+        this.mockMvc.perform(delete(deleteGoalPath("22222222-2222-2222-2222-222222222201"))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void deleteGoalNotFoundReturnsStandardErrorBody() throws Exception {
+        authenticateStudent();
+        String goalId = "22222222-2222-2222-2222-222222222299";
+        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND))
+                .when(learningGoalService).deleteGoal(goalId);
+
+        this.mockMvc.perform(delete(deleteGoalPath(goalId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer student-token"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("not_found"))
+                .andExpect(jsonPath("$.message").value("The requested resource was not found."));
+    }
+
+    @Test
+    void deleteGoalWithoutBearerTokenReturnsUnauthorizedErrorBody() throws Exception {
+        this.mockMvc.perform(delete(deleteGoalPath("22222222-2222-2222-2222-222222222201")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("unauthorized"))
+                .andExpect(jsonPath("$.message").value("Access is unauthorized."));
+    }
+
     private void authenticateStudent() {
         when(this.jwtDecoder.decode("student-token")).thenReturn(Jwt.withTokenValue("student-token")
                 .header("alg", "none")
@@ -308,6 +344,10 @@ class StudentProfileControllerTest {
 
     private static String updateGoalPath(String id) {
         return StudentApiV1.PATH_UPDATE_GOAL.replace("{id}", id);
+    }
+
+    private static String deleteGoalPath(String id) {
+        return StudentApiV1.PATH_DELETE_GOAL.replace("{id}", id);
     }
 
     private static String validGoalInputJson() {

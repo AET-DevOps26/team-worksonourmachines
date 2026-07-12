@@ -197,6 +197,39 @@ class LearningGoalServiceTest {
         verifyNoInteractions(authenticatedUser, repository);
     }
 
+    @Test
+    void deletesGoalOwnedByAuthenticatedStudent() {
+        LearningGoalEntity entity = goal();
+        when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(repository.findByIdAndStudentId(GOAL_ID, STUDENT_ID)).thenReturn(Optional.of(entity));
+
+        service.deleteGoal(GOAL_ID.toString());
+
+        verify(repository).delete(entity);
+    }
+
+    @Test
+    void returnsNotFoundWhenDeletingMissingOrForeignGoal() {
+        when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(repository.findByIdAndStudentId(GOAL_ID, STUDENT_ID)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.deleteGoal(GOAL_ID.toString()));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+    }
+
+    @Test
+    void returnsNotFoundForMalformedDeleteGoalIdWithoutQueryingPersistence() {
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.deleteGoal("1-1-1-1-1"));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verifyNoInteractions(authenticatedUser, repository);
+    }
+
     private LearningGoalEntity capturedSavedGoal() {
         org.mockito.ArgumentCaptor<LearningGoalEntity> captor =
                 org.mockito.ArgumentCaptor.forClass(LearningGoalEntity.class);
