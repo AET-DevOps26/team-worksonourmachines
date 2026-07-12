@@ -3,7 +3,7 @@
 from typing import List
 
 from fastapi import Depends, Security  # noqa: F401
-from fastapi.openapi.models import OAuthFlowImplicit, OAuthFlows  # noqa: F401
+from fastapi.openapi.models import OAuthFlowImplicit, OAuthFlows, OAuthFlowClientCredentials  # noqa: F401
 from fastapi.security import (  # noqa: F401
     HTTPAuthorizationCredentials,
     HTTPBasic,
@@ -18,10 +18,21 @@ from fastapi.security.api_key import APIKeyCookie, APIKeyHeader, APIKeyQuery  # 
 
 from openapi_server.models.extra_models import TokenModel
 
+oauth2_application = OAuth2(
+    flows=OAuthFlows(
+        clientCredentials=OAuthFlowClientCredentials(
+        tokenUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token",
+        scopes={
+                "openid": "",
+                "profile": "",
+                "email": "",
+                "roles": "",
+    },)))
 
 
 def get_token_KeycloakClientAuth(
-    security_scopes: SecurityScopes, token: str = Depends(oauth2_)
+    security_scopes: SecurityScopes, token: str = Depends(
+oauth2_application)
 ) -> TokenModel:
     """
     Validate and decode token.
