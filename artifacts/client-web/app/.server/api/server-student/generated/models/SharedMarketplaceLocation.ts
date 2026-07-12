@@ -23,8 +23,8 @@ export const SharedMarketplaceLocation = {
     Garching: 'garching',
     Munich: 'munich',
     Weihenstephan: 'weihenstephan',
-    Staubing: 'staubing',
-    Ottobrun: 'ottobrun'
+    Straubing: 'straubing',
+    Ottobrunn: 'ottobrunn'
 } as const;
 export type SharedMarketplaceLocation = typeof SharedMarketplaceLocation[keyof typeof SharedMarketplaceLocation];
 

@@ -3,7 +3,7 @@
 from typing import List
 
 from fastapi import Depends, Security  # noqa: F401
-from fastapi.openapi.models import OAuthFlowImplicit, OAuthFlows  # noqa: F401
+from fastapi.openapi.models import OAuthFlowImplicit, OAuthFlows, OAuthFlowClientCredentials  # noqa: F401
 from fastapi.security import (  # noqa: F401
     HTTPAuthorizationCredentials,
     HTTPBasic,
@@ -18,27 +18,26 @@ from fastapi.security.api_key import APIKeyCookie, APIKeyHeader, APIKeyQuery  # 
 
 from openapi_server.models.extra_models import TokenModel
 
-oauth2_code = OAuth2AuthorizationCodeBearer(
-    authorizationUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth",
-    tokenUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token",
-    refreshUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token",
-    scopes={
-        "openid": "",
-        "basic": "",
-        "profile": "",
-        "email": "",
-        "roles": "",
-    }
-)
+oauth2_application = OAuth2(
+    flows=OAuthFlows(
+        clientCredentials=OAuthFlowClientCredentials(
+        tokenUrl="https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token",
+        scopes={
+                "openid": "",
+                "profile": "",
+                "email": "",
+                "roles": "",
+    },)))
 
 
-def get_token_KeycloakAuth(
-    security_scopes: SecurityScopes, token: str = Depends(oauth2_code)
+def get_token_KeycloakClientAuth(
+    security_scopes: SecurityScopes, token: str = Depends(
+oauth2_application)
 ) -> TokenModel:
     return TokenModel(sub=token)
 
 
-def validate_scope_KeycloakAuth(
+def validate_scope_KeycloakClientAuth(
     required_scopes: SecurityScopes, token_scopes: List[str]
 ) -> bool:
     """
@@ -48,9 +47,8 @@ def validate_scope_KeycloakAuth(
     :type required_scopes: List[str]
     :param token_scopes Scope present in token
     :type token_scopes: List[str]
-    :return: True if access to called API is allowed
+    :return: True if access to allowed API is allowed
     :rtype: bool
     """
 
     return False
-

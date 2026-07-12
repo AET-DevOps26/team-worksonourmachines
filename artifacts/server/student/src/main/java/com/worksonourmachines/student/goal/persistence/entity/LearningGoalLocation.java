@@ -7,8 +7,8 @@ public enum LearningGoalLocation {
     GARCHING,
     MUNICH,
     WEIHENSTEPHAN,
-    STAUBING,
-    OTTOBRUN;
+    STRAUBING,
+    OTTOBRUNN;
 
     public SharedMarketplaceLocation toDto() {
         return SharedMarketplaceLocation.fromValue(name().toLowerCase());

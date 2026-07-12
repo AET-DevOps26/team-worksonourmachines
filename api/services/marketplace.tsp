@@ -25,8 +25,8 @@ namespace Shared.Marketplace {
     garching,
     munich,
     weihenstephan,
-    staubing,
-    ottobrun,
+    straubing,
+    ottobrunn,
   }
 
   enum ApplicationStatus {

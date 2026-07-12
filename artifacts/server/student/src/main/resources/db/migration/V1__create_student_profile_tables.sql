@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS student.student_profile_languages (
 
 CREATE TABLE IF NOT EXISTS student.learning_goals (
     id uuid PRIMARY KEY,
-    student_id uuid NOT NULL,
+    student_id uuid NOT NULL REFERENCES student.student_profiles(student_id) ON DELETE CASCADE,
     module_id varchar(255) NOT NULL,
     description text NOT NULL,
     target_date timestamp with time zone NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS student.learning_goal_locations (
     goal_id uuid NOT NULL REFERENCES student.learning_goals(id) ON DELETE CASCADE,
     position integer NOT NULL,
     location varchar(32) NOT NULL CHECK (
-        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STAUBING', 'OTTOBRUN')
+        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STRAUBING', 'OTTOBRUNN')
     ),
     PRIMARY KEY (goal_id, position)
 );

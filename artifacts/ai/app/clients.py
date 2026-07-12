@@ -14,8 +14,8 @@ VALID_LOCATIONS = {
     "garching",
     "munich",
     "weihenstephan",
-    "staubing",
-    "ottobrun",
+    "straubing",
+    "ottobrunn",
 }
 
 

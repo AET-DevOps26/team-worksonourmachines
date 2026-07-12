@@ -5,7 +5,7 @@ from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 from openapi_server.models.shared_ai_generate_plan_request import SharedAiGeneratePlanRequest
 from openapi_server.models.shared_ai_generate_plan_response import SharedAiGeneratePlanResponse
 from openapi_server.models.shared_errors_error_body import SharedErrorsErrorBody
-from openapi_server.security_api import get_token_KeycloakAuth
+from openapi_server.security_api import get_token_KeycloakClientAuth
 
 class BaseDefaultApi:
     subclasses: ClassVar[Tuple] = ()

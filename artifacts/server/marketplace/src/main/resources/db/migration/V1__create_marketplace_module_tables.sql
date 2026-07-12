@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS marketplace.tutor_profile_locations (
     profile_id uuid NOT NULL REFERENCES marketplace.tutor_profiles(id) ON DELETE CASCADE,
     position integer NOT NULL,
     location varchar(32) NOT NULL CHECK (
-        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STAUBING', 'OTTOBRUN')
+        location IN ('ONLINE', 'GARCHING', 'MUNICH', 'WEIHENSTEPHAN', 'STRAUBING', 'OTTOBRUNN')
     ),
     PRIMARY KEY (profile_id, position)
 );
