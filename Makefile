@@ -106,6 +106,16 @@ test: ## Run all tests
 	@echo "Testing server microservices..."
 	@$(SERVER_TEST)
 
+.PHONY: test-ai
+test-ai: ## Run AI tests
+	@echo "Testing AI code..."
+	@$(RUN_TOOLING) ai-tooling run test
+
+.PHONY: test-server
+test-server: ## Run server microservice tests
+	@echo "Testing server microservices..."
+	@$(SERVER_TEST)
+
 ARGS ?=
 
 .PHONY: api-pnpm
