@@ -49,7 +49,7 @@ enum StudentVersions {
 @service(#{ title: "Student API" })
 @server("https://student.example.local", "Student API")
 @versioned(StudentVersions)
-@useAuth(KeycloakBearerAuth)
+@useAuth(KeycloakAuth)
 @route("/v1")
 namespace Student {
   @summary("Get my student profile")

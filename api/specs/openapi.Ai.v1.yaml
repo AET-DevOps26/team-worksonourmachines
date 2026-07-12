@@ -36,25 +36,32 @@ paths:
             schema:
               $ref: '#/components/schemas/Shared.Ai.GeneratePlanRequest'
 security:
-  - KeycloakBearerAuth: []
+  - KeycloakClientAuth:
+      - openid
+      - profile
+      - email
+      - roles
 components:
   schemas:
-    Shared.Errors.ErrorBody:
+    Shared.Ai.GeneratePlanRequest:
       type: object
       required:
-        - code
-        - message
+        - learningGoalId
       properties:
-        code:
+        learningGoalId:
           type: string
-        message:
+    Shared.Ai.GeneratePlanResponse:
+      type: object
+      required:
+        - learningGoalId
+        - suggestions
+      properties:
+        learningGoalId:
           type: string
-    Shared.Ai.PlanTier:
-      type: string
-      enum:
-        - cheapest
-        - within_budget
-        - best_quality
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Ai.PlanSuggestion'
     Shared.Ai.PlanMilestone:
       type: object
       required:
@@ -77,21 +84,6 @@ components:
           type: integer
           format: int32
           description: Estimated cost in EUR (whole euros).
-    Shared.Ai.ProposedTutor:
-      type: object
-      required:
-        - id
-        - displayName
-        - hourlyRate
-      properties:
-        id:
-          type: string
-        displayName:
-          type: string
-        hourlyRate:
-          type: integer
-          format: int32
-          description: Hourly rate in EUR (whole euros).
     Shared.Ai.PlanSuggestion:
       type: object
       required:
@@ -117,30 +109,49 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Shared.Ai.PlanMilestone'
-    Shared.Ai.GeneratePlanRequest:
+    Shared.Ai.PlanTier:
+      type: string
+      enum:
+        - cheapest
+        - within_budget
+        - best_quality
+    Shared.Ai.ProposedTutor:
       type: object
       required:
-        - learningGoalId
+        - id
+        - displayName
+        - hourlyRate
       properties:
-        learningGoalId:
+        id:
           type: string
-    Shared.Ai.GeneratePlanResponse:
+        displayName:
+          type: string
+        hourlyRate:
+          type: integer
+          format: int32
+          description: Hourly rate in EUR (whole euros).
+    Shared.Errors.ErrorBody:
       type: object
       required:
-        - learningGoalId
-        - suggestions
+        - code
+        - message
       properties:
-        learningGoalId:
+        code:
           type: string
-        suggestions:
-          type: array
-          items:
-            $ref: '#/components/schemas/Shared.Ai.PlanSuggestion'
+        message:
+          type: string
   securitySchemes:
-    KeycloakBearerAuth:
-      type: http
-      scheme: Bearer
-      description: Keycloak access token issued to the BFF client
+    KeycloakClientAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          scopes:
+            openid: ''
+            profile: ''
+            email: ''
+            roles: ''
+      description: Keycloak OAuth2 client credentials auth for Scalar/API testing
 servers:
   - url: https://ai.example.local
     description: AI API

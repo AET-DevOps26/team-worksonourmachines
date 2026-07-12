@@ -9,6 +9,15 @@ logger = logging.getLogger(__name__)
 STUDENT_API_URL = os.getenv("STUDENT_API_URL", "http://server-student:8081")
 MARKETPLACE_API_URL = os.getenv("MARKETPLACE_API_URL", "http://server-marketplace:8082")
 
+VALID_LOCATIONS = {
+    "online",
+    "garching",
+    "munich",
+    "weihenstephan",
+    "staubing",
+    "ottobrun",
+}
+
 
 def _auth_headers(authorization: str) -> dict:
     return {"Authorization": authorization}
@@ -53,11 +62,20 @@ async def list_tutors(
     locations: list,
     authorization: str,
 ) -> list:
+    invalid = [loc for loc in locations if loc.lower() not in VALID_LOCATIONS]
+    if invalid:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"Invalid location(s): {', '.join(invalid)}."
+                f" Valid values: {', '.join(sorted(VALID_LOCATIONS))}"
+            ),
+        )
     params: dict = {"moduleId": module_id}
     if languages:
         params["languages"] = languages
     if locations:
-        params["locations"] = locations
+        params["locations"] = [loc.lower() for loc in locations]
     url = f"{MARKETPLACE_API_URL}/v1/tutors"
     async with httpx.AsyncClient() as client:
         response = await client.get(

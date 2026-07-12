@@ -31,7 +31,7 @@ public class SharedStudentStudentProfileInput {
   private String bio;
 
   @Valid
-  private List<@Pattern(regexp = ".*\\S.*")@Size(min = 1)String> languages = new ArrayList<>();
+  private List<String> languages = new ArrayList<>();
 
   private @Nullable SharedStudyFocusStudyFocus studyFocus;
 
@@ -42,7 +42,7 @@ public class SharedStudentStudentProfileInput {
   /**
    * Constructor with only required parameters
    */
-  public SharedStudentStudentProfileInput(String displayName, String bio, List<@Pattern(regexp = ".*\\S.*")@Size(min = 1)String> languages) {
+  public SharedStudentStudentProfileInput(String displayName, String bio, List<String> languages) {
     this.displayName = displayName;
     this.bio = bio;
     this.languages = languages;
@@ -57,7 +57,7 @@ public class SharedStudentStudentProfileInput {
    * Get displayName
    * @return displayName
    */
-  @NotNull @Pattern(regexp = ".*\\S.*") @Size(min = 1) 
+  @NotNull 
   @JsonProperty("displayName")
   public String getDisplayName() {
     return displayName;
@@ -77,7 +77,7 @@ public class SharedStudentStudentProfileInput {
    * Get bio
    * @return bio
    */
-  @NotNull @Pattern(regexp = ".*\\S.*") @Size(min = 1) 
+  @NotNull 
   @JsonProperty("bio")
   public String getBio() {
     return bio;
@@ -88,7 +88,7 @@ public class SharedStudentStudentProfileInput {
     this.bio = bio;
   }
 
-  public SharedStudentStudentProfileInput languages(List<@Pattern(regexp = ".*\\S.*")@Size(min = 1)String> languages) {
+  public SharedStudentStudentProfileInput languages(List<String> languages) {
     this.languages = languages;
     return this;
   }
@@ -105,14 +105,14 @@ public class SharedStudentStudentProfileInput {
    * Get languages
    * @return languages
    */
-  @NotNull @Size(min = 1) 
+  @NotNull 
   @JsonProperty("languages")
-  public List<@Pattern(regexp = ".*\\S.*")@Size(min = 1)String> getLanguages() {
+  public List<String> getLanguages() {
     return languages;
   }
 
   @JsonProperty("languages")
-  public void setLanguages(List<@Pattern(regexp = ".*\\S.*")@Size(min = 1)String> languages) {
+  public void setLanguages(List<String> languages) {
     this.languages = languages;
   }
 
