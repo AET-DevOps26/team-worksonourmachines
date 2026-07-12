@@ -1,7 +1,6 @@
 import "../shared/errors.tsp";
 import "../shared/security.tsp";
 
-using Http;
 using TypeSpec.Http;
 using TypeSpec.Versioning;
 using Shared.Errors;
@@ -16,13 +15,17 @@ namespace Shared.Ai {
     dueDate: utcDateTime;
     topicId: string;
     tutorId: string;
-    estimatedCost: float32;
+
+    @doc("Estimated cost in EUR (whole euros).")
+    estimatedCost: int32;
   }
 
   model ProposedTutor {
     id: string;
     displayName: string;
-    hourlyRate: float32;
+
+    @doc("Hourly rate in EUR (whole euros).")
+    hourlyRate: int32;
   }
 
   enum PlanTier {
@@ -34,7 +37,10 @@ namespace Shared.Ai {
   model PlanSuggestion {
     tier: PlanTier;
     description: string;
-    totalEstimatedCost: float32;
+
+    @doc("Total estimated cost in EUR (whole euros).")
+    totalEstimatedCost: int32;
+
     proposedTutors: ProposedTutor[];
     milestones: PlanMilestone[];
   }
@@ -52,7 +58,7 @@ namespace Shared.Ai {
 @service(#{ title: "AI API" })
 @server("https://ai.example.local", "AI API")
 @versioned(AiVersions)
-@useAuth(KeycloakBearerAuth)
+@useAuth(KeycloakClientAuth)
 @route("/v1")
 namespace Ai {
   using Shared.Ai;

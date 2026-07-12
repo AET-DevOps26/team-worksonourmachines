@@ -78,8 +78,8 @@ paths:
       summary: Create a learning goal
       parameters: []
       responses:
-        '200':
-          description: The request has succeeded.
+        '201':
+          description: The resource was created successfully.
           content:
             application/json:
               schema:
@@ -196,18 +196,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
 security:
-  - KeycloakAuth:
-      - openid
-      - basic
-      - profile
-      - email
-      - roles
+  - KeycloakBearerAuth: []
 components:
   schemas:
-    NonBlankString:
-      type: string
-      minLength: 1
-      pattern: .*\S.*
     Shared.Errors.ErrorBody:
       type: object
       required:
@@ -235,14 +226,13 @@ components:
         - languages
       properties:
         displayName:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         bio:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         languages:
           type: array
           items:
-            $ref: '#/components/schemas/NonBlankString'
-          minItems: 1
+            type: string
         studyFocus:
           allOf:
             - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
@@ -255,14 +245,13 @@ components:
         - languages
       properties:
         displayName:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         bio:
-          $ref: '#/components/schemas/NonBlankString'
+          type: string
         languages:
           type: array
           items:
-            $ref: '#/components/schemas/NonBlankString'
-          minItems: 1
+            type: string
         studyFocus:
           allOf:
             - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
@@ -287,10 +276,15 @@ components:
           type: string
           format: date-time
         selfAssessedLevel:
-          type: string
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Self-assessed level from 1 (beginner) to 5 (expert).
         budgetEur:
           type: integer
           format: int32
+          minimum: 0
           description: Budget in EUR (whole euros).
         locations:
           type: array
@@ -313,10 +307,15 @@ components:
           type: string
           format: date-time
         selfAssessedLevel:
-          type: string
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Self-assessed level from 1 (beginner) to 5 (expert).
         budgetEur:
           type: integer
           format: int32
+          minimum: 0
           description: Budget in EUR (whole euros).
         locations:
           type: array
@@ -356,21 +355,11 @@ components:
           description: Applying theory to exercises and exam-style problems.
       description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
   securitySchemes:
-    KeycloakAuth:
-      type: oauth2
-      flows:
-        authorizationCode:
-          authorizationUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth
-          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
-          refreshUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
-          scopes:
-            openid: ''
-            basic: ''
-            profile: ''
-            email: ''
-            roles: ''
-      description: Keycloak OAuth2 authorization code auth for user login
+    KeycloakBearerAuth:
+      type: http
+      scheme: Bearer
+      description: Keycloak access token issued to the BFF client
 servers:
-  - url: https://api.tutormatch.localhost
+  - url: https://student.example.local
     description: Student API
     variables: {}

@@ -74,8 +74,9 @@ components:
         tutorId:
           type: string
         estimatedCost:
-          type: number
-          format: float
+          type: integer
+          format: int32
+          description: Estimated cost in EUR (whole euros).
     Shared.Ai.ProposedTutor:
       type: object
       required:
@@ -88,8 +89,9 @@ components:
         displayName:
           type: string
         hourlyRate:
-          type: number
-          format: float
+          type: integer
+          format: int32
+          description: Hourly rate in EUR (whole euros).
     Shared.Ai.PlanSuggestion:
       type: object
       required:
@@ -104,8 +106,9 @@ components:
         description:
           type: string
         totalEstimatedCost:
-          type: number
-          format: float
+          type: integer
+          format: int32
+          description: Total estimated cost in EUR (whole euros).
         proposedTutors:
           type: array
           items:
