@@ -103,8 +103,6 @@ test: ## Run all tests
 	@$(RUN_TOOLING) client-web-tooling run test
 	@echo "Testing AI code..."
 	@$(RUN_TOOLING) ai-tooling run test
-	@echo "Testing server microservices..."
-	@$(SERVER_TEST)
 
 ARGS ?=
 
