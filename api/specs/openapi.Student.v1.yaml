@@ -196,8 +196,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
 security:
-  - KeycloakClientAuth:
+  - KeycloakAuth:
       - openid
+      - basic
       - profile
       - email
       - roles
@@ -360,17 +361,20 @@ components:
           description: Applying theory to exercises and exam-style problems.
       description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
   securitySchemes:
-    KeycloakClientAuth:
+    KeycloakAuth:
       type: oauth2
       flows:
-        clientCredentials:
+        authorizationCode:
+          authorizationUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/auth
           tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          refreshUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
           scopes:
             openid: ''
+            basic: ''
             profile: ''
             email: ''
             roles: ''
-      description: Keycloak OAuth2 client credentials auth for Scalar/API testing
+      description: Keycloak OAuth2 authorization code auth for user login
 servers:
   - url: https://api.tutormatch.localhost
     description: Student API

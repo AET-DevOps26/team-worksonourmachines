@@ -32,7 +32,7 @@ import type { CreateGoalRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -67,7 +67,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
@@ -103,7 +103,7 @@ import type { DeleteGoalRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -138,7 +138,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
@@ -174,7 +174,7 @@ import type { GetGoalRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -209,7 +209,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
@@ -247,7 +247,7 @@ import type { GetMyProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -274,7 +274,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
@@ -309,7 +309,7 @@ import type { ListMyGoalsRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -336,7 +336,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
@@ -371,7 +371,7 @@ import type { UpdateGoalRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -409,7 +409,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
@@ -448,7 +448,7 @@ import type { UpdateMyProfileRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({ 
-    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
     accessToken: "YOUR ACCESS TOKEN",
   });
   const api = new DefaultApi(config);
@@ -483,7 +483,7 @@ example().catch(console.error);
 
 ### Authorization
 
-[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
 
 ### HTTP request headers
 
