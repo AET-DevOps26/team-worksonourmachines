@@ -59,7 +59,7 @@ namespace Shared.Ai {
 @service(#{ title: "AI API" })
 @server("https://ai.example.local", "AI API")
 @versioned(AiVersions)
-@useAuth(KeycloakBearerAuth)
+@useAuth(KeycloakClientAuth)
 @route("/v1")
 namespace Ai {
   using Shared.Ai;
