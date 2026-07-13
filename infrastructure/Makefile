@@ -175,7 +175,7 @@ rancher-check-image-digests:
 
 .PHONY: rancher-cluster-check
 rancher-cluster-check:
-	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" version --output=yaml
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" cluster-info
 
 .PHONY: rancher-chart-lint
 rancher-chart-lint:
