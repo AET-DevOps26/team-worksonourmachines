@@ -78,11 +78,10 @@ The image job supplies `IMAGE_TAG=<git-sha>`, publishes each image, and records 
 
 1. `rancher-check-deploy-env`
 2. `rancher-check-image-digests`
-3. `rancher-cluster-check`
-4. `rancher-chart-lint`
-5. `rancher-release-unlock`
-6. `rancher-helm-upgrade`
-7. `rancher-rollout-status`
+3. `rancher-chart-lint`
+4. `rancher-release-unlock`
+5. `rancher-helm-upgrade`
+6. `rancher-rollout-status`
 
 The production GitHub environment must define these secrets:
 
