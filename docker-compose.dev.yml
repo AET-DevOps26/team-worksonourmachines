@@ -4,6 +4,7 @@ x-server-base: &server-base
   volumes:
     - ./artifacts/server:/app/server:Z
     - server-maven-repository:/root/.m2
+    - caddy_data:/caddy-data:ro
   depends_on:
     postgres:
       condition: service_healthy
@@ -73,7 +74,7 @@ services:
     <<: *server-base
     environment:
       PORT: "8083"
-    command: ["mvn", "-pl", "communication", "-am", "spring-boot:run"]
+    entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl communication -am spring-boot:run"]
     ports:
       - 127.0.0.1:8083:8083
 
@@ -81,9 +82,9 @@ services:
     <<: *server-base
     environment:
       PORT: "8082"
-      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
+      KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
-    command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
+    entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl marketplace -am spring-boot:run"]
     ports:
       - 127.0.0.1:8082:8082
 
@@ -91,9 +92,9 @@ services:
     <<: *server-base
     environment:
       PORT: "8081"
-      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
+      KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
-    command: ["mvn", "-pl", "student", "-am", "spring-boot:run"]
+    entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl student -am spring-boot:run"]
     ports:
       - 127.0.0.1:8081:8081
 

@@ -52,7 +52,14 @@ async def get_module(module_id: str, authorization: str) -> dict:
     _raise_for_status(response, f"get_module module_id={module_id}")
     data = response.json()
     items = data.get("items", data) if isinstance(data, dict) else data
-    summary = next((item for item in items if item.get("id") == module_id), None)
+    summary = next(
+        (
+            item
+            for item in items
+            if item.get("id") == module_id or item.get("code") == module_id
+        ),
+        None,
+    )
     if summary is None:
         raise HTTPException(status_code=404, detail=f"Module {module_id} not found")
     code = summary.get("code")
