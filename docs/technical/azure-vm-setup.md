@@ -141,12 +141,7 @@ The playbook:
 
 The setup playbook prepares the VM. The run playbook deploys `docker-compose.yml`, `docker-compose.azure.yml`, and runtime configuration files. Docker Compose merges the base file with the Azure override, then pulls the published GHCR images. It does not copy the application source code to the VM and does not build images on the VM.
 
-By default, the VM deployment uses these image tags:
-
-- `ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest`
-- `ghcr.io/aet-devops26/team-worksonourmachines/ai:latest`
-
-For reproducible deployment, pass the Git commit SHA tag produced by the image workflow:
+The VM deployment requires the Git commit SHA tag produced by the image workflow:
 
 ```bash
 ansible-playbook \

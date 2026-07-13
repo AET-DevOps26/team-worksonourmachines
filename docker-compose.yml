@@ -161,7 +161,7 @@ services:
 
   ai:
     <<: *hardening
-    image: ${AI_IMAGE:-ghcr.io/aet-devops26/team-worksonourmachines/ai:latest}
+    image: ${AI_IMAGE:-tutormatch/ai:dev}
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
       interval: 10s

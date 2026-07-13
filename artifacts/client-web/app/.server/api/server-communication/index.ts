@@ -5,7 +5,7 @@ import { Configuration, DefaultApi } from './generated';
 
 export const communicationApi = new DefaultApi(
     new Configuration({
-        accessToken: () => resolveAccessTokenForActiveRequest().then((token) => token ?? ''),
+        accessToken: () => resolveAccessTokenForActiveRequest().then((token) => `Bearer ${token}`),
         basePath: env.get('SERVER_COMMUNICATION_API_URL'),
         middleware: [errorMiddlewareConfiguration()],
     }),

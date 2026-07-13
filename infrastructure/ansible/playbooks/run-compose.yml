@@ -10,7 +10,7 @@
     compose_azure_file: docker-compose.azure.yml
     repo_root: "{{ playbook_dir }}/../../.."
     image_prefix: ghcr.io/aet-devops26/team-worksonourmachines
-    image_tag: latest
+    image_tag: ""
     app_hostname: "{{ (ansible_host | default(inventory_hostname)) ~ '.nip.io' }}"
     app_base_url: "https://{{ app_hostname }}"
     keycloak_hostname: "https://auth.{{ app_hostname }}"
@@ -39,11 +39,12 @@
     - name: Validate required production secrets
       ansible.builtin.assert:
         that:
+          - image_tag | length > 0
           - postgres_password | length > 0
           - keycloak_db_password | length > 0
           - keycloak_admin_password | length > 0
           - keycloak_client_secret | length > 0
-        fail_msg: "Set the production secrets via environment variables or Ansible Vault before deployment."
+        fail_msg: "Set image_tag to a Git commit SHA and provide the production secrets via environment variables or Ansible Vault."
 
   tasks:
     - name: Ensure application directories exist
