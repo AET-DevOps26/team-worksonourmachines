@@ -216,7 +216,7 @@ rancher-helm-upgrade: rancher-check-deploy-env rancher-check-image-digests
 		--set-string postgres.keycloakPassword="$${KEYCLOAK_DB_PASSWORD}" \
 		--set-string keycloak.adminPassword="$${KEYCLOAK_ADMIN_PASSWORD}" \
 		--set-string keycloak.clientWebSecret="$${KEYCLOAK_CLIENT_WEB_SECRET}" \
-		--atomic \
+		--rollback-on-failure \
 		--timeout "$(RANCHER_TIMEOUT)"
 
 .PHONY: rancher-rollout-status
