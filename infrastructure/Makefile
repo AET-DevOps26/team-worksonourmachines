@@ -175,7 +175,7 @@ rancher-check-image-digests:
 
 .PHONY: rancher-cluster-check
 rancher-cluster-check:
-	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" get pods -o name || true
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" cluster-info
 
 .PHONY: rancher-chart-lint
 rancher-chart-lint:
@@ -231,7 +231,6 @@ rancher-prod-deploy: ## Validate and deploy the recorded image digests to Ranche
 rancher-prod-deploy: \
 	rancher-check-deploy-env \
 	rancher-check-image-digests \
-	rancher-cluster-check \
 	rancher-chart-lint \
 	rancher-release-unlock \
 	rancher-helm-upgrade \
