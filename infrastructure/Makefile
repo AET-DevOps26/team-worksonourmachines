@@ -175,7 +175,7 @@ rancher-check-image-digests:
 
 .PHONY: rancher-cluster-check
 rancher-cluster-check:
-	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" cluster-info
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" get pods -o name > /dev/null
 
 .PHONY: rancher-chart-lint
 rancher-chart-lint:
