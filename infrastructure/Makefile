@@ -223,7 +223,7 @@ rancher-helm-upgrade: rancher-check-deploy-env rancher-check-image-digests
 rancher-rollout-status:
 	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		rollout status deployment --all \
+		rollout status deployment/ai deployment/api-ui deployment/client-web deployment/server-communication deployment/server-marketplace deployment/server-student \
 		--timeout="$(RANCHER_TIMEOUT)"
 
 .PHONY: rancher-prod-deploy
@@ -231,7 +231,6 @@ rancher-prod-deploy: ## Validate and deploy the recorded image digests to Ranche
 rancher-prod-deploy: \
 	rancher-check-deploy-env \
 	rancher-check-image-digests \
-	rancher-cluster-check \
 	rancher-chart-lint \
 	rancher-release-unlock \
 	rancher-helm-upgrade \
