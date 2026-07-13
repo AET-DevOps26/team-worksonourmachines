@@ -30,20 +30,24 @@ All services run as single-replica Deployments in the `team-worksonourmachines` 
 
 ## Helm chart
 
-The chart lives at `helm/tutormatch/`. It has no sub-chart dependencies — all manifests are written as plain templates.
+The chart lives at `infrastructure/helm/tutormatch/`. It has no sub-chart dependencies — all manifests are written as plain templates. Kubernetes build and deployment commands live in `infrastructure/Makefile`, which the root `Makefile` includes.
 
 ```
-helm/tutormatch/
-├── Chart.yaml
-├── values.yaml          # Defaults used in production (Rancher)
-├── values.local.yaml    # Overrides for local Helm dev / port-forwarding
-└── templates/
-    ├── ai.yaml          # AI Deployment + Service
-    ├── client-web.yaml  # client-web Deployment + Service + Ingress + Keycloak ConfigMap
-    ├── keycloak.yaml    # Keycloak Deployment + Service + Ingress + config-cli Job
-    ├── postgres.yaml    # Postgres StatefulSet + Service + PVC
-    ├── redis.yaml       # Redis Deployment + Service
-    └── secret.yaml      # ai-secrets, postgres-secrets, keycloak-secrets
+infrastructure/
+├── Makefile             # k3d and Rancher orchestration targets
+└── helm/tutormatch/
+    ├── Chart.yaml
+    ├── values.yaml          # Defaults used in production (Rancher)
+    ├── values.local.yaml    # Local k3d overrides
+    └── templates/
+        ├── ai.yaml
+        ├── api-ui.yaml
+        ├── client-web.yaml
+        ├── keycloak.yaml
+        ├── postgres.yaml
+        ├── redis.yaml
+        ├── secret.yaml
+        └── servers.yaml
 ```
 
 ### Key values
@@ -62,51 +66,56 @@ helm/tutormatch/
 
 ## CI/CD
 
-Images are built and pushed to GHCR by GitHub Actions (`build-push.yml`). The workflow triggers on pushes to `main`.
-
-**You cannot push images directly** — `docker push ghcr.io/aet-devops26/...` is denied for personal tokens. All image builds go through CI.
-
-After images are pushed, deploy to the cluster:
+Images are built and pushed to GHCR by GitHub Actions (`build-push.yml`). The workflow triggers on pushes to `main`, but delegates the implementation to the same Make targets available to developers:
 
 ```bash
-helm upgrade --install tutormatch helm/tutormatch \
-  --kube-context stud \
-  --namespace team-worksonourmachines \
-  --set-string global.imageTag=<git-sha> \
-  --set ai.llmApiKey=<your-logos-api-key>
+make rancher-publish-images
+make rancher-deploy
 ```
 
-The `LLM_API_KEY` is stored as a GitHub Actions secret and injected via `--set` in the CI deploy step. Do not commit it.
+The image job supplies `IMAGE_TAG=<git-sha>` and runs `rancher-publish-images`. The deployment job configures the kubeconfig, supplies the required deployment secrets, and runs `rancher-deploy`. The composite deployment target executes these ordered targets:
+
+1. `rancher-check-deploy-env`
+2. `rancher-cluster-check`
+3. `rancher-chart-lint`
+4. `rancher-release-unlock`
+5. `rancher-helm-upgrade`
+6. `rancher-rollout-status`
+
+The production GitHub environment must define these secrets:
+
+| Secret | Purpose |
+|---|---|
+| `KUBECONFIG` | Base64-encoded Rancher kubeconfig |
+| `LLM_API_KEY` | Logos API authentication |
+| `POSTGRES_PASSWORD` | Application database user |
+| `KEYCLOAK_DB_PASSWORD` | Keycloak database user |
+| `KEYCLOAK_ADMIN_PASSWORD` | Keycloak administration and config import |
+| `KEYCLOAK_CLIENT_WEB_SECRET` | Confidential OIDC client |
+
+`IMAGE_TAG` is supplied automatically from `github.sha`. For an existing persistent database, the three database/administration credentials must initially match the values already stored by PostgreSQL and Keycloak. Changing Kubernetes Secrets alone does not rotate persisted credentials.
 
 ## Manual deploy
 
-To deploy from your local machine you need the `stud` kubeconfig context (request access from the TUM Rancher team). With context configured:
+To deploy from your local machine, you need the `stud` kubeconfig context and permission to pull the immutable images. Supply the same required environment variables as CI:
 
 ```bash
-# First time or after chart changes
-helm upgrade --install tutormatch helm/tutormatch \
-  --kube-context stud \
-  --namespace team-worksonourmachines \
-  --create-namespace \
-  --set-string global.imageTag=<git-sha> \
-  --set ai.llmApiKey=<your-logos-api-key>
-
-# Check rollout
-kubectl --context stud -n team-worksonourmachines get pods
-kubectl --context stud -n team-worksonourmachines rollout status deployment/ai
+IMAGE_TAG=<git-sha> \
+LLM_API_KEY=<your-logos-api-key> \
+POSTGRES_PASSWORD=<current-postgres-password> \
+KEYCLOAK_DB_PASSWORD=<current-keycloak-db-password> \
+KEYCLOAK_ADMIN_PASSWORD=<current-keycloak-admin-password> \
+KEYCLOAK_CLIENT_WEB_SECRET=<client-secret> \
+make rancher-deploy
 ```
 
-To override any value without editing `values.yaml`:
+Useful individual targets are:
 
 ```bash
-helm upgrade --install tutormatch helm/tutormatch \
-  --kube-context stud \
-  --namespace team-worksonourmachines \
-  --set-string global.imageTag=<git-sha> \
-  --set ai.llmProvider=logos \
-  --set ai.llmApiKey=<key>
+make rancher-chart-lint
+make rancher-rollout-status
+make rancher-diagnostics
 ```
-
 
 ## Local cluster (k3d)
 
@@ -122,126 +131,41 @@ brew install k3d kubectl helm
 
 Docker must be running.
 
-### 1. Create a cluster with port mappings
+### Deploy the complete local stack
 
-Disable k3d's built-in Traefik so it doesn't conflict with nginx:
-
-```bash
-k3d cluster create tutormatch \
-  --port "80:80@loadbalancer" \
-  --port "443:443@loadbalancer" \
-  --k3s-arg '--disable=traefik@server:0'
-```
-
-### 2. Install nginx ingress controller
+Start Ollama on the host if AI calls are part of the test. The Makefile defaults the in-cluster AI URL to `http://host.k3d.internal:11434`.
 
 ```bash
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm install ingress-nginx ingress-nginx/ingress-nginx \
-  --kube-context k3d-tutormatch \
-  --namespace ingress-nginx \
-  --create-namespace \
-  --set controller.service.type=LoadBalancer
-kubectl --context k3d-tutormatch -n ingress-nginx \
-  wait --for=condition=ready pod \
-  -l app.kubernetes.io/component=controller \
-  --timeout=90s
+ollama serve
 ```
 
-### 3. Load images into the cluster
-
-The chart pulls from GHCR. Do **not** import two images in parallel — k3d's import tool uses a shared tarball path and parallel writes corrupt each other. Run them sequentially.
-
-**Option A — pull an immutable Git SHA from GHCR** (needs a successful image workflow):
+Then one command creates the cluster, installs ingress-nginx, builds and imports all images sequentially, deploys the chart, waits for every Deployment, and runs endpoint smoke tests:
 
 ```bash
-IMAGE_TAG=<git-sha>
-for image in client-web api-ui ai server-student server-marketplace server-communication; do
-  docker pull "ghcr.io/aet-devops26/team-worksonourmachines/${image}:${IMAGE_TAG}"
-  k3d image import "ghcr.io/aet-devops26/team-worksonourmachines/${image}:${IMAGE_TAG}" -c tutormatch
-done
+make k3d-deploy
 ```
 
-**Option B — build locally and load** (build context is the repo root):
+The dynamic ingress ClusterIP is passed directly to Helm; `values.local.yaml` no longer needs to be edited whenever the cluster is recreated.
+
+Each phase is also independently invokable:
 
 ```bash
-docker build -f artifacts/client-web/docker/Dockerfile --target prod \
-  -t ghcr.io/aet-devops26/team-worksonourmachines/client-web:local .
-docker build -f artifacts/api-ui/docker/Dockerfile \
-  -t ghcr.io/aet-devops26/team-worksonourmachines/api-ui:local .
-docker build -f artifacts/ai/docker/Dockerfile --target prod \
-  -t ghcr.io/aet-devops26/team-worksonourmachines/ai:local .
-for module in student marketplace communication; do
-  docker build -f artifacts/server/docker/Dockerfile --target prod \
-    --build-arg "SERVER_MODULE=${module}" \
-    -t "ghcr.io/aet-devops26/team-worksonourmachines/server-${module}:local" .
-done
-for image in client-web api-ui ai server-student server-marketplace server-communication; do
-  k3d image import "ghcr.io/aet-devops26/team-worksonourmachines/${image}:local" -c tutormatch
-done
+make k3d-cluster-create
+make k3d-ingress-install
+make k3d-images-build
+make k3d-images-import
+make k3d-helm-upgrade
+make k3d-rollout-status
+make k3d-smoke-test
 ```
 
-When using locally built images, pass `--set-string global.imageTag=local` to the Helm command in step 5. When using Option A, pass `--set-string global.imageTag="$IMAGE_TAG"` instead.
-
-### 4. Set the nginx ClusterIP in values.local.yaml
-
-`client-web` performs server-side OIDC discovery at startup against `https://auth.tutormatch.127.0.0.1.nip.io`. Two things must be set in `helm/tutormatch/values.local.yaml` for this to work:
-
-1. **`ingress.hostAliasIP`** — from inside the pod, `127.0.0.1` resolves to the pod loopback (not the host), so the nip.io hostnames must be aliased to the nginx ingress ClusterIP.
-2. **`clientWeb.tlsRejectUnauthorized: false`** — nginx uses a self-signed certificate locally; Node.js rejects it by default, which causes the OIDC fetch to fail.
-
-Get the nginx ClusterIP:
+To use a different host-side LLM endpoint:
 
 ```bash
-kubectl --context k3d-tutormatch -n ingress-nginx \
-  get svc ingress-nginx-controller -o jsonpath='{.spec.clusterIP}'
+make k3d-deploy K3D_LLM_BASE_URL=http://host.k3d.internal:1234
 ```
 
-Edit `helm/tutormatch/values.local.yaml` and set `ingress.hostAliasIP` to the ClusterIP printed above. The `clientWeb.tlsRejectUnauthorized: false` entry is already present in `values.local.yaml`.
-
-> **If you recreate the cluster**, nginx gets a new ClusterIP. Repeat this step before deploying.
-
-### 5. Deploy with local overrides
-
-`values.local.yaml` sets `ai.llmBaseUrl: http://ollama:11434`. There is no Ollama pod in the chart — you must either start Ollama on your host or override to Logos.
-
-**Option A — Ollama on your host** (run `ollama serve` first):
-
-```bash
-helm upgrade --install tutormatch helm/tutormatch \
-  --kube-context k3d-tutormatch \
-  --namespace team-worksonourmachines \
-  --create-namespace \
-  -f helm/tutormatch/values.local.yaml \
-  --set-string global.imageTag=local \
-  --set ai.llmBaseUrl=http://host.k3d.internal:11434
-```
-
-**Option B — Logos** (requires TUM VPN):
-
-```bash
-helm upgrade --install tutormatch helm/tutormatch \
-  --kube-context k3d-tutormatch \
-  --namespace team-worksonourmachines \
-  --create-namespace \
-  -f helm/tutormatch/values.local.yaml \
-  --set-string global.imageTag=local \
-  --set ai.llmProvider=logos \
-  --set ai.llmBaseUrl=https://logos.aet.cit.tum.de \
-  --set ai.llmModel=openai/gpt-oss-120b \
-  --set ai.llmApiKey=<your-logos-api-key>
-```
-
-### 6. Check rollout
-
-```bash
-kubectl --context k3d-tutormatch -n team-worksonourmachines get pods
-kubectl --context k3d-tutormatch -n team-worksonourmachines rollout status deployment/client-web
-kubectl --context k3d-tutormatch -n team-worksonourmachines rollout status deployment/ai
-```
-
-### 7. Open the app
+### Open the app
 
 nginx uses HTTPS with its default self-signed certificate — accept the browser security warning on first visit.
 
@@ -250,21 +174,21 @@ nginx uses HTTPS with its default self-signed certificate — accept the browser
 | <https://tutormatch.127.0.0.1.nip.io> | App |
 | <https://auth.tutormatch.127.0.0.1.nip.io> | Keycloak |
 
-### 8. Tear down
+### Tear down
 
 ```bash
-k3d cluster delete tutormatch
+make k3d-cluster-delete
 ```
 
 ## Secrets
 
-In K8s, secrets are managed by the Helm chart in `templates/secret.yaml`. They are created from `values.yaml` fields. **Never commit real secret values to `values.yaml`** — always pass them via `--set` at deploy time:
+In K8s, secrets are created by `templates/secret.yaml` from Helm values. Never commit real secret values to `values.yaml`.
 
 | Secret | Key | Source |
 |---|---|---|
 | `ai-secrets` | `LLM_API_KEY` | `--set ai.llmApiKey=...` |
-| `postgres-secrets` | DB credentials | `values.yaml` (override for production) |
-| `keycloak-secrets` | Admin credentials, client secret | `values.yaml` (override for production) |
+| `postgres-secrets` | DB credentials | Override for production; rotating an existing PVC requires a coordinated database-password change |
+| `keycloak-secrets` | Admin credentials, client secret | Override for production; coordinate changes with the persisted Keycloak database |
 
 ## Troubleshooting
 
@@ -275,7 +199,7 @@ In K8s, secrets are managed by the Helm chart in `templates/secret.yaml`. They a
 | `logos.aet.cit.tum.de` unreachable locally | You are not on TUM VPN. Connect and retry. |
 | Keycloak `config-cli` Job fails | The Job has `helm.sh/hook: post-install,post-upgrade` — it runs after every `helm upgrade`. Check its logs: `kubectl --context stud -n team-worksonourmachines logs job/keycloak-config`. |
 | `client-web` redirects loop at login | Keycloak `client-web` redirect URIs may not match the current ingress host. Re-run `helm upgrade` so the config-cli Job reapplies the realm. |
-| Local stack slow / AI times out | Ollama is still downloading the model. Wait for `docker compose logs ollama` to show the pull complete, or switch to Logos. |
-| Local `client-web` crashes with `Failed to discover OIDC configuration` | Two possible causes: (1) `ingress.hostAliasIP` not set in `values.local.yaml` — nip.io resolves to the pod loopback inside the pod; (2) `clientWeb.tlsRejectUnauthorized` not set to `false` — Node.js rejects nginx's self-signed cert. Check both values are set and redeploy. |
+| Local stack slow / AI times out | Ollama may still be downloading the model. Check `ollama list`, or use another provider through `K3D_LLM_BASE_URL`. |
+| Local `client-web` crashes with `Failed to discover OIDC configuration` | Re-run `make k3d-helm-upgrade`; it discovers the current ingress ClusterIP and passes it to Helm. Also verify `clientWeb.tlsRejectUnauthorized: false` remains in `values.local.yaml`. |
 | Local ingresses show no `ADDRESS` / return 404 | nginx ingress controller not installed, or `ingressClassName` mismatch. Verify nginx is running: `kubectl --context k3d-tutormatch -n ingress-nginx get pods`. The chart uses `ingressClassName: nginx`. |
 | `k3d image import` fails with `invalid tar header` | Two imports ran in parallel and corrupted each other's tarball. Run imports sequentially. |
