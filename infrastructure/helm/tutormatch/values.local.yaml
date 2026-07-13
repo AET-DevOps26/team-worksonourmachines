@@ -8,11 +8,18 @@ ingress:
 clientWeb:
   # Disable TLS verification for pod-internal OIDC discovery against the self-signed nginx cert
   tlsRejectUnauthorized: false
+  imagePullPolicy: IfNotPresent
 
 apiUi:
   imagePullPolicy: IfNotPresent
 
-clientWeb:
+serverCommunication:
+  imagePullPolicy: IfNotPresent
+
+serverMarketplace:
+  imagePullPolicy: IfNotPresent
+
+serverStudent:
   imagePullPolicy: IfNotPresent
 
 ai:

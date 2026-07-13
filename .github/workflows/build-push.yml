@@ -11,6 +11,9 @@ env:
   IMAGE_PREFIX: ghcr.io/aet-devops26/team-worksonourmachines
   NAMESPACE: team-worksonourmachines
   RELEASE_NAME: tutormatch
+  RANCHER_KUBE_CONTEXT: stud
+  RANCHER_DIGEST_FILE: /tmp/rancher-image-digests.env
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-and-push:
@@ -32,46 +35,16 @@ jobs:
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push AI image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: artifacts/ai/docker/Dockerfile
-          target: prod
-          push: true
-          provenance: false
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/ai:latest
-            ${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Publish application images and record digests
+        run: make -C infrastructure rancher-publish-images
 
-      - name: Build and push Client Web image
-        uses: docker/build-push-action@v6
+      - name: Upload published image digests
+        uses: actions/upload-artifact@v4
         with:
-          context: .
-          file: artifacts/client-web/docker/Dockerfile
-          target: prod
-          push: true
-          provenance: false
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/client-web:latest
-            ${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push API UI image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: artifacts/api-ui/docker/Dockerfile
-          push: true
-          provenance: false
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/api-ui:latest
-            ${{ env.IMAGE_PREFIX }}/api-ui:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          name: rancher-image-digests
+          path: ${{ env.RANCHER_DIGEST_FILE }}
+          if-no-files-found: error
+          retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
@@ -84,6 +57,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Download published image digests
+        uses: actions/download-artifact@v4
+        with:
+          name: rancher-image-digests
+          path: /tmp
+
       - name: Setup Helm
         uses: azure/setup-helm@v4
 
@@ -95,63 +74,15 @@ jobs:
           echo "$KUBECONFIG_DATA" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      - name: Cluster connectivity check
-        run: kubectl get pods -n ${{ env.NAMESPACE }} || true
-
-      - name: Lint chart
-        run: helm lint ./infrastructure/helm/tutormatch
-
-      - name: Unlock stuck Helm release
-        run: |
-          STATUS=$(helm status ${{ env.RELEASE_NAME }} --namespace ${{ env.NAMESPACE }} -o json 2>/dev/null | jq -r '.info.status' || echo "not-found")
-          if [[ "$STATUS" == "pending-upgrade" || "$STATUS" == "pending-install" || "$STATUS" == "pending-rollback" ]]; then
-            helm rollback ${{ env.RELEASE_NAME }} 0 --namespace ${{ env.NAMESPACE }} || true
-          fi
-
-      - name: Deploy
+      - name: Deploy to Rancher
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-        run: |
-          helm upgrade --install ${{ env.RELEASE_NAME }} ./infrastructure/helm/tutormatch \
-            --namespace ${{ env.NAMESPACE }} \
-            --create-namespace \
-            --set ai.image=${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }} \
-            --set clientWeb.image=${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }} \
-            --set apiUi.image=${{ env.IMAGE_PREFIX }}/api-ui:${{ github.sha }} \
-            --set-string ai.llmApiKey="$LLM_API_KEY" \
-            --atomic \
-            --timeout 15m
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          KEYCLOAK_DB_PASSWORD: ${{ secrets.KEYCLOAK_DB_PASSWORD }}
+          KEYCLOAK_ADMIN_PASSWORD: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
+          KEYCLOAK_CLIENT_WEB_SECRET: ${{ secrets.KEYCLOAK_CLIENT_WEB_SECRET }}
+        run: make -C infrastructure rancher-prod-deploy
 
       - name: Deployment diagnostics
         if: failure()
-        run: |
-          echo "=== Pods ==="
-          kubectl get pods -n ${{ env.NAMESPACE }} -o wide
-
-          echo "=== Deployments ==="
-          kubectl get deployments -n ${{ env.NAMESPACE }}
-
-          echo "=== Events ==="
-          kubectl get events -n ${{ env.NAMESPACE }} --sort-by=.metadata.creationTimestamp
-
-          echo "=== Helm Status ==="
-          helm status ${{ env.RELEASE_NAME }} -n ${{ env.NAMESPACE }} || true
-
-          echo "=== Describe Pods ==="
-          kubectl describe pods -n ${{ env.NAMESPACE }}
-
-          echo "=== Postgres Logs ==="
-          PGPOD=$(kubectl get pods -n ${{ env.NAMESPACE }} -l app=postgres -o name | head -1)
-          if [ -n "$PGPOD" ]; then
-            kubectl logs -n ${{ env.NAMESPACE }} $PGPOD --previous 2>&1 || \
-            kubectl logs -n ${{ env.NAMESPACE }} $PGPOD 2>&1 || true
-          else
-            echo "No postgres pod found"
-          fi
-
-          echo "=== Pod Logs ==="
-          for pod in $(kubectl get pods -n ${{ env.NAMESPACE }} -o name); do
-            echo "--- $pod ---"
-            kubectl logs -n ${{ env.NAMESPACE }} $pod --all-containers=true --tail=50 --previous 2>&1 || \
-            kubectl logs -n ${{ env.NAMESPACE }} $pod --all-containers=true --tail=50 2>&1 || true
-          done
+        run: make -C infrastructure rancher-diagnostics

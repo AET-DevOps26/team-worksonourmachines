@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ai
-          image: {{ .Values.ai.image }}
+          image: {{ include "tutormatch.image" (list . "ai" .Values.ai.imageDigest) | quote }}
           imagePullPolicy: {{ .Values.ai.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 8000
