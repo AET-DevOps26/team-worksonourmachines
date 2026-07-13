@@ -16,8 +16,9 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
             f" problem solving: {tsf.get('problemSolving', '?')}"
         )
         difficulty = t.get("difficultyHint", "unknown")
+        name = t.get("name", "unknown")
         topics_lines.append(
-            f"- [{t['id']}] {t['name']} (difficulty: {difficulty})\n"
+            f"- [{t.get('id', '')}] {name} (difficulty: {difficulty})\n"
             f"  Description: {t.get('description', '')}\n"
             f"  Study demands — {demands}"
         )
@@ -27,11 +28,13 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
     for tutor in tutors:
         rating = tutor.get("ratingSummary", {})
         avail = [
-            a["weekday"] for a in tutor.get("availability", []) if a.get("available")
+            a.get("weekday")
+            for a in tutor.get("availability", [])
+            if a.get("available")
         ]
         coverages = [c.get("moduleCode", "") for c in tutor.get("coverages", [])]
         tutors_lines.append(
-            f"- {tutor['displayName']}"
+            f"- {tutor.get('displayName', 'unknown')}"
             f" | €{tutor.get('hourlyRate', '?')}/h"
             f" | rating: {rating.get('average', '?')}"
             f" ({rating.get('count', '?')} sessions)\n"

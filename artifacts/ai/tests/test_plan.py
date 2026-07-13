@@ -486,6 +486,7 @@ async def test_language_filter_case_insensitive():
 
     _, _, _, tutors_arg = mock_build_prompt.call_args.args
     assert any(t["id"] == "t-de" for t in tutors_arg)
+    assert not any(t["id"] == "t-en" for t in tutors_arg)
 
 
 @pytest.mark.asyncio

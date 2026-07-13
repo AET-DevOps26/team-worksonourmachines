@@ -9,14 +9,7 @@ logger = logging.getLogger(__name__)
 STUDENT_API_URL = os.getenv("STUDENT_API_URL", "http://server-student:8081")
 MARKETPLACE_API_URL = os.getenv("MARKETPLACE_API_URL", "http://server-marketplace:8082")
 
-VALID_LOCATIONS = {
-    "online",
-    "garching",
-    "munich",
-    "weihenstephan",
-    "straubing",
-    "ottobrunn",
-}
+_client = httpx.AsyncClient(timeout=10.0)
 
 
 def _auth_headers(authorization: str) -> dict:
@@ -29,22 +22,23 @@ def _raise_for_status(response: httpx.Response, context: str) -> None:
     logger.error(
         "%s failed status=%s body=%s", context, response.status_code, response.text
     )
-    raise HTTPException(status_code=response.status_code, detail=response.text)
+    if response.status_code == 404:
+        raise HTTPException(status_code=404, detail=f"{context}: not found")
+    if response.status_code == 401:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    raise HTTPException(status_code=502, detail=f"Upstream service error ({context})")
 
 
 async def get_learning_goal(goal_id: str, authorization: str) -> dict:
     url = f"{STUDENT_API_URL}/v1/students/me/goals/{goal_id}"
-    print({goal_id})
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=_auth_headers(authorization))
+    response = await _client.get(url, headers=_auth_headers(authorization))
     _raise_for_status(response, f"get_learning_goal goal_id={goal_id}")
     return response.json()
 
 
 async def get_student_profile(authorization: str) -> dict:
     url = f"{STUDENT_API_URL}/v1/students/me"
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=_auth_headers(authorization))
+    response = await _client.get(url, headers=_auth_headers(authorization))
     _raise_for_status(response, "get_student_profile")
     return response.json()
 
@@ -52,10 +46,9 @@ async def get_student_profile(authorization: str) -> dict:
 async def get_module(module_id: str, authorization: str) -> dict:
     # Two-step: list to resolve UUID → code, then fetch by code to get topics.
     url = f"{MARKETPLACE_API_URL}/v1/modules"
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            url, params={"pageSize": 100}, headers=_auth_headers(authorization)
-        )
+    response = await _client.get(
+        url, params={"pageSize": 100}, headers=_auth_headers(authorization)
+    )
     _raise_for_status(response, f"get_module module_id={module_id}")
     data = response.json()
     items = data.get("items", data) if isinstance(data, dict) else data
@@ -65,11 +58,10 @@ async def get_module(module_id: str, authorization: str) -> dict:
     code = summary.get("code")
     if not code:
         return summary
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{MARKETPLACE_API_URL}/v1/modules/{code}",
-            headers=_auth_headers(authorization),
-        )
+    response = await _client.get(
+        f"{MARKETPLACE_API_URL}/v1/modules/{code}",
+        headers=_auth_headers(authorization),
+    )
     _raise_for_status(response, f"get_module code={code}")
     return response.json()
 
@@ -77,26 +69,15 @@ async def get_module(module_id: str, authorization: str) -> dict:
 async def list_tutors(
     module_id: str,
     languages: list,
-    locations: list,
     authorization: str,
 ) -> list:
-    invalid = [loc for loc in locations if loc.lower() not in VALID_LOCATIONS]
-    if invalid:
-        raise HTTPException(
-            status_code=422,
-            detail=(
-                f"Invalid location(s): {', '.join(invalid)}."
-                f" Valid values: {', '.join(sorted(VALID_LOCATIONS))}"
-            ),
-        )
     params: dict = {"moduleId": module_id}
     if languages:
         params["languages"] = languages
     url = f"{MARKETPLACE_API_URL}/v1/tutors"
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            url, params=params, headers=_auth_headers(authorization)
-        )
+    response = await _client.get(
+        url, params=params, headers=_auth_headers(authorization)
+    )
     _raise_for_status(response, f"list_tutors module_id={module_id}")
     data = response.json()
     return data.get("items", data) if isinstance(data, dict) else data
