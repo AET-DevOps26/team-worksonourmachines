@@ -11,6 +11,7 @@ const Env = type({
     LOG_LEVEL: "'debug' | 'info' | 'warn' | 'error'",
     NODE_ENV: "'development' | 'production'",
     REDIS_URL: 'string',
+    SERVER_AI_API_URL: 'string',
     SERVER_COMMUNICATION_API_URL: 'string',
     SERVER_MARKETPLACE_API_URL: 'string',
     SERVER_STUDENT_API_URL: 'string',

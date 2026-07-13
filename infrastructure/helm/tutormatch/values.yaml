@@ -12,6 +12,7 @@ ai:
 
 clientWeb:
   image: ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
+  serverAiApiUrl: tbd
   serverCommunicationApiUrl: tbd
   serverMarketplaceApiUrl: tbd
   serverStudentApiUrl: tbd

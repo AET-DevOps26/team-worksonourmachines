@@ -119,6 +119,7 @@ services:
       KEYCLOAK_CLIENT_ID: client-web
       KEYCLOAK_CLIENT_SECRET: client-web-dev-secret
       REDIS_URL: redis://redis:6379
+      SERVER_AI_API_URL: http://ai:8000
       SERVER_COMMUNICATION_API_URL: http://server-communication:8083
       SERVER_MARKETPLACE_API_URL: http://server-marketplace:8082
       SERVER_STUDENT_API_URL: http://server-student:8081

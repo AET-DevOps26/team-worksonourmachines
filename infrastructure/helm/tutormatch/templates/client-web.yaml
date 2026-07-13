@@ -48,6 +48,8 @@ spec:
                   key: KEYCLOAK_CLIENT_WEB_SECRET
             - name: REDIS_URL
               value: "redis://redis:6379"
+            - name: SERVER_AI_API_URL
+              value: {{ .Values.clientWeb.serverAiApiUrl | quote }}
             - name: SERVER_COMMUNICATION_API_URL
               value: {{ .Values.clientWeb.serverCommunicationApiUrl | quote }}
             - name: SERVER_MARKETPLACE_API_URL
