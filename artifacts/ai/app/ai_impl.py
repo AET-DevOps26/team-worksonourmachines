@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import re
@@ -78,14 +79,23 @@ class DefaultApiImpl(BaseDefaultApi):
         start = time.perf_counter()
 
         student_token = await exchange_token(authorization)
-        goal = await get_learning_goal(goal_id, student_token)
-        student = await get_student_profile(student_token)
-        module = await get_module(goal["moduleId"], authorization)
-        tutors = await list_tutors(
-            module_id=goal["moduleId"],
-            languages=student.get("languages", []),
-            locations=goal.get("locations", []),
-            authorization=authorization,
+        goal, student = await asyncio.gather(
+            get_learning_goal(goal_id, student_token),
+            get_student_profile(student_token),
+        )
+        module_id = goal.get("moduleId")
+        if not module_id:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Learning goal {goal_id} has no moduleId",
+            )
+        module, tutors = await asyncio.gather(
+            get_module(module_id, authorization),
+            list_tutors(
+                module_id=module_id,
+                languages=student.get("languages", []),
+                authorization=authorization,
+            ),
         )
 
         student_langs = {lang.lower() for lang in student.get("languages", [])}

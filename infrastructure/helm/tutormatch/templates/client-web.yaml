@@ -26,7 +26,7 @@ spec:
       {{- end }}
       containers:
         - name: client-web
-          image: {{ .Values.clientWeb.image }}
+          image: {{ include "tutormatch.image" (list . "client-web" .Values.clientWeb.imageDigest) | quote }}
           imagePullPolicy: {{ .Values.clientWeb.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 3000
