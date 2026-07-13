@@ -5,7 +5,7 @@ import { Configuration, DefaultApi } from './generated';
 
 export const marketplaceApi = new DefaultApi(
     new Configuration({
-        accessToken: () => resolveAccessTokenForActiveRequest().then((token) => token ?? ''),
+        accessToken: () => resolveAccessTokenForActiveRequest().then((token) => `Bearer ${token}`),
         basePath: env.get('SERVER_MARKETPLACE_API_URL'),
         middleware: [errorMiddlewareConfiguration()],
     }),
