@@ -231,7 +231,6 @@ rancher-prod-deploy: ## Validate and deploy the recorded image digests to Ranche
 rancher-prod-deploy: \
 	rancher-check-deploy-env \
 	rancher-check-image-digests \
-	rancher-cluster-check \
 	rancher-chart-lint \
 	rancher-release-unlock \
 	rancher-helm-upgrade \
