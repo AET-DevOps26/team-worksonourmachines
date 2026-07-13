@@ -31,7 +31,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: {{ $server.name }}
-          image: "{{ $root.Values.global.imageRegistry }}/{{ $server.name }}:{{ required "global.imageTag must be set to an immutable image tag" $root.Values.global.imageTag }}"
+          image: {{ include "tutormatch.image" (list $root $server.name $server.config.imageDigest) | quote }}
           imagePullPolicy: {{ $server.config.imagePullPolicy | default "Always" }}
           ports:
             - name: http

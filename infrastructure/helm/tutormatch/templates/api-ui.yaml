@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api-ui
-          image: "{{ .Values.global.imageRegistry }}/api-ui:{{ required "global.imageTag must be set to an immutable image tag" .Values.global.imageTag }}"
+          image: {{ include "tutormatch.image" (list . "api-ui" .Values.apiUi.imageDigest) | quote }}
           imagePullPolicy: {{ .Values.apiUi.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 8080

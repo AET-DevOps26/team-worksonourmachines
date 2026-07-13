@@ -2,33 +2,39 @@ namespace: team-worksonourmachines
 
 global:
   imageRegistry: ghcr.io/aet-devops26/team-worksonourmachines
-  # Required for production deployments; GitHub Actions sets this to github.sha.
+  # Traceability tag and local fallback. Production deployments use per-image digests.
   imageTag: ""
 
 ingress:
   host: team-worksonourmachines.stud.k8s.aet.cit.tum.de
 
 ai:
+  imageDigest: ""
   llmProvider: logos
   llmBaseUrl: https://logos.aet.cit.tum.de
   llmModel: openai/gpt-oss-120b
   llmApiKey: ""  # Set via the LLM_API_KEY GitHub Actions secret
 
 clientWeb:
+  imageDigest: ""
   serverCommunicationApiUrl: http://server-communication:8083
   serverMarketplaceApiUrl: http://server-marketplace:8082
   serverStudentApiUrl: http://server-student:8081
 
 serverCommunication:
+  imageDigest: ""
   port: 8083
 
 serverMarketplace:
+  imageDigest: ""
   port: 8082
 
 serverStudent:
+  imageDigest: ""
   port: 8081
 
-apiUi: {}
+apiUi:
+  imageDigest: ""
 
 postgres:
   db: tutormatch

@@ -2,6 +2,7 @@ package com.worksonourmachines.communication;
 
 import org.openapitools.api.CommunicationApiV1;
 import org.openapitools.model.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public class CommunicationController implements CommunicationApiV1 {
     @Override
     public ResponseEntity<SharedCommunicationConversationDetail> getConversation(String id) {
-        return null;
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @Override
@@ -21,16 +22,16 @@ public class CommunicationController implements CommunicationApiV1 {
 
     @Override
     public ResponseEntity<MessagePage> listMessages(String id, Integer page, Integer pageSize) {
-        return null;
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @Override
     public ResponseEntity<SharedCommunicationChatMessage> sendMessage(String id, SharedCommunicationSendMessageRequest sharedCommunicationSendMessageRequest) {
-        return null;
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @Override
     public ResponseEntity<SharedCommunicationConversationDetail> startConversation(SharedCommunicationStartConversationRequest sharedCommunicationStartConversationRequest) {
-        return null;
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 }

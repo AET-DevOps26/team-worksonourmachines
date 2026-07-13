@@ -26,7 +26,7 @@ spec:
       {{- end }}
       containers:
         - name: client-web
-          image: "{{ .Values.global.imageRegistry }}/client-web:{{ required "global.imageTag must be set to an immutable image tag" .Values.global.imageTag }}"
+          image: {{ include "tutormatch.image" (list . "client-web" .Values.clientWeb.imageDigest) | quote }}
           imagePullPolicy: {{ .Values.clientWeb.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 3000

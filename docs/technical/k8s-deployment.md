@@ -30,9 +30,9 @@ All services run as single-replica Deployments in the `team-worksonourmachines` 
 
 ## Helm chart
 
-The chart lives at `infrastructure/helm/tutormatch/`. It has no sub-chart dependencies — all manifests are written as plain templates. Kubernetes build and deployment commands live in `infrastructure/Makefile`, which the root `Makefile` includes.
+The chart lives at `infrastructure/helm/tutormatch/`. It has no sub-chart dependencies — all manifests are written as plain templates. Kubernetes build and deployment commands live in `infrastructure/Makefile` and are invoked with `make -C infrastructure <target>`.
 
-```
+```text
 infrastructure/
 ├── Makefile             # k3d and Rancher orchestration targets
 └── helm/tutormatch/
@@ -57,7 +57,8 @@ infrastructure/
 | `namespace` | `team-worksonourmachines` | Kubernetes namespace |
 | `ingress.host` | `team-worksonourmachines.stud.k8s.aet.cit.tum.de` | Base hostname; Keycloak gets `auth.<host>` |
 | `global.imageRegistry` | `ghcr.io/aet-devops26/team-worksonourmachines` | Registry and repository prefix for first-party images |
-| `global.imageTag` | `""` | Required immutable image tag; CI injects the Git commit SHA |
+| `global.imageTag` | `""` | Traceability tag and local-k3d fallback; CI injects the Git commit SHA |
+| `*.imageDigest` | `""` | Production content digest recorded by Buildx; takes precedence over `global.imageTag` |
 | `ai.llmProvider` | `logos` | LLM provider (`logos`, `ollama`, `lmstudio`, `openai`) |
 | `ai.llmBaseUrl` | `https://logos.aet.cit.tum.de` | LLM API base URL |
 | `ai.llmModel` | `openai/gpt-oss-120b` | Model name |
@@ -69,18 +70,19 @@ infrastructure/
 Images are built and pushed to GHCR by GitHub Actions (`build-push.yml`). The workflow triggers on pushes to `main`, but delegates the implementation to the same Make targets available to developers:
 
 ```bash
-make rancher-publish-images
-make rancher-deploy
+make -C infrastructure rancher-publish-images
+make -C infrastructure rancher-prod-deploy
 ```
 
-The image job supplies `IMAGE_TAG=<git-sha>` and runs `rancher-publish-images`. The deployment job configures the kubeconfig, supplies the required deployment secrets, and runs `rancher-deploy`. The composite deployment target executes these ordered targets:
+The image job supplies `IMAGE_TAG=<git-sha>`, publishes each image, and records the returned manifest digest from Buildx metadata. GitHub Actions transfers the six-digest file to the deployment job as a short-lived artifact. Helm then renders first-party images as `repository@sha256:…`; the SHA tag remains only for traceability. The composite deployment target executes these ordered targets:
 
 1. `rancher-check-deploy-env`
-2. `rancher-cluster-check`
-3. `rancher-chart-lint`
-4. `rancher-release-unlock`
-5. `rancher-helm-upgrade`
-6. `rancher-rollout-status`
+2. `rancher-check-image-digests`
+3. `rancher-cluster-check`
+4. `rancher-chart-lint`
+5. `rancher-release-unlock`
+6. `rancher-helm-upgrade`
+7. `rancher-rollout-status`
 
 The production GitHub environment must define these secrets:
 
@@ -93,28 +95,29 @@ The production GitHub environment must define these secrets:
 | `KEYCLOAK_ADMIN_PASSWORD` | Keycloak administration and config import |
 | `KEYCLOAK_CLIENT_WEB_SECRET` | Confidential OIDC client |
 
-`IMAGE_TAG` is supplied automatically from `github.sha`. For an existing persistent database, the three database/administration credentials must initially match the values already stored by PostgreSQL and Keycloak. Changing Kubernetes Secrets alone does not rotate persisted credentials.
+`IMAGE_TAG` and `RANCHER_DIGEST_FILE` are managed automatically by CI. For an existing persistent database, the three database/administration credentials must initially match the values already stored by PostgreSQL and Keycloak. Changing Kubernetes Secrets alone does not rotate persisted credentials.
 
 ## Manual deploy
 
-To deploy from your local machine, you need the `stud` kubeconfig context and permission to pull the immutable images. Supply the same required environment variables as CI:
+To deploy from your local machine, download the `rancher-image-digests` artifact from the corresponding image-build run. Then supply its path together with the same required environment variables as CI:
 
 ```bash
 IMAGE_TAG=<git-sha> \
+RANCHER_DIGEST_FILE=/path/to/rancher-image-digests.env \
 LLM_API_KEY=<your-logos-api-key> \
 POSTGRES_PASSWORD=<current-postgres-password> \
 KEYCLOAK_DB_PASSWORD=<current-keycloak-db-password> \
 KEYCLOAK_ADMIN_PASSWORD=<current-keycloak-admin-password> \
 KEYCLOAK_CLIENT_WEB_SECRET=<client-secret> \
-make rancher-deploy
+make -C infrastructure rancher-prod-deploy
 ```
 
 Useful individual targets are:
 
 ```bash
-make rancher-chart-lint
-make rancher-rollout-status
-make rancher-diagnostics
+make -C infrastructure rancher-chart-lint
+make -C infrastructure rancher-rollout-status
+make -C infrastructure rancher-diagnostics
 ```
 
 ## Local cluster (k3d)
@@ -142,7 +145,7 @@ ollama serve
 Then one command creates the cluster, installs ingress-nginx, builds and imports all images sequentially, deploys the chart, waits for every Deployment, and runs endpoint smoke tests:
 
 ```bash
-make k3d-deploy
+make -C infrastructure k3d-deploy
 ```
 
 The dynamic ingress ClusterIP is passed directly to Helm; `values.local.yaml` no longer needs to be edited whenever the cluster is recreated.
@@ -150,19 +153,19 @@ The dynamic ingress ClusterIP is passed directly to Helm; `values.local.yaml` no
 Each phase is also independently invokable:
 
 ```bash
-make k3d-cluster-create
-make k3d-ingress-install
-make k3d-images-build
-make k3d-images-import
-make k3d-helm-upgrade
-make k3d-rollout-status
-make k3d-smoke-test
+make -C infrastructure k3d-cluster-create
+make -C infrastructure k3d-ingress-install
+make -C infrastructure k3d-images-build
+make -C infrastructure k3d-images-import
+make -C infrastructure k3d-helm-upgrade
+make -C infrastructure k3d-rollout-status
+make -C infrastructure k3d-smoke-test
 ```
 
 To use a different host-side LLM endpoint:
 
 ```bash
-make k3d-deploy K3D_LLM_BASE_URL=http://host.k3d.internal:1234
+make -C infrastructure k3d-deploy K3D_LLM_BASE_URL=http://host.k3d.internal:1234
 ```
 
 ### Open the app
@@ -177,7 +180,7 @@ nginx uses HTTPS with its default self-signed certificate — accept the browser
 ### Tear down
 
 ```bash
-make k3d-cluster-delete
+make -C infrastructure k3d-cluster-delete
 ```
 
 ## Secrets
@@ -200,6 +203,6 @@ In K8s, secrets are created by `templates/secret.yaml` from Helm values. Never c
 | Keycloak `config-cli` Job fails | The Job has `helm.sh/hook: post-install,post-upgrade` — it runs after every `helm upgrade`. Check its logs: `kubectl --context stud -n team-worksonourmachines logs job/keycloak-config`. |
 | `client-web` redirects loop at login | Keycloak `client-web` redirect URIs may not match the current ingress host. Re-run `helm upgrade` so the config-cli Job reapplies the realm. |
 | Local stack slow / AI times out | Ollama may still be downloading the model. Check `ollama list`, or use another provider through `K3D_LLM_BASE_URL`. |
-| Local `client-web` crashes with `Failed to discover OIDC configuration` | Re-run `make k3d-helm-upgrade`; it discovers the current ingress ClusterIP and passes it to Helm. Also verify `clientWeb.tlsRejectUnauthorized: false` remains in `values.local.yaml`. |
+| Local `client-web` crashes with `Failed to discover OIDC configuration` | Re-run `make -C infrastructure k3d-helm-upgrade`; it discovers the current ingress ClusterIP and passes it to Helm. Also verify `clientWeb.tlsRejectUnauthorized: false` remains in `values.local.yaml`. |
 | Local ingresses show no `ADDRESS` / return 404 | nginx ingress controller not installed, or `ingressClassName` mismatch. Verify nginx is running: `kubectl --context k3d-tutormatch -n ingress-nginx get pods`. The chart uses `ingressClassName: nginx`. |
 | `k3d image import` fails with `invalid tar header` | Two imports ran in parallel and corrupted each other's tarball. Run imports sequentially. |
