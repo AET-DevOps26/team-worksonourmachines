@@ -12,13 +12,12 @@ env:
   NAMESPACE: team-worksonourmachines
   RELEASE_NAME: tutormatch
   RANCHER_KUBE_CONTEXT: stud
+  RANCHER_DIGEST_FILE: /tmp/rancher-image-digests.env
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    env:
-      RANCHER_DIGEST_FILE: ${{ runner.temp }}/rancher-image-digests.env
     permissions:
       contents: read
       packages: write
@@ -51,8 +50,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-push
     environment: production
-    env:
-      RANCHER_DIGEST_FILE: ${{ runner.temp }}/rancher-image-digests.env
     concurrency:
       group: deploy-production
       cancel-in-progress: false
@@ -64,7 +61,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: rancher-image-digests
-          path: ${{ runner.temp }}
+          path: /tmp
 
       - name: Setup Helm
         uses: azure/setup-helm@v4
