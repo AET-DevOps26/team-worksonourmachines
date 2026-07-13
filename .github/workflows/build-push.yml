@@ -40,9 +40,7 @@ jobs:
           target: prod
           push: true
           provenance: false
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/ai:latest
-            ${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }}
+          tags: ${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -54,9 +52,7 @@ jobs:
           target: prod
           push: true
           provenance: false
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/client-web:latest
-            ${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }}
+          tags: ${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -67,11 +63,48 @@ jobs:
           file: artifacts/api-ui/docker/Dockerfile
           push: true
           provenance: false
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/api-ui:latest
-            ${{ env.IMAGE_PREFIX }}/api-ui:${{ github.sha }}
+          tags: ${{ env.IMAGE_PREFIX }}/api-ui:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Build and push Communication Server image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: artifacts/server/docker/Dockerfile
+          target: prod
+          build-args: SERVER_MODULE=communication
+          push: true
+          provenance: false
+          tags: ${{ env.IMAGE_PREFIX }}/server-communication:${{ github.sha }}
+          cache-from: type=gha,scope=server-communication
+          cache-to: type=gha,mode=max,scope=server-communication
+
+      - name: Build and push Marketplace Server image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: artifacts/server/docker/Dockerfile
+          target: prod
+          build-args: SERVER_MODULE=marketplace
+          push: true
+          provenance: false
+          tags: ${{ env.IMAGE_PREFIX }}/server-marketplace:${{ github.sha }}
+          cache-from: type=gha,scope=server-marketplace
+          cache-to: type=gha,mode=max,scope=server-marketplace
+
+      - name: Build and push Student Server image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: artifacts/server/docker/Dockerfile
+          target: prod
+          build-args: SERVER_MODULE=student
+          push: true
+          provenance: false
+          tags: ${{ env.IMAGE_PREFIX }}/server-student:${{ github.sha }}
+          cache-from: type=gha,scope=server-student
+          cache-to: type=gha,mode=max,scope=server-student
 
   deploy:
     runs-on: ubuntu-latest
@@ -99,7 +132,7 @@ jobs:
         run: kubectl get pods -n ${{ env.NAMESPACE }} || true
 
       - name: Lint chart
-        run: helm lint ./infrastructure/helm/tutormatch
+        run: helm lint ./infrastructure/helm/tutormatch --set-string global.imageTag=${{ github.sha }}
 
       - name: Unlock stuck Helm release
         run: |
@@ -115,9 +148,8 @@ jobs:
           helm upgrade --install ${{ env.RELEASE_NAME }} ./infrastructure/helm/tutormatch \
             --namespace ${{ env.NAMESPACE }} \
             --create-namespace \
-            --set ai.image=${{ env.IMAGE_PREFIX }}/ai:${{ github.sha }} \
-            --set clientWeb.image=${{ env.IMAGE_PREFIX }}/client-web:${{ github.sha }} \
-            --set apiUi.image=${{ env.IMAGE_PREFIX }}/api-ui:${{ github.sha }} \
+            --set-string global.imageRegistry=${{ env.IMAGE_PREFIX }} \
+            --set-string global.imageTag=${{ github.sha }} \
             --set-string ai.llmApiKey="$LLM_API_KEY" \
             --atomic \
             --timeout 15m

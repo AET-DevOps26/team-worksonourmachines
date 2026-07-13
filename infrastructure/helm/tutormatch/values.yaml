@@ -1,23 +1,34 @@
 namespace: team-worksonourmachines
 
+global:
+  imageRegistry: ghcr.io/aet-devops26/team-worksonourmachines
+  # Required for production deployments; GitHub Actions sets this to github.sha.
+  imageTag: ""
+
 ingress:
   host: team-worksonourmachines.stud.k8s.aet.cit.tum.de
 
 ai:
-  image: ghcr.io/aet-devops26/team-worksonourmachines/ai:latest
   llmProvider: logos
   llmBaseUrl: https://logos.aet.cit.tum.de
   llmModel: openai/gpt-oss-120b
   llmApiKey: ""  # Set via the LLM_API_KEY GitHub Actions secret
 
 clientWeb:
-  image: ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
-  serverCommunicationApiUrl: tbd
-  serverMarketplaceApiUrl: tbd
-  serverStudentApiUrl: tbd
+  serverCommunicationApiUrl: http://server-communication:8083
+  serverMarketplaceApiUrl: http://server-marketplace:8082
+  serverStudentApiUrl: http://server-student:8081
 
-apiUi:
-  image: ghcr.io/aet-devops26/team-worksonourmachines/api-ui:latest
+serverCommunication:
+  port: 8083
+
+serverMarketplace:
+  port: 8082
+
+serverStudent:
+  port: 8081
+
+apiUi: {}
 
 postgres:
   db: tutormatch

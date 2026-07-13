@@ -7,5 +7,35 @@ auth.{$APP_HOSTNAME} {
 }
 
 api.{$APP_HOSTNAME} {
-	reverse_proxy api-ui:8080
+	handle /v1/students* {
+		reverse_proxy server-student:8081
+	}
+
+	handle /v1/admin* {
+		reverse_proxy server-marketplace:8082
+	}
+
+	handle /v1/modules* {
+		reverse_proxy server-marketplace:8082
+	}
+
+	handle /v1/tutors* {
+		reverse_proxy server-marketplace:8082
+	}
+
+	handle /v1/tutor-applications* {
+		reverse_proxy server-marketplace:8082
+	}
+
+	handle /v1/conversations* {
+		reverse_proxy server-communication:8083
+	}
+
+	handle /v1/plan* {
+		reverse_proxy ai:8000
+	}
+
+	handle {
+		reverse_proxy api-ui:8080
+	}
 }

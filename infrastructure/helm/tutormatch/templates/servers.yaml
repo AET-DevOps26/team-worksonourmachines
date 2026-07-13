@@ -1,0 +1,104 @@
+{{- $root := . -}}
+{{- $servers := list
+      (dict "name" "server-communication" "config" .Values.serverCommunication "dbPrefix" "COMMUNICATION")
+      (dict "name" "server-marketplace" "config" .Values.serverMarketplace "dbPrefix" "MARKETPLACE")
+      (dict "name" "server-student" "config" .Values.serverStudent "dbPrefix" "STUDENT") -}}
+{{- range $index, $server := $servers }}
+{{- if $index }}
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $server.name }}
+  namespace: {{ $root.Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $server.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $server.name }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: {{ $server.name }}
+          image: "{{ $root.Values.global.imageRegistry }}/{{ $server.name }}:{{ required "global.imageTag must be set to an immutable image tag" $root.Values.global.imageTag }}"
+          imagePullPolicy: {{ $server.config.imagePullPolicy | default "Always" }}
+          ports:
+            - name: http
+              containerPort: {{ $server.config.port }}
+          env:
+            - name: PORT
+              value: {{ $server.config.port | quote }}
+            - name: KEYCLOAK_ISSUER
+              value: "https://auth.{{ $root.Values.ingress.host }}/realms/tutormatch"
+            - name: KEYCLOAK_JWK_SET_URI
+              value: "http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs"
+            - name: {{ $server.dbPrefix }}_DB_URL
+              value: "jdbc:postgresql://postgres:5432/{{ $root.Values.postgres.db }}"
+            - name: {{ $server.dbPrefix }}_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_USER
+            - name: {{ $server.dbPrefix }}_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $server.name }}
+  namespace: {{ $root.Values.namespace }}
+spec:
+  selector:
+    app: {{ $server.name }}
+  ports:
+    - name: http
+      port: {{ $server.config.port }}
+      targetPort: http
+{{- end }}

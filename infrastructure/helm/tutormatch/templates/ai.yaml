@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ai
-          image: {{ .Values.ai.image }}
+          image: "{{ .Values.global.imageRegistry }}/ai:{{ required "global.imageTag must be set to an immutable image tag" .Values.global.imageTag }}"
           imagePullPolicy: {{ .Values.ai.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 8000

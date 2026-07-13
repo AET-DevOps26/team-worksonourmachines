@@ -52,12 +52,12 @@ helm/tutormatch/
 |---|---|---|
 | `namespace` | `team-worksonourmachines` | Kubernetes namespace |
 | `ingress.host` | `team-worksonourmachines.stud.k8s.aet.cit.tum.de` | Base hostname; Keycloak gets `auth.<host>` |
-| `ai.image` | `ghcr.io/aet-devops26/team-worksonourmachines/ai:latest` | AI container image |
+| `global.imageRegistry` | `ghcr.io/aet-devops26/team-worksonourmachines` | Registry and repository prefix for first-party images |
+| `global.imageTag` | `""` | Required immutable image tag; CI injects the Git commit SHA |
 | `ai.llmProvider` | `logos` | LLM provider (`logos`, `ollama`, `lmstudio`, `openai`) |
 | `ai.llmBaseUrl` | `https://logos.aet.cit.tum.de` | LLM API base URL |
 | `ai.llmModel` | `openai/gpt-oss-120b` | Model name |
 | `ai.llmApiKey` | `""` | Set via `--set` or GitHub Actions secret |
-| `clientWeb.image` | `ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest` | client-web container image |
 | `postgres.storageSize` | `1Gi` | PVC size for Postgres |
 
 ## CI/CD
@@ -72,6 +72,7 @@ After images are pushed, deploy to the cluster:
 helm upgrade --install tutormatch helm/tutormatch \
   --kube-context stud \
   --namespace team-worksonourmachines \
+  --set-string global.imageTag=<git-sha> \
   --set ai.llmApiKey=<your-logos-api-key>
 ```
 
@@ -87,6 +88,7 @@ helm upgrade --install tutormatch helm/tutormatch \
   --kube-context stud \
   --namespace team-worksonourmachines \
   --create-namespace \
+  --set-string global.imageTag=<git-sha> \
   --set ai.llmApiKey=<your-logos-api-key>
 
 # Check rollout
@@ -100,6 +102,7 @@ To override any value without editing `values.yaml`:
 helm upgrade --install tutormatch helm/tutormatch \
   --kube-context stud \
   --namespace team-worksonourmachines \
+  --set-string global.imageTag=<git-sha> \
   --set ai.llmProvider=logos \
   --set ai.llmApiKey=<key>
 ```
@@ -150,13 +153,14 @@ kubectl --context k3d-tutormatch -n ingress-nginx \
 
 The chart pulls from GHCR. Do **not** import two images in parallel — k3d's import tool uses a shared tarball path and parallel writes corrupt each other. Run them sequentially.
 
-**Option A — pull from GHCR** (needs a recent push to `main`):
+**Option A — pull an immutable Git SHA from GHCR** (needs a successful image workflow):
 
 ```bash
-docker pull ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest
-docker pull ghcr.io/aet-devops26/team-worksonourmachines/ai:latest
-k3d image import ghcr.io/aet-devops26/team-worksonourmachines/client-web:latest -c tutormatch
-k3d image import ghcr.io/aet-devops26/team-worksonourmachines/ai:latest -c tutormatch
+IMAGE_TAG=<git-sha>
+for image in client-web api-ui ai server-student server-marketplace server-communication; do
+  docker pull "ghcr.io/aet-devops26/team-worksonourmachines/${image}:${IMAGE_TAG}"
+  k3d image import "ghcr.io/aet-devops26/team-worksonourmachines/${image}:${IMAGE_TAG}" -c tutormatch
+done
 ```
 
 **Option B — build locally and load** (build context is the repo root):
@@ -164,13 +168,21 @@ k3d image import ghcr.io/aet-devops26/team-worksonourmachines/ai:latest -c tutor
 ```bash
 docker build -f artifacts/client-web/docker/Dockerfile --target prod \
   -t ghcr.io/aet-devops26/team-worksonourmachines/client-web:local .
+docker build -f artifacts/api-ui/docker/Dockerfile \
+  -t ghcr.io/aet-devops26/team-worksonourmachines/api-ui:local .
 docker build -f artifacts/ai/docker/Dockerfile --target prod \
   -t ghcr.io/aet-devops26/team-worksonourmachines/ai:local .
-k3d image import ghcr.io/aet-devops26/team-worksonourmachines/client-web:local -c tutormatch
-k3d image import ghcr.io/aet-devops26/team-worksonourmachines/ai:local -c tutormatch
+for module in student marketplace communication; do
+  docker build -f artifacts/server/docker/Dockerfile --target prod \
+    --build-arg "SERVER_MODULE=${module}" \
+    -t "ghcr.io/aet-devops26/team-worksonourmachines/server-${module}:local" .
+done
+for image in client-web api-ui ai server-student server-marketplace server-communication; do
+  k3d image import "ghcr.io/aet-devops26/team-worksonourmachines/${image}:local" -c tutormatch
+done
 ```
 
-When using locally-built images, add `--set clientWeb.image=...:local --set ai.image=...:local --set clientWeb.imagePullPolicy=IfNotPresent --set ai.imagePullPolicy=IfNotPresent` to the deploy command in step 5.
+When using locally built images, pass `--set-string global.imageTag=local` to the Helm command in step 5. When using Option A, pass `--set-string global.imageTag="$IMAGE_TAG"` instead.
 
 ### 4. Set the nginx ClusterIP in values.local.yaml
 
@@ -202,6 +214,7 @@ helm upgrade --install tutormatch helm/tutormatch \
   --namespace team-worksonourmachines \
   --create-namespace \
   -f helm/tutormatch/values.local.yaml \
+  --set-string global.imageTag=local \
   --set ai.llmBaseUrl=http://host.k3d.internal:11434
 ```
 
@@ -213,6 +226,7 @@ helm upgrade --install tutormatch helm/tutormatch \
   --namespace team-worksonourmachines \
   --create-namespace \
   -f helm/tutormatch/values.local.yaml \
+  --set-string global.imageTag=local \
   --set ai.llmProvider=logos \
   --set ai.llmBaseUrl=https://logos.aet.cit.tum.de \
   --set ai.llmModel=openai/gpt-oss-120b \

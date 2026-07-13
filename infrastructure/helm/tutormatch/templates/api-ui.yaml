@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api-ui
-          image: {{ .Values.apiUi.image }}
+          image: "{{ .Values.global.imageRegistry }}/api-ui:{{ required "global.imageTag must be set to an immutable image tag" .Values.global.imageTag }}"
           imagePullPolicy: {{ .Values.apiUi.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: 8080
@@ -90,6 +90,55 @@ spec:
     - host: api.{{ .Values.ingress.host }}
       http:
         paths:
+          - path: /v1/students
+            pathType: Prefix
+            backend:
+              service:
+                name: server-student
+                port:
+                  number: {{ .Values.serverStudent.port }}
+          - path: /v1/admin
+            pathType: Prefix
+            backend:
+              service:
+                name: server-marketplace
+                port:
+                  number: {{ .Values.serverMarketplace.port }}
+          - path: /v1/modules
+            pathType: Prefix
+            backend:
+              service:
+                name: server-marketplace
+                port:
+                  number: {{ .Values.serverMarketplace.port }}
+          - path: /v1/tutors
+            pathType: Prefix
+            backend:
+              service:
+                name: server-marketplace
+                port:
+                  number: {{ .Values.serverMarketplace.port }}
+          - path: /v1/tutor-applications
+            pathType: Prefix
+            backend:
+              service:
+                name: server-marketplace
+                port:
+                  number: {{ .Values.serverMarketplace.port }}
+          - path: /v1/conversations
+            pathType: Prefix
+            backend:
+              service:
+                name: server-communication
+                port:
+                  number: {{ .Values.serverCommunication.port }}
+          - path: /v1/plan
+            pathType: Prefix
+            backend:
+              service:
+                name: ai
+                port:
+                  number: 8000
           - path: /
             pathType: Prefix
             backend:
