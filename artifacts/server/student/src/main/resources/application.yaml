@@ -33,3 +33,11 @@ keycloak:
   token-url: ${KEYCLOAK_TOKEN_URL:http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token}
   client-id: ${KEYCLOAK_CLIENT_ID:server-student}
   client-secret: ${KEYCLOAK_CLIENT_SECRET:server-student-dev-secret}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
