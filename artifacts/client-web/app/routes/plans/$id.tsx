@@ -207,6 +207,7 @@ export default function StudyPlanRoute() {
 
 function SuggestionCard({ suggestion }: { suggestion: PlanSuggestion }) {
     const tier = suggestion.tier as string;
+    const tutorById = Object.fromEntries(suggestion.proposedTutors.map((t) => [t.id, t]));
     return (
         <Card className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-4">
@@ -250,6 +251,9 @@ function SuggestionCard({ suggestion }: { suggestion: PlanSuggestion }) {
                                     <span className="ml-2 text-muted-foreground">
                                         due {new Date(milestone.dueDate).toLocaleDateString('en-GB')} · €
                                         {milestone.estimatedCost}
+                                        {tutorById[milestone.tutorId] && (
+                                            <> · {tutorById[milestone.tutorId]!.displayName}</>
+                                        )}
                                     </span>
                                 </div>
                             </li>
