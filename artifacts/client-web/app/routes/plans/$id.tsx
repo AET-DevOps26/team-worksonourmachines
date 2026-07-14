@@ -1,4 +1,5 @@
-import { Form, Link, redirect, useLoaderData, useNavigation } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useFetcher, useLoaderData, useRevalidator } from 'react-router';
 import type { SharedStudentGeneratedPlanSuggestion } from '~/.server/api/server-student/generated';
 import { isErr } from '~/.server/lib/result';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
@@ -24,7 +25,7 @@ export const action = protectedAction(async ({ params }) => {
     const goalId = params.id ?? '';
     const result = await generatePlan(goalId);
     if (isErr(result)) throw result.error;
-    return redirect(`/plans/${goalId}`);
+    return { ok: true };
 });
 
 type PlanSuggestion = SharedStudentGeneratedPlanSuggestion;
@@ -41,49 +42,117 @@ const TIER_BADGE_VARIANTS: Record<string, 'success' | 'warning' | 'default'> = {
     within_budget: 'warning',
 };
 
+function generatingKey(goalId: string) {
+    return `plan-generating:${goalId}`;
+}
+
+function regeneratingFromKey(goalId: string) {
+    return `plan-regenerating-from:${goalId}`;
+}
+
 export default function StudyPlanRoute() {
     const { plan, goalId } = useLoaderData<typeof loader>();
-    const navigation = useNavigation();
-    const isGenerating = navigation.state !== 'idle';
+    const fetcher = useFetcher();
+    const { revalidate } = useRevalidator();
+    const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    const isSubmitting = fetcher.state !== 'idle';
+    const [hydrated, setHydrated] = useState(false);
+    const [storedGenerating, setStoredGenerating] = useState(false);
+    const [regeneratingFrom, setRegeneratingFrom] = useState<string | null>(null);
+
+    // Read sessionStorage on client only (after hydration)
+    useEffect(() => {
+        setStoredGenerating(sessionStorage.getItem(generatingKey(goalId)) === '1');
+        setRegeneratingFrom(sessionStorage.getItem(regeneratingFromKey(goalId)));
+        setHydrated(true);
+    }, [goalId]);
+
+    const isGenerating = isSubmitting || storedGenerating;
+
+    // When fetcher submits, mark generating and record current plan timestamp
+    useEffect(() => {
+        if (fetcher.state === 'submitting') {
+            sessionStorage.setItem(generatingKey(goalId), '1');
+            setStoredGenerating(true);
+            const from = plan?.createdAt ? new Date(plan.createdAt).toISOString() : null;
+            if (from) {
+                sessionStorage.setItem(regeneratingFromKey(goalId), from);
+            } else {
+                sessionStorage.removeItem(regeneratingFromKey(goalId));
+            }
+            setRegeneratingFrom(from);
+        }
+    }, [fetcher.state, goalId, plan?.createdAt]);
+
+    function handleGenerateClick() {
+        sessionStorage.setItem(generatingKey(goalId), '1');
+        setStoredGenerating(true);
+        const from = plan?.createdAt ? new Date(plan.createdAt).toISOString() : null;
+        if (from) {
+            sessionStorage.setItem(regeneratingFromKey(goalId), from);
+        } else {
+            sessionStorage.removeItem(regeneratingFromKey(goalId));
+        }
+        setRegeneratingFrom(from);
+    }
+
+    // Poll every 4 seconds while generating
+    useEffect(() => {
+        if (isGenerating) {
+            pollRef.current = setInterval(() => revalidate(), 4000);
+        }
+        return () => {
+            if (pollRef.current) clearInterval(pollRef.current);
+        };
+    }, [isGenerating, revalidate]);
+
+    // Clear generating flag when the expected new plan arrives — only after hydration
+    useEffect(() => {
+        if (!hydrated || !isGenerating) return;
+        const isNewPlan = regeneratingFrom
+            ? plan && new Date(plan.createdAt).toISOString() !== regeneratingFrom
+            : !!plan;
+        if (isNewPlan) {
+            sessionStorage.removeItem(generatingKey(goalId));
+            sessionStorage.removeItem(regeneratingFromKey(goalId));
+            setStoredGenerating(false);
+            setRegeneratingFrom(null);
+            if (pollRef.current) clearInterval(pollRef.current);
+        }
+    }, [plan, goalId, isGenerating, regeneratingFrom, hydrated]);
+
+    const spinner = (
+        <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor" />
+        </svg>
+    );
 
     if (!plan) {
         return (
             <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">Study plan</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">No plan has been generated for this goal yet.</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        {isGenerating
+                            ? "Generating your study plan — this can take a couple of minutes. You can navigate away; we'll keep checking."
+                            : 'No plan has been generated for this goal yet.'}
+                    </p>
                 </div>
-                <Form method="post">
-                    <Button disabled={isGenerating} type="submit">
-                        {isGenerating ? (
-                            <span className="flex items-center gap-1.5">
-                                <svg
-                                    className="h-3.5 w-3.5 animate-spin"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    />
-                                    <path
-                                        className="opacity-75"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                        fill="currentColor"
-                                    />
-                                </svg>
-                                Generating — this can take a couple of minutes…
-                            </span>
-                        ) : (
-                            'Generate study plan'
-                        )}
-                    </Button>
-                </Form>
+                {!isGenerating && (
+                    <fetcher.Form method="post">
+                        <Button onClick={handleGenerateClick} type="submit">
+                            Generate study plan
+                        </Button>
+                    </fetcher.Form>
+                )}
+                {isGenerating && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        {spinner}
+                        <span>Checking for your plan…</span>
+                    </div>
+                )}
                 <Link
                     className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'self-start')}
                     to={`/me/goals/${goalId}`}
@@ -104,37 +173,24 @@ export default function StudyPlanRoute() {
                         started.
                     </p>
                 </div>
-                <Form method="post">
-                    <Button disabled={isGenerating} size="sm" type="submit" variant="outline">
+                <fetcher.Form method="post">
+                    <Button
+                        disabled={isGenerating}
+                        onClick={handleGenerateClick}
+                        size="sm"
+                        type="submit"
+                        variant="outline"
+                    >
                         {isGenerating ? (
                             <span className="flex items-center gap-1.5">
-                                <svg
-                                    className="h-3.5 w-3.5 animate-spin"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    />
-                                    <path
-                                        className="opacity-75"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                        fill="currentColor"
-                                    />
-                                </svg>
-                                Generating…
+                                {spinner}
+                                Regenerating…
                             </span>
                         ) : (
                             'Regenerate'
                         )}
                     </Button>
-                </Form>
+                </fetcher.Form>
             </div>
 
             {plan.suggestions.map((suggestion) => (

@@ -2,6 +2,9 @@ package com.worksonourmachines.student.plan.service;
 
 import java.util.UUID;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import org.openapitools.model.SharedStudentGeneratedPlan;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class GeneratedPlanService {
     private final GeneratedPlanRepository generatedPlanRepository;
     private final GeneratedPlanMapper generatedPlanMapper;
     private final AiServiceClient aiServiceClient;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public GeneratedPlanService(
             AuthenticatedUser authenticatedUser,
@@ -45,6 +51,7 @@ public class GeneratedPlanService {
 
         var aiResponse = aiServiceClient.generatePlan(id, authenticatedUser.bearerToken());
         generatedPlanRepository.deleteByGoalId(goalId);
+        entityManager.flush();
         var entity = generatedPlanRepository.save(generatedPlanMapper.toEntity(goalId, aiResponse));
         return generatedPlanMapper.toDto(entity);
     }
