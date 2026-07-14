@@ -12,8 +12,7 @@ CREATE TABLE student.plan_suggestions (
     tier                 varchar(32) NOT NULL
                              CHECK (tier IN ('CHEAPEST', 'WITHIN_BUDGET', 'BEST_QUALITY')),
     description          text NOT NULL,
-    total_estimated_cost integer NOT NULL CHECK (total_estimated_cost >= 0),
-    PRIMARY KEY (id)
+    total_estimated_cost integer NOT NULL CHECK (total_estimated_cost >= 0)
 );
 
 CREATE TABLE student.plan_suggestion_tutors (
