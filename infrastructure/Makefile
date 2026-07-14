@@ -15,6 +15,7 @@ RANCHER_METADATA_DIR ?= /tmp/tutormatch-rancher-build-metadata
 K3D_CLUSTER ?= tutormatch
 K3D_KUBE_CONTEXT := k3d-$(K3D_CLUSTER)
 K3D_IMAGE_TAG ?= local
+K3D_TIMEOUT ?= 15m
 K3D_LLM_BASE_URL ?= http://host.k3d.internal:11434
 K3D_APP_URL ?= https://tutormatch.127.0.0.1.nip.io
 K3D_AUTH_URL ?= https://auth.tutormatch.127.0.0.1.nip.io
@@ -44,8 +45,6 @@ rancher-publish-ai: rancher-image-digests-init rancher-check-image-env
 		--file "$(KUBERNETES_REPO_ROOT)/artifacts/ai/docker/Dockerfile" \
 		--target prod \
 		--tag "$(IMAGE_PREFIX)/ai:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/ai:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/ai:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/ai.json" \
 		--provenance=false \
 		--push \
@@ -59,8 +58,6 @@ rancher-publish-client-web: rancher-image-digests-init rancher-check-image-env
 		--file "$(KUBERNETES_REPO_ROOT)/artifacts/client-web/docker/Dockerfile" \
 		--target prod \
 		--tag "$(IMAGE_PREFIX)/client-web:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/client-web:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/client-web:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/client-web.json" \
 		--provenance=false \
 		--push \
@@ -73,8 +70,6 @@ rancher-publish-api-ui: rancher-image-digests-init rancher-check-image-env
 	@docker buildx build \
 		--file "$(KUBERNETES_REPO_ROOT)/artifacts/api-ui/docker/Dockerfile" \
 		--tag "$(IMAGE_PREFIX)/api-ui:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/api-ui:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/api-ui:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/api-ui.json" \
 		--provenance=false \
 		--push \
@@ -89,8 +84,6 @@ rancher-publish-server-communication: rancher-image-digests-init rancher-check-i
 		--target prod \
 		--build-arg SERVER_MODULE=communication \
 		--tag "$(IMAGE_PREFIX)/server-communication:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/server-communication:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/server-communication:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/server-communication.json" \
 		--provenance=false \
 		--push \
@@ -105,8 +98,6 @@ rancher-publish-server-marketplace: rancher-image-digests-init rancher-check-ima
 		--target prod \
 		--build-arg SERVER_MODULE=marketplace \
 		--tag "$(IMAGE_PREFIX)/server-marketplace:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/server-marketplace:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/server-marketplace:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/server-marketplace.json" \
 		--provenance=false \
 		--push \
@@ -121,8 +112,6 @@ rancher-publish-server-student: rancher-image-digests-init rancher-check-image-e
 		--target prod \
 		--build-arg SERVER_MODULE=student \
 		--tag "$(IMAGE_PREFIX)/server-student:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/server-student:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/server-student:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/server-student.json" \
 		--provenance=false \
 		--push \
@@ -223,7 +212,7 @@ rancher-helm-upgrade: rancher-check-deploy-env rancher-check-image-digests
 rancher-rollout-status:
 	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		rollout status deployment/ai deployment/api-ui deployment/client-web deployment/server-communication deployment/server-marketplace deployment/server-student \
+		rollout status deployment \
 		--timeout="$(RANCHER_TIMEOUT)"
 
 .PHONY: rancher-prod-deploy
@@ -321,19 +310,22 @@ k3d-helm-upgrade: ## Install or upgrade TutorMatch in local k3d
 		--set-string global.imageRegistry="$(IMAGE_PREFIX)" \
 		--set-string global.imageTag="$(K3D_IMAGE_TAG)" \
 		--set-string ingress.hostAliasIP="$$ingress_ip" \
-		--set-string ai.llmBaseUrl="$(K3D_LLM_BASE_URL)"
+		--set-string ai.llmBaseUrl="$(K3D_LLM_BASE_URL)" \
+		--timeout "$(K3D_TIMEOUT)"
 
 .PHONY: k3d-rollout-status
 k3d-rollout-status: ## Wait for all local deployments
 	@kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
-		rollout status deployment --all --timeout=15m
+		rollout status deployment --timeout="$(K3D_TIMEOUT)"
 
 .PHONY: k3d-smoke-test
 k3d-smoke-test: ## Smoke-test the local web, Keycloak, and API endpoints
-	@curl --silent --show-error --fail --insecure "$(K3D_APP_URL)" >/dev/null
-	@curl --silent --show-error --fail --insecure \
+	@curl --silent --show-error --fail --insecure --connect-timeout 5 --max-time 30 \
+		"$(K3D_APP_URL)" >/dev/null
+	@curl --silent --show-error --fail --insecure --connect-timeout 5 --max-time 30 \
 		"$(K3D_AUTH_URL)/realms/tutormatch/.well-known/openid-configuration" >/dev/null
-	@curl --silent --show-error --fail --insecure "$(K3D_API_URL)" >/dev/null
+	@curl --silent --show-error --fail --insecure --connect-timeout 5 --max-time 30 \
+		"$(K3D_API_URL)" >/dev/null
 	@echo "Local Kubernetes smoke tests passed"
 
 .PHONY: k3d-local-deploy

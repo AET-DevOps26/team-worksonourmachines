@@ -177,6 +177,11 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   progressDeadlineSeconds: 900
   selector:
     matchLabels:
@@ -241,10 +246,10 @@ spec:
             failureThreshold: 12
           resources:
             requests:
-              cpu: 500m
+              cpu: 400m
               memory: 512Mi
             limits:
-              cpu: 1000m
+              cpu: 600m
               memory: 1Gi
 ---
 apiVersion: batch/v1
