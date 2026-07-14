@@ -94,6 +94,9 @@ services:
       PORT: "8081"
       KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
+      KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token
+      KEYCLOAK_CLIENT_ID: server-student
+      KEYCLOAK_CLIENT_SECRET: server-student-dev-secret
       AI_SERVICE_URL: http://ai:8000
     entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl student -am spring-boot:run"]
     ports:
@@ -167,15 +170,18 @@ services:
       - 127.0.0.1:8000:8000
     environment:
       LOG_LEVEL: INFO
-      LLM_PROVIDER: ${LLM_PROVIDER:-lmstudio}
-      LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:1234/v1}
-      LLM_MODEL: ${LLM_MODEL:-local-model}
-      LLM_API_KEY: ${LLM_API_KEY:-not-required}
+      LLM_PROVIDER: ollama
+      LLM_BASE_URL: http://ollama:11434
+      LLM_MODEL: llama3.2:latest
+      LLM_API_KEY: not-required
       STUDENT_API_URL: http://server-student:8081
       MARKETPLACE_API_URL: http://server-marketplace:8082
+      KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
+      KEYCLOAK_JWKS_URI: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs
       KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token
       AI_CLIENT_ID: server-ai
       AI_CLIENT_SECRET: server-ai-dev-secret
+      EXPECTED_CALLER_CLIENT_ID: server-student
     depends_on:
       server-student:
         condition: service_started

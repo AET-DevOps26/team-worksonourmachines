@@ -213,7 +213,7 @@ def _make_llm_message(content: str):
 @pytest.fixture()
 def mock_clients():
     with (
-        patch("app.ai_impl.exchange_token", new_callable=AsyncMock) as et,
+        patch("app.ai_impl.get_service_token", new_callable=AsyncMock) as gst,
         patch("app.ai_impl.get_learning_goal", new_callable=AsyncMock) as gl,
         patch("app.ai_impl.get_student_profile", new_callable=AsyncMock) as gs,
         patch("app.ai_impl.get_module", new_callable=AsyncMock) as gm,
@@ -223,7 +223,7 @@ def mock_clients():
             return_value={"provider": "test", "model": "test"},
         ),
     ):
-        et.return_value = "Bearer exchanged-tok"
+        gst.return_value = "Bearer service-tok"
         gl.return_value = GOAL
         gs.return_value = STUDENT
         gm.return_value = MODULE
@@ -248,7 +248,9 @@ async def test_generate_plan_uses_structured_output_for_openai(mock_clients):
         mock_get_llm.return_value = llm
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         result = await impl.generate_plan(req, "Bearer tok")
 
     # with_structured_output called with the response model
@@ -266,7 +268,9 @@ async def test_generate_plan_success(mock_clients):
         mock_get_llm.return_value = llm
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         result = await impl.generate_plan(req, "Bearer tok")
 
     assert result.learning_goal_id == "goal-1"
@@ -283,7 +287,9 @@ async def test_generate_plan_strips_markdown_fence(mock_clients):
         mock_get_llm.return_value = llm
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         result = await impl.generate_plan(req, "Bearer tok")
 
     assert result.learning_goal_id == "goal-1"
@@ -302,7 +308,9 @@ async def test_generate_plan_retries_on_bad_json(mock_clients):
         mock_get_llm.return_value = llm
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         result = await impl.generate_plan(req, "Bearer tok")
 
     assert llm.ainvoke.call_count == 2
@@ -325,7 +333,9 @@ async def test_generate_plan_raises_500_after_two_bad_responses(mock_clients):
         mock_get_llm.return_value = llm
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         with pytest.raises(HTTPException) as exc_info:
             await impl.generate_plan(req, "Bearer tok")
 
@@ -337,9 +347,11 @@ async def test_generate_plan_raises_500_after_two_bad_responses(mock_clients):
 async def test_generate_plan_raises_502_on_token_exchange_failure():
     with (
         patch(
-            "app.ai_impl.exchange_token",
+            "app.ai_impl.get_service_token",
             new_callable=AsyncMock,
-            side_effect=HTTPException(status_code=502, detail="Token exchange failed"),
+            side_effect=HTTPException(
+                status_code=502, detail="Failed to obtain service token"
+            ),
         ),
         patch(
             "app.ai_impl.get_llm_info",
@@ -347,12 +359,14 @@ async def test_generate_plan_raises_502_on_token_exchange_failure():
         ),
     ):
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         with pytest.raises(HTTPException) as exc_info:
             await impl.generate_plan(req, "Bearer tok")
 
     assert exc_info.value.status_code == 502
-    assert "Token exchange failed" in exc_info.value.detail
+    assert "service token" in exc_info.value.detail
 
 
 @pytest.mark.asyncio
@@ -363,7 +377,9 @@ async def test_generate_plan_raises_502_on_llm_connection_error(mock_clients):
         mock_get_llm.return_value = llm
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         with pytest.raises(HTTPException) as exc_info:
             await impl.generate_plan(req, "Bearer tok")
 
@@ -415,9 +431,9 @@ def _filtering_mock_clients(student_override=None, goal_override=None, tutors=No
     raw_tutors = tutors if tutors is not None else [TUTOR_DE, TUTOR_EN, TUTOR_BOTH]
     return [
         patch(
-            "app.ai_impl.exchange_token",
+            "app.ai_impl.get_service_token",
             new_callable=AsyncMock,
-            return_value="Bearer exchanged-tok",
+            return_value="Bearer service-tok",
         ),
         patch(
             "app.ai_impl.get_learning_goal",
@@ -460,7 +476,9 @@ async def test_language_filter_passes_only_matching_tutors_to_llm():
         mock_get_llm.return_value = _mock_llm_returning(MOCK_LLM_RESPONSE)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         await impl.generate_plan(req, "Bearer tok")
 
     _, _, _, tutors_arg = mock_build_prompt.call_args.args
@@ -481,7 +499,9 @@ async def test_language_filter_case_insensitive():
         mock_get_llm.return_value = _mock_llm_returning(MOCK_LLM_RESPONSE)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         await impl.generate_plan(req, "Bearer tok")
 
     _, _, _, tutors_arg = mock_build_prompt.call_args.args
@@ -496,7 +516,9 @@ async def test_language_filter_no_match_raises_422():
             stack.enter_context(p)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         with pytest.raises(HTTPException) as exc_info:
             await impl.generate_plan(req, "Bearer tok")
 
@@ -516,7 +538,9 @@ async def test_language_filter_skipped_when_student_has_no_languages():
         mock_get_llm.return_value = _mock_llm_returning(MOCK_LLM_RESPONSE)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         await impl.generate_plan(req, "Bearer tok")
 
     _, _, _, tutors_arg = mock_build_prompt.call_args.args
@@ -535,7 +559,9 @@ async def test_location_filter_passes_only_matching_tutors_to_llm():
         mock_get_llm.return_value = _mock_llm_returning(MOCK_LLM_RESPONSE)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         await impl.generate_plan(req, "Bearer tok")
 
     _, _, _, tutors_arg = mock_build_prompt.call_args.args
@@ -554,7 +580,9 @@ async def test_location_filter_no_match_raises_422():
             stack.enter_context(p)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         with pytest.raises(HTTPException) as exc_info:
             await impl.generate_plan(req, "Bearer tok")
 
@@ -574,7 +602,9 @@ async def test_location_filter_skipped_when_goal_has_no_locations():
         mock_get_llm.return_value = _mock_llm_returning(MOCK_LLM_RESPONSE)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         await impl.generate_plan(req, "Bearer tok")
 
     _, _, _, tutors_arg = mock_build_prompt.call_args.args
@@ -599,7 +629,9 @@ async def test_both_filters_applied_sequentially():
         mock_get_llm.return_value = _mock_llm_returning(MOCK_LLM_RESPONSE)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         await impl.generate_plan(req, "Bearer tok")
 
     _, _, _, tutors_arg = mock_build_prompt.call_args.args
@@ -619,7 +651,9 @@ async def test_location_filter_422_after_language_filter_narrows_pool():
             stack.enter_context(p)
 
         impl = DefaultApiImpl()
-        req = SharedAiGeneratePlanRequest.from_dict({"learningGoalId": "goal-1"})
+        req = SharedAiGeneratePlanRequest.from_dict(
+            {"learningGoalId": "goal-1", "studentId": "student-uuid-1"}
+        )
         with pytest.raises(HTTPException) as exc_info:
             await impl.generate_plan(req, "Bearer tok")
 

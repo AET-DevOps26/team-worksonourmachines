@@ -32,7 +32,8 @@ class SharedAiGeneratePlanRequest(BaseModel):
     SharedAiGeneratePlanRequest
     """ # noqa: E501
     learning_goal_id: StrictStr = Field(alias="learningGoalId")
-    __properties: ClassVar[List[str]] = ["learningGoalId"]
+    student_id: StrictStr = Field(alias="studentId")
+    __properties: ClassVar[List[str]] = ["learningGoalId", "studentId"]
 
     model_config = {
         "populate_by_name": True,
@@ -83,7 +84,8 @@ class SharedAiGeneratePlanRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "learningGoalId": obj.get("learningGoalId")
+            "learningGoalId": obj.get("learningGoalId"),
+            "studentId": obj.get("studentId"),
         })
         return _obj
 

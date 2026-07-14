@@ -32,6 +32,13 @@ public class LearningGoalService {
     }
 
     @Transactional(readOnly = true)
+    public SharedStudentLearningGoal getGoalByStudentId(UUID goalId, UUID studentId) {
+        return learningGoalRepository.findByIdAndStudentId(goalId, studentId)
+                .map(learningGoalMapper::toDto)
+                .orElseThrow(LearningGoalService::notFound);
+    }
+
+    @Transactional(readOnly = true)
     public SharedStudentLearningGoal getGoal(String id) {
         UUID goalId = parseGoalId(id);
         UUID studentId = authenticatedUser.id();

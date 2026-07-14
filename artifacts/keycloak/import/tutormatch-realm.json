@@ -19,6 +19,10 @@
       {
         "name": "admin",
         "description": "Administrative role for local TUtorMatch development."
+      },
+      {
+        "name": "service",
+        "description": "Internal service-to-service role, assigned to service accounts."
       }
     ]
   },
@@ -129,7 +133,7 @@
     {
       "clientId": "server-ai",
       "name": "TUtorMatch AI Service",
-      "description": "Service account for the AI backend; uses token exchange to act on behalf of students with read-only access.",
+      "description": "Service account for the AI backend; authenticates with client credentials to read student and marketplace data.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
@@ -140,9 +144,23 @@
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": true,
       "defaultClientScopes": ["profile", "roles", "basic", "email"],
-      "attributes": {
-        "standard.token.exchange.enabled": "true"
-      }
+      "attributes": {}
+    },
+    {
+      "clientId": "server-student",
+      "name": "TUtorMatch Student Service",
+      "description": "Service account for the student backend; authenticates with client credentials when calling the AI service.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "server-student-dev-secret",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": ["profile", "roles", "basic", "email"],
+      "attributes": {}
     },
     {
       "id" : "d8854ec4-8e9d-4d35-a111-776bf1dbe001",
@@ -234,7 +252,13 @@
       "username": "service-account-server-ai",
       "serviceAccountClientId": "server-ai",
       "enabled": true,
-      "realmRoles": []
+      "realmRoles": ["service"]
+    },
+    {
+      "username": "service-account-server-student",
+      "serviceAccountClientId": "server-student",
+      "enabled": true,
+      "realmRoles": ["service"]
     },
     {
       "username": "service-account-server-marketplace-admin",

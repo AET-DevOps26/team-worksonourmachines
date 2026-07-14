@@ -29,15 +29,15 @@ def _raise_for_status(response: httpx.Response, context: str) -> None:
     raise HTTPException(status_code=502, detail=f"Upstream service error ({context})")
 
 
-async def get_learning_goal(goal_id: str, authorization: str) -> dict:
-    url = f"{STUDENT_API_URL}/v1/students/me/goals/{goal_id}"
+async def get_learning_goal(goal_id: str, student_id: str, authorization: str) -> dict:
+    url = f"{STUDENT_API_URL}/v1/internal/students/{student_id}/goals/{goal_id}"
     response = await _client.get(url, headers=_auth_headers(authorization))
     _raise_for_status(response, f"get_learning_goal goal_id={goal_id}")
     return response.json()
 
 
-async def get_student_profile(authorization: str) -> dict:
-    url = f"{STUDENT_API_URL}/v1/students/me"
+async def get_student_profile(student_id: str, authorization: str) -> dict:
+    url = f"{STUDENT_API_URL}/v1/internal/students/{student_id}"
     response = await _client.get(url, headers=_auth_headers(authorization))
     _raise_for_status(response, "get_student_profile")
     return response.json()

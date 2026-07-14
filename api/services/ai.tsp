@@ -47,6 +47,9 @@ namespace Shared.Ai {
 
   model GeneratePlanRequest {
     learningGoalId: string;
+
+    @doc("UUID of the student for whom the plan is generated. Provided by the student service; the AI must not derive identity from the inbound token.")
+    studentId: string;
   }
 
   model GeneratePlanResponse {
@@ -58,7 +61,7 @@ namespace Shared.Ai {
 @service(#{ title: "AI API" })
 @server("https://ai.example.local", "AI API")
 @versioned(AiVersions)
-@useAuth(KeycloakAuth)
+@useAuth(KeycloakClientAuth)
 @route("/v1")
 namespace Ai {
   using Shared.Ai;

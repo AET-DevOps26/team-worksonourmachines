@@ -32,7 +32,9 @@ oauth2_application = OAuth2(
 
 bearer_scheme = HTTPBearer()
 
-
+# This default is replaced at startup with app.auth.verify_service_token via
+# app.include_router(...) after dependency_overrides is set. The fallback here
+# accepts any bearer so the generated OpenAPI schema remains valid for Scalar.
 def get_token_KeycloakClientAuth(
     security_scopes: SecurityScopes,
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
@@ -43,15 +45,4 @@ def get_token_KeycloakClientAuth(
 def validate_scope_KeycloakClientAuth(
     required_scopes: SecurityScopes, token_scopes: List[str]
 ) -> bool:
-    """
-    Validate required scopes are included in token scope
-
-    :param required_scopes Required scope to access called API
-    :type required_scopes: List[str]
-    :param token_scopes Scope present in token
-    :type token_scopes: List[str]
-    :return: True if access to allowed API is allowed
-    :rtype: bool
-    """
-
     return False

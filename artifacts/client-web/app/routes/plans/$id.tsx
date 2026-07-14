@@ -24,8 +24,8 @@ export const loader = protectedLoader(async ({ params }) => {
 export const action = protectedAction(async ({ params }) => {
     const goalId = params.id ?? '';
     const result = await generatePlan(goalId);
-    if (isErr(result)) throw result.error;
-    return { ok: true };
+    if (isErr(result)) return { error: 'Generation failed. Please try again.', ok: false };
+    return { error: null, ok: true };
 });
 
 type PlanSuggestion = SharedStudentGeneratedPlanSuggestion;
@@ -49,7 +49,6 @@ function generatingKey(goalId: string) {
 function regeneratingFromKey(goalId: string) {
     return `plan-regenerating-from:${goalId}`;
 }
-
 export default function StudyPlanRoute() {
     const { plan, goalId } = useLoaderData<typeof loader>();
     const fetcher = useFetcher();
@@ -57,70 +56,100 @@ export default function StudyPlanRoute() {
     const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const isSubmitting = fetcher.state !== 'idle';
+    const actionError = fetcher.data && !fetcher.data.ok ? fetcher.data.error : null;
+
     const [hydrated, setHydrated] = useState(false);
     const [storedGenerating, setStoredGenerating] = useState(false);
-    const [regeneratingFrom, setRegeneratingFrom] = useState<string | null>(null);
+    const [regeneratingFromId, setRegeneratingFromId] = useState<string | null>(null);
 
-    // Read sessionStorage on client only (after hydration)
     useEffect(() => {
-        setStoredGenerating(sessionStorage.getItem(generatingKey(goalId)) === '1');
-        setRegeneratingFrom(sessionStorage.getItem(regeneratingFromKey(goalId)));
+        setStoredGenerating(localStorage.getItem(generatingKey(goalId)) === '1');
+        setRegeneratingFromId(localStorage.getItem(regeneratingFromKey(goalId)));
         setHydrated(true);
-    }, [goalId]);
+    }, [goalId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const isGenerating = isSubmitting || storedGenerating;
+    // Before hydration we don't know whether we're generating — hide the button
+    // so the user never sees a stale "Regenerate" label before localStorage is read.
+    const buttonReady = hydrated || isSubmitting;
 
-    // When fetcher submits, mark generating and record current plan timestamp
+    // When fetcher submits, mark generating and record the current plan id so we
+    // can detect when a genuinely new plan has arrived after a regenerate.
     useEffect(() => {
         if (fetcher.state === 'submitting') {
-            sessionStorage.setItem(generatingKey(goalId), '1');
+            localStorage.setItem(generatingKey(goalId), '1');
             setStoredGenerating(true);
-            const from = plan?.createdAt ? new Date(plan.createdAt).toISOString() : null;
-            if (from) {
-                sessionStorage.setItem(regeneratingFromKey(goalId), from);
+            const fromId = plan?.id ?? null;
+            if (fromId) {
+                localStorage.setItem(regeneratingFromKey(goalId), fromId);
             } else {
-                sessionStorage.removeItem(regeneratingFromKey(goalId));
+                localStorage.removeItem(regeneratingFromKey(goalId));
             }
-            setRegeneratingFrom(from);
+            setRegeneratingFromId(fromId);
         }
-    }, [fetcher.state, goalId, plan?.createdAt]);
+        // When the action completes with an error, clear the generating flag so
+        // the button re-enables and the user can try again.
+        if (fetcher.state === 'idle' && fetcher.data && !fetcher.data.ok) {
+            localStorage.removeItem(generatingKey(goalId));
+            localStorage.removeItem(regeneratingFromKey(goalId));
+            setStoredGenerating(false);
+            setRegeneratingFromId(null);
+        }
+    }, [fetcher.state, fetcher.data, goalId, plan?.id]);
 
     function handleGenerateClick() {
-        sessionStorage.setItem(generatingKey(goalId), '1');
-        setStoredGenerating(true);
-        const from = plan?.createdAt ? new Date(plan.createdAt).toISOString() : null;
-        if (from) {
-            sessionStorage.setItem(regeneratingFromKey(goalId), from);
-        } else {
-            sessionStorage.removeItem(regeneratingFromKey(goalId));
-        }
-        setRegeneratingFrom(from);
+        // intentionally empty — state is set in the fetcher.state effect above
+        // to avoid unmounting the form before the submit fires
     }
 
-    // Poll every 4 seconds while generating
+    // Poll every 4 seconds while generating.
     useEffect(() => {
         if (isGenerating) {
             pollRef.current = setInterval(() => revalidate(), 4000);
         }
         return () => {
-            if (pollRef.current) clearInterval(pollRef.current);
+            if (pollRef.current) {
+                clearInterval(pollRef.current);
+                pollRef.current = null;
+            }
         };
     }, [isGenerating, revalidate]);
 
-    // Clear generating flag when the expected new plan arrives — only after hydration
+    // Clear generating flag when the expected new plan arrives.
+    // For regenerate: wait until plan.id differs from the stored id.
+    // For first generate: any plan arriving is enough.
     useEffect(() => {
-        if (!hydrated || !isGenerating) return;
-        const isNewPlan = regeneratingFrom
-            ? plan && new Date(plan.createdAt).toISOString() !== regeneratingFrom
+        if (!isGenerating) return;
+        const isNewPlan = regeneratingFromId
+            ? plan !== null && plan !== undefined && plan.id !== regeneratingFromId
             : !!plan;
         if (isNewPlan) {
-            sessionStorage.removeItem(generatingKey(goalId));
-            sessionStorage.removeItem(regeneratingFromKey(goalId));
+            localStorage.removeItem(generatingKey(goalId));
+            localStorage.removeItem(regeneratingFromKey(goalId));
             setStoredGenerating(false);
-            setRegeneratingFrom(null);
-            if (pollRef.current) clearInterval(pollRef.current);
+            setRegeneratingFromId(null);
+            if (pollRef.current) {
+                clearInterval(pollRef.current);
+                pollRef.current = null;
+            }
         }
-    }, [plan, goalId, isGenerating, regeneratingFrom, hydrated]);
+    }, [plan, goalId, isGenerating, regeneratingFromId]);
+
+    // Safety timeout: clear the generating flag after 10 minutes so the UI never
+    // gets permanently stuck if the server request failed silently.
+    useEffect(() => {
+        if (!isGenerating) return;
+        const timeout = setTimeout(
+            () => {
+                localStorage.removeItem(generatingKey(goalId));
+                localStorage.removeItem(regeneratingFromKey(goalId));
+                setStoredGenerating(false);
+                setRegeneratingFromId(null);
+            },
+            10 * 60 * 1000,
+        );
+        return () => clearTimeout(timeout);
+    }, [isGenerating, goalId]);
 
     const spinner = (
         <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -140,6 +169,7 @@ export default function StudyPlanRoute() {
                             : 'No plan has been generated for this goal yet.'}
                     </p>
                 </div>
+                {actionError && <p className="text-sm text-destructive">{actionError}</p>}
                 {!isGenerating && (
                     <fetcher.Form method="post">
                         <Button onClick={handleGenerateClick} type="submit">
@@ -172,24 +202,27 @@ export default function StudyPlanRoute() {
                         Three AI-generated options for your learning goal. Pick one and reach out to a tutor to get
                         started.
                     </p>
+                    {actionError && <p className="mt-1 text-sm text-destructive">{actionError}</p>}
                 </div>
                 <fetcher.Form method="post">
-                    <Button
-                        disabled={isGenerating}
-                        onClick={handleGenerateClick}
-                        size="sm"
-                        type="submit"
-                        variant="outline"
-                    >
-                        {isGenerating ? (
-                            <span className="flex items-center gap-1.5">
-                                {spinner}
-                                Regenerating…
-                            </span>
-                        ) : (
-                            'Regenerate'
-                        )}
-                    </Button>
+                    {buttonReady && (
+                        <Button
+                            disabled={isGenerating}
+                            onClick={handleGenerateClick}
+                            size="sm"
+                            type="submit"
+                            variant="outline"
+                        >
+                            {isGenerating ? (
+                                <span className="flex items-center gap-1.5">
+                                    {spinner}
+                                    Regenerating…
+                                </span>
+                            ) : (
+                                'Regenerate'
+                            )}
+                        </Button>
+                    )}
                 </fetcher.Form>
             </div>
 
@@ -242,7 +275,7 @@ function SuggestionCard({ suggestion }: { suggestion: PlanSuggestion }) {
                     <p className="mb-2 text-sm font-medium">Milestones</p>
                     <ol className="flex flex-col gap-2">
                         {suggestion.milestones.map((milestone, i) => (
-                            <li className="flex items-start gap-3 text-sm" key={milestone.title}>
+                            <li className="flex items-start gap-3 text-sm" key={milestone.topicId}>
                                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
                                     {i + 1}
                                 </span>
