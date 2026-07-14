@@ -41,6 +41,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.worksonourmachines.server.common.security.CommonSecurityConfiguration;
 import com.worksonourmachines.student.goal.service.LearningGoalService;
+import com.worksonourmachines.student.plan.service.GeneratedPlanService;
 import com.worksonourmachines.student.profile.service.StudentProfileService;
 
 @WebMvcTest(StudentProfileController.class)
@@ -373,6 +374,11 @@ class StudentProfileControllerTest {
         @Bean
         LearningGoalService learningGoalService() {
             return mock(LearningGoalService.class);
+        }
+
+        @Bean
+        GeneratedPlanService generatedPlanService() {
+            return mock(GeneratedPlanService.class);
         }
 
         @Bean

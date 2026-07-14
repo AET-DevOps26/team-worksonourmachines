@@ -192,7 +192,7 @@ function SuggestionCard({ suggestion }: { suggestion: PlanSuggestion }) {
                                 <div className="flex-1">
                                     <span className="font-medium">{milestone.title}</span>
                                     <span className="ml-2 text-muted-foreground">
-                                        due {new Date(milestone.dueDate).toLocaleDateString()} · €
+                                        due {new Date(milestone.dueDate).toLocaleDateString('en-GB')} · €
                                         {milestone.estimatedCost}
                                     </span>
                                 </div>
