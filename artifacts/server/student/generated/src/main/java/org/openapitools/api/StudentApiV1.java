@@ -6,6 +6,7 @@
 package org.openapitools.api;
 
 import org.openapitools.model.SharedErrorsErrorBody;
+import org.openapitools.model.SharedStudentGeneratedPlan;
 import org.openapitools.model.SharedStudentLearningGoal;
 import org.openapitools.model.SharedStudentLearningGoalInput;
 import org.openapitools.model.SharedStudentStudentProfile;
@@ -65,6 +66,26 @@ public interface StudentApiV1 {
     );
 
 
+    String PATH_GENERATE_PLAN = "/v1/students/me/goals/{id}/plan";
+    /**
+     * POST /v1/students/me/goals/{id}/plan : Generate and persist a study plan for a learning goal
+     * Calls the AI service to generate a study plan and persists it. Replaces any existing plan for the goal.
+     *
+     * @param id  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = StudentApiV1.PATH_GENERATE_PLAN,
+        produces = { "application/json" }
+    )
+    ResponseEntity<SharedStudentGeneratedPlan> generatePlan(
+         @PathVariable("id") String id
+    );
+
+
     String PATH_GET_GOAL = "/v1/students/me/goals/{id}";
     /**
      * GET /v1/students/me/goals/{id} : Get a learning goal
@@ -99,6 +120,25 @@ public interface StudentApiV1 {
     )
     ResponseEntity<SharedStudentStudentProfile> getMyProfile(
         
+    );
+
+
+    String PATH_GET_PLAN = "/v1/students/me/goals/{id}/plan";
+    /**
+     * GET /v1/students/me/goals/{id}/plan : Get the persisted study plan for a learning goal
+     *
+     * @param id  (required)
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     *         or The server cannot find the requested resource. (status code 404)
+     */
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = StudentApiV1.PATH_GET_PLAN,
+        produces = { "application/json" }
+    )
+    ResponseEntity<SharedStudentGeneratedPlan> getPlan(
+         @PathVariable("id") String id
     );
 
 

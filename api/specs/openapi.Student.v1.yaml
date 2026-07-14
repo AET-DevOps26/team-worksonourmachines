@@ -195,6 +195,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+  /v1/students/me/goals/{id}/plan:
+    post:
+      operationId: generatePlan
+      summary: Generate and persist a study plan for a learning goal
+      description: Calls the AI service to generate a study plan and persists it. Replaces any existing plan for the goal.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.GeneratedPlan'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+    get:
+      operationId: getPlan
+      summary: Get the persisted study plan for a learning goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.GeneratedPlan'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
 security:
   - KeycloakAuth:
       - openid
@@ -223,6 +281,90 @@ components:
         - weihenstephan
         - straubing
         - ottobrunn
+    Shared.Student.GeneratedPlan:
+      type: object
+      required:
+        - id
+        - learningGoalId
+        - createdAt
+        - suggestions
+      properties:
+        id:
+          type: string
+        learningGoalId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Student.GeneratedPlanSuggestion'
+    Shared.Student.GeneratedPlanMilestone:
+      type: object
+      required:
+        - title
+        - dueDate
+        - topicId
+        - tutorId
+        - estimatedCost
+      properties:
+        title:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        topicId:
+          type: string
+        tutorId:
+          type: string
+        estimatedCost:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Estimated cost in EUR (whole euros).
+    Shared.Student.GeneratedPlanSuggestion:
+      type: object
+      required:
+        - tier
+        - description
+        - totalEstimatedCost
+        - proposedTutors
+        - milestones
+      properties:
+        tier:
+          $ref: '#/components/schemas/Shared.Student.PlanTier'
+        description:
+          type: string
+        totalEstimatedCost:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Total estimated cost in EUR (whole euros).
+        proposedTutors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Student.GeneratedPlanTutor'
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Student.GeneratedPlanMilestone'
+    Shared.Student.GeneratedPlanTutor:
+      type: object
+      required:
+        - id
+        - displayName
+        - hourlyRate
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        hourlyRate:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Hourly rate in EUR (whole euros).
     Shared.Student.LearningGoal:
       type: object
       required:
@@ -289,6 +431,12 @@ components:
           items:
             $ref: '#/components/schemas/Shared.Marketplace.Location'
       description: The template for omitting properties.
+    Shared.Student.PlanTier:
+      type: string
+      enum:
+        - cheapest
+        - within_budget
+        - best_quality
     Shared.Student.StudentProfile:
       type: object
       required:

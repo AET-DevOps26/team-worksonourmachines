@@ -32,3 +32,11 @@ export async function updateGoal(id: string, input: SharedStudentLearningGoalInp
 export async function deleteGoal(id: string) {
     return callApi(() => studentApi.deleteGoal({ id }));
 }
+
+export async function generatePlan(id: string) {
+    return callApi(() => studentApi.generatePlan({ id }));
+}
+
+export async function getPlan(id: string) {
+    return callApi(() => studentApi.getPlan({ id }));
+}

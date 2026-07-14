@@ -94,6 +94,10 @@ services:
       PORT: "8081"
       KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
+      AI_SERVICE_URL: http://ai:8000
+      AI_CLIENT_ID: server-ai
+      AI_CLIENT_SECRET: server-ai-dev-secret
+      AI_TOKEN_URL: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token
     entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl student -am spring-boot:run"]
     ports:
       - 127.0.0.1:8081:8081
@@ -120,7 +124,6 @@ services:
       KEYCLOAK_CLIENT_ID: client-web
       KEYCLOAK_CLIENT_SECRET: client-web-dev-secret
       REDIS_URL: redis://redis:6379
-      SERVER_AI_API_URL: http://ai:8000
       SERVER_COMMUNICATION_API_URL: http://server-communication:8083
       SERVER_MARKETPLACE_API_URL: http://server-marketplace:8082
       SERVER_STUDENT_API_URL: http://server-student:8081

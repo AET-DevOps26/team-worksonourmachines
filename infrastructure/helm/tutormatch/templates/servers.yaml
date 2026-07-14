@@ -55,6 +55,19 @@ spec:
                 secretKeyRef:
                   name: postgres-secrets
                   key: POSTGRES_PASSWORD
+            {{- if eq $server.name "server-student" }}
+            - name: AI_SERVICE_URL
+              value: "http://ai:8000"
+            - name: AI_CLIENT_ID
+              value: "server-ai"
+            - name: AI_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ai-secrets
+                  key: AI_CLIENT_SECRET
+            - name: AI_TOKEN_URL
+              value: "http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token"
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -1,4 +1,4 @@
-import { Form, Link, redirect, useLoaderData, useNavigation } from 'react-router';
+import { Form, Link, redirect, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { listModules } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
@@ -43,8 +43,6 @@ export const action = protectedAction(async ({ request, params }) => {
 
 export default function LearningGoalDetailRoute() {
     const { goal, moduleCode } = useLoaderData<typeof loader>();
-    const navigation = useNavigation();
-    const isGenerating = navigation.state === 'loading' && navigation.location?.pathname === `/plans/${goal.id}`;
 
     return (
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
@@ -54,47 +52,10 @@ export default function LearningGoalDetailRoute() {
                         <CardTitle>{goal.description}</CardTitle>
                         <CardDescription className="mt-1">Module: {moduleCode ?? goal.moduleId}</CardDescription>
                     </div>
-                    <Link
-                        className={cn(
-                            buttonVariants({ size: 'sm' }),
-                            isGenerating ? 'pointer-events-none opacity-60' : '',
-                        )}
-                        to={`/plans/${goal.id}`}
-                    >
-                        {isGenerating ? (
-                            <span className="flex items-center gap-1.5">
-                                <svg
-                                    className="h-3.5 w-3.5 animate-spin"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    />
-                                    <path
-                                        className="opacity-75"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                        fill="currentColor"
-                                    />
-                                </svg>
-                                Generating…
-                            </span>
-                        ) : (
-                            'Generate study plan'
-                        )}
+                    <Link className={cn(buttonVariants({ size: 'sm' }))} to={`/plans/${goal.id}`}>
+                        Study plan
                     </Link>
                 </div>
-                {isGenerating && (
-                    <p className="mt-3 text-sm text-muted-foreground">
-                        Generating your personalised study plan — this can take a couple of minutes.
-                    </p>
-                )}
             </Card>
 
             <Card className="flex flex-col gap-4">

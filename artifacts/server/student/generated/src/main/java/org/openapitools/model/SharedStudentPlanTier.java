@@ -15,27 +15,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets Shared.Marketplace.Location
+ * Gets or Sets Shared.Student.PlanTier
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.22.0")
-public enum SharedMarketplaceLocation {
+public enum SharedStudentPlanTier {
   
-  ONLINE("online"),
+  CHEAPEST("cheapest"),
   
-  GARCHING("garching"),
+  WITHIN_BUDGET("within_budget"),
   
-  MUNICH("munich"),
-  
-  WEIHENSTEPHAN("weihenstephan"),
-  
-  STRAUBING("straubing"),
-  
-  OTTOBRUNN("ottobrunn");
+  BEST_QUALITY("best_quality");
 
   private final String value;
 
-  SharedMarketplaceLocation(String value) {
+  SharedStudentPlanTier(String value) {
     this.value = value;
   }
 
@@ -50,8 +44,8 @@ public enum SharedMarketplaceLocation {
   }
 
   @JsonCreator
-  public static SharedMarketplaceLocation fromValue(String value) {
-    for (SharedMarketplaceLocation b : SharedMarketplaceLocation.values()) {
+  public static SharedStudentPlanTier fromValue(String value) {
+    for (SharedStudentPlanTier b : SharedStudentPlanTier.values()) {
       if (b.value.equals(value)) {
         return b;
       }
