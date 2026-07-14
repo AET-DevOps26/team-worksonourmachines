@@ -76,12 +76,7 @@ spec:
             periodSeconds: 20
             failureThreshold: 3
           resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 300m
-              memory: 512Mi
+            {{- toYaml $server.config.resources | nindent 12 }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp
