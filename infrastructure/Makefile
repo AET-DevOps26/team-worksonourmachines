@@ -44,8 +44,6 @@ rancher-publish-ai: rancher-image-digests-init rancher-check-image-env
 		--file "$(KUBERNETES_REPO_ROOT)/artifacts/ai/docker/Dockerfile" \
 		--target prod \
 		--tag "$(IMAGE_PREFIX)/ai:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/ai:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/ai:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/ai.json" \
 		--provenance=false \
 		--push \
@@ -59,8 +57,6 @@ rancher-publish-client-web: rancher-image-digests-init rancher-check-image-env
 		--file "$(KUBERNETES_REPO_ROOT)/artifacts/client-web/docker/Dockerfile" \
 		--target prod \
 		--tag "$(IMAGE_PREFIX)/client-web:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/client-web:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/client-web:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/client-web.json" \
 		--provenance=false \
 		--push \
@@ -73,8 +69,6 @@ rancher-publish-api-ui: rancher-image-digests-init rancher-check-image-env
 	@docker buildx build \
 		--file "$(KUBERNETES_REPO_ROOT)/artifacts/api-ui/docker/Dockerfile" \
 		--tag "$(IMAGE_PREFIX)/api-ui:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/api-ui:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/api-ui:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/api-ui.json" \
 		--provenance=false \
 		--push \
@@ -89,8 +83,6 @@ rancher-publish-server-communication: rancher-image-digests-init rancher-check-i
 		--target prod \
 		--build-arg SERVER_MODULE=communication \
 		--tag "$(IMAGE_PREFIX)/server-communication:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/server-communication:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/server-communication:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/server-communication.json" \
 		--provenance=false \
 		--push \
@@ -105,8 +97,6 @@ rancher-publish-server-marketplace: rancher-image-digests-init rancher-check-ima
 		--target prod \
 		--build-arg SERVER_MODULE=marketplace \
 		--tag "$(IMAGE_PREFIX)/server-marketplace:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/server-marketplace:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/server-marketplace:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/server-marketplace.json" \
 		--provenance=false \
 		--push \
@@ -121,8 +111,6 @@ rancher-publish-server-student: rancher-image-digests-init rancher-check-image-e
 		--target prod \
 		--build-arg SERVER_MODULE=student \
 		--tag "$(IMAGE_PREFIX)/server-student:$${IMAGE_TAG}" \
-		--cache-from type=registry,ref="$(IMAGE_PREFIX)/server-student:buildcache" \
-		--cache-to type=registry,ref="$(IMAGE_PREFIX)/server-student:buildcache",mode=max \
 		--metadata-file "$(RANCHER_METADATA_DIR)/server-student.json" \
 		--provenance=false \
 		--push \
