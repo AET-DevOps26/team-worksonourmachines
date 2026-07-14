@@ -339,7 +339,7 @@
           },
           {
             "id": "e59b9c4d-a25d-42fc-afe6-637f06b02a5c",
-            "name": "- moduleCode: String"
+            "name": "- moduleId: String"
           },
           {
             "id": "ce8c6ea4-a87c-4fae-8141-150114c63978",
@@ -380,8 +380,8 @@
       "height": 250,
       "type": "class",
       "position": {
-        "x": 40,
-        "y": 430
+        "x": 30,
+        "y": 475
       },
       "parentId": "2ee42a19-185d-42e1-b064-af6b37680bf3",
       "data": {
@@ -401,7 +401,7 @@
           },
           {
             "id": "ae5039a6-9a81-4400-a29c-300b757ec8c7",
-            "name": "- status: String"
+            "name": "- totalEstimatedCost: int"
           },
           {
             "id": "320bff44-2b96-457f-b65e-1c4a936fe40a",
@@ -427,7 +427,7 @@
     {
       "id": "76a0cdd9-8f19-45e4-803f-4edde51e9e82",
       "width": 230,
-      "height": 130,
+      "height": 220,
       "type": "class",
       "position": {
         "x": 680,
@@ -448,13 +448,25 @@
           {
             "id": "356d87c1-8eb4-4fa3-9ba5-e957f13d5944",
             "name": "- dueDate: DateTime"
+          },
+          {
+            "id": "bc58a4e8-1639-47d1-a856-93c8e9630794",
+            "name": "-tutorID: String"
+          },
+          {
+            "id": "17f78e53-6732-4115-8ff2-6a5b416bfe7c",
+            "name": "-topicId: String"
+          },
+          {
+            "id": "0e92f563-2b08-471b-b7ef-66c125a66eae",
+            "name": "-cost: int"
           }
         ],
         "methods": []
       },
       "measured": {
         "width": 230,
-        "height": 130
+        "height": 220
       }
     },
     {
