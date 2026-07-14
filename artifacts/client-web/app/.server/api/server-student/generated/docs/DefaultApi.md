@@ -1,6 +1,6 @@
 # DefaultApi
 
-All URIs are relative to *https://student.example.local*
+All URIs are relative to *https://api.tutormatch.localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
