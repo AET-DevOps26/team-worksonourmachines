@@ -59,28 +59,34 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         " background information only."
     )
     cheapest_rate = min((t.get("hourlyRate", 0) for t in tutors), default=0)
-    within_budget = (
-        f"2. **within_budget** — stay within €{budget} total while preferring"
-        " higher-rated tutors."
-        f" The cheapest available tutor charges €{cheapest_rate}/h."
-        f" If €{budget} is less than the cost of a single session at that rate,"
-        " the budget is infeasible: set description to"
-        ' "Budget of €' + str(budget) + " is too low — the cheapest available"
-        f' session costs €{cheapest_rate}", set totalEstimatedCost to {cheapest_rate},'
-        " and return empty proposedTutors and milestones arrays."
-        " Never invent costs below the actual tutor hourly rates."
-    )
+    if budget == "not specified":
+        within_budget = (
+            "2. **within_budget** — no budget was specified; behave the same as"
+            " **cheapest** but prefer higher-rated tutors where rates are equal."
+        )
+    else:
+        within_budget = (
+            f"2. **within_budget** — stay within €{budget} total while preferring"
+            " higher-rated tutors."
+            f" The cheapest available tutor charges €{cheapest_rate}/h."
+            f" If €{budget} is less than the cost of even one session at that rate,"
+            f' set description to "Budget of €{budget} is too low — the cheapest'
+            f' available session costs €{cheapest_rate}", set totalEstimatedCost to 0,'
+            " and return empty proposedTutors and milestones arrays."
+            " Never invent costs below the actual tutor hourly rates."
+        )
     rule_prioritise = (
         "- Prioritise topics where the student's weak skills overlap with"
         " the topic's high demands."
     )
     output_tutors = (
         '      "proposedTutors": [{"id": "<id>", "displayName": "<name>",'
-        ' "hourlyRate": <float>}],'
+        ' "hourlyRate": <integer, whole euros>}],'
     )
     output_milestones = (
         '      "milestones": [{"title": "<title>", "dueDate": "<ISO 8601>",'
-        ' "topicId": "<id>", "tutorId": "<id>", "estimatedCost": <float>}]'
+        ' "topicId": "<id>", "tutorId": "<id>",'
+        ' "estimatedCost": <integer, whole euros>}]'
     )
 
     lines = [
@@ -125,8 +131,8 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         '- Milestone title should reflect the topic name (e.g. "Study: <topic name>").',
         "- Space milestones evenly between today and the target date.",
         "- Do not suggest booking or transactions.",
-        "- estimatedCost per milestone = sessionDurationHours × tutorHourlyRate."
-        " Never use a cost lower than the tutor's hourly rate.",
+        "- estimatedCost per milestone = round(sessionDurationHours × tutorHourlyRate)"
+        " — whole euros only, never fractional, never below the tutor's hourly rate.",
         "- totalEstimatedCost = sum of all milestone estimatedCosts.",
         "",
         "## Output format",
@@ -137,7 +143,7 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "    {",
         '      "tier": "cheapest" | "within_budget" | "best_quality",',
         '      "description": "<one sentence>",',
-        '      "totalEstimatedCost": <float>,',
+        '      "totalEstimatedCost": <integer, whole euros>,',
         output_tutors,
         output_milestones,
         "    }",
