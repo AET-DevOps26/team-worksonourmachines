@@ -24,7 +24,7 @@ public class PlanSuggestionEntity {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "plan_id", nullable = false)
+    @Column(name = "plan_id", nullable = false, insertable = false, updatable = false)
     private UUID planId;
 
     @Column(name = "position", nullable = false)
@@ -60,14 +60,12 @@ public class PlanSuggestionEntity {
     }
 
     public PlanSuggestionEntity(
-            UUID planId,
             int position,
             PlanTier tier,
             String description,
             int totalEstimatedCost,
             List<PlanSuggestionTutor> proposedTutors,
             List<PlanSuggestionMilestone> milestones) {
-        this.planId = planId;
         this.position = position;
         this.tier = tier;
         this.description = description;
@@ -84,7 +82,6 @@ public class PlanSuggestionEntity {
     }
 
     public UUID getId() { return id; }
-    public UUID getPlanId() { return planId; }
     public int getPosition() { return position; }
     public PlanTier getTier() { return tier; }
     public String getDescription() { return description; }

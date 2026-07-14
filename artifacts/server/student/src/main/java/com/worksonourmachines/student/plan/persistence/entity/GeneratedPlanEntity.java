@@ -10,6 +10,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
@@ -29,7 +30,8 @@ public class GeneratedPlanEntity {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
-    @OneToMany(mappedBy = "planId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "plan_id", nullable = false)
     @OrderBy("position ASC")
     private List<PlanSuggestionEntity> suggestions = new ArrayList<>();
 

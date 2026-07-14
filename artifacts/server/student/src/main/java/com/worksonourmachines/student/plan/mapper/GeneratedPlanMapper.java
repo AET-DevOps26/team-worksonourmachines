@@ -23,7 +23,6 @@ import com.worksonourmachines.student.plan.persistence.entity.PlanTier;
 public class GeneratedPlanMapper {
 
     public GeneratedPlanEntity toEntity(UUID goalId, AiGeneratePlanResponse response) {
-        UUID planId = UUID.randomUUID();
         List<AiPlanSuggestion> rawSuggestions = response.suggestions();
         List<PlanSuggestionEntity> suggestions = new ArrayList<>();
         for (int i = 0; i < rawSuggestions.size(); i++) {
@@ -36,7 +35,6 @@ public class GeneratedPlanMapper {
                             m.title(), m.dueDate(), m.topicId(), m.tutorId(), m.estimatedCost()))
                     .toList();
             suggestions.add(new PlanSuggestionEntity(
-                    planId,
                     i,
                     PlanTier.valueOf(s.tier().toUpperCase().replace("-", "_")),
                     s.description(),
