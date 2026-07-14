@@ -3,7 +3,6 @@ package com.worksonourmachines.student.plan.service;
 import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 
 import org.openapitools.model.SharedStudentGeneratedPlan;
 import org.springframework.http.HttpStatus;
@@ -25,21 +24,21 @@ public class GeneratedPlanService {
     private final GeneratedPlanRepository generatedPlanRepository;
     private final GeneratedPlanMapper generatedPlanMapper;
     private final AiServiceClient aiServiceClient;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public GeneratedPlanService(
             AuthenticatedUser authenticatedUser,
             LearningGoalRepository learningGoalRepository,
             GeneratedPlanRepository generatedPlanRepository,
             GeneratedPlanMapper generatedPlanMapper,
-            AiServiceClient aiServiceClient) {
+            AiServiceClient aiServiceClient,
+            EntityManager entityManager) {
         this.authenticatedUser = authenticatedUser;
         this.learningGoalRepository = learningGoalRepository;
         this.generatedPlanRepository = generatedPlanRepository;
         this.generatedPlanMapper = generatedPlanMapper;
         this.aiServiceClient = aiServiceClient;
+        this.entityManager = entityManager;
     }
 
     @Transactional

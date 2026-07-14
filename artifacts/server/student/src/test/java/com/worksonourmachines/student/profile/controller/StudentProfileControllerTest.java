@@ -37,9 +37,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.worksonourmachines.server.common.security.CommonSecurityConfiguration;
+import jakarta.persistence.EntityManager;
 import com.worksonourmachines.student.goal.service.LearningGoalService;
 import com.worksonourmachines.student.plan.service.GeneratedPlanService;
 import com.worksonourmachines.student.profile.service.StudentProfileService;
@@ -377,8 +379,14 @@ class StudentProfileControllerTest {
         }
 
         @Bean
+        @Primary
         GeneratedPlanService generatedPlanService() {
             return mock(GeneratedPlanService.class);
+        }
+
+        @Bean
+        EntityManager entityManager() {
+            return mock(EntityManager.class);
         }
 
         @Bean
