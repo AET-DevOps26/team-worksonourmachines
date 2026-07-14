@@ -314,7 +314,7 @@ k3d-helm-upgrade: ## Install or upgrade TutorMatch in local k3d
 .PHONY: k3d-rollout-status
 k3d-rollout-status: ## Wait for all local deployments
 	@kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
-		rollout status deployment --all --timeout=15m
+		rollout status deployment --timeout=15m
 
 .PHONY: k3d-smoke-test
 k3d-smoke-test: ## Smoke-test the local web, Keycloak, and API endpoints
