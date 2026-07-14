@@ -28,6 +28,3 @@ server:
 
 ai:
   service-url: ${AI_SERVICE_URL:http://ai:8000}
-  client-id: ${AI_CLIENT_ID:server-ai}
-  client-secret: ${AI_CLIENT_SECRET:server-ai-dev-secret}
-  token-url: ${AI_TOKEN_URL:http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token}

@@ -43,7 +43,7 @@ public class GeneratedPlanService {
         learningGoalRepository.findByIdAndStudentId(goalId, studentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        var aiResponse = aiServiceClient.generatePlan(id);
+        var aiResponse = aiServiceClient.generatePlan(id, authenticatedUser.bearerToken());
         generatedPlanRepository.deleteByGoalId(goalId);
         var entity = generatedPlanRepository.save(generatedPlanMapper.toEntity(goalId, aiResponse));
         return generatedPlanMapper.toDto(entity);

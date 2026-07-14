@@ -36,4 +36,13 @@ public class AuthenticatedUser {
         }
         return username;
     }
+
+    public String bearerToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)
+                || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Authenticated JWT principal is required.");
+        }
+        return jwtAuthenticationToken.getToken().getTokenValue();
+    }
 }
