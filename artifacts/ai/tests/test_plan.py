@@ -74,13 +74,16 @@ VALID_RESPONSE = {
 }
 
 
+VALID_TUTORS = [{"id": "u1", "displayName": "Anna", "hourlyRate": 25}]
+
+
 def test_map_response_basic():
-    result = _map_response(VALID_RESPONSE)
+    result = _map_response(VALID_RESPONSE, VALID_TUTORS)
     assert result.learning_goal_id == "goal-1"
     assert len(result.suggestions) == 1
     s = result.suggestions[0]
     assert s.tier == "cheapest"
-    assert s.total_estimated_cost == 50
+    assert s.total_estimated_cost == 25  # recomputed from milestone sum
     assert len(s.proposed_tutors) == 1
     assert s.proposed_tutors[0].display_name == "Anna"
     assert len(s.milestones) == 1
@@ -89,7 +92,7 @@ def test_map_response_basic():
 
 
 def test_map_response_empty_suggestions():
-    result = _map_response({"learningGoalId": "g2", "suggestions": []})
+    result = _map_response({"learningGoalId": "g2", "suggestions": []}, VALID_TUTORS)
     assert result.learning_goal_id == "g2"
     assert result.suggestions == []
 
@@ -158,7 +161,7 @@ def test_build_prompt_contains_key_sections():
     assert "## Learning goal" in prompt
     assert "## Topics to cover" in prompt
     assert "## Available tutors" in prompt
-    assert "## Instructions" in prompt
+    assert "## Rules" in prompt
     assert "## Output format" in prompt
 
 
@@ -233,7 +236,7 @@ def mock_clients():
 
 @pytest.mark.asyncio
 async def test_generate_plan_uses_structured_output_for_openai(mock_clients):
-    expected = _map_response(VALID_RESPONSE)
+    expected = _map_response(VALID_RESPONSE, VALID_TUTORS)
     with (
         patch("app.ai_impl.get_llm") as mock_get_llm,
         patch(
