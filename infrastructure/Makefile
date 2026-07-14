@@ -15,6 +15,7 @@ RANCHER_METADATA_DIR ?= /tmp/tutormatch-rancher-build-metadata
 K3D_CLUSTER ?= tutormatch
 K3D_KUBE_CONTEXT := k3d-$(K3D_CLUSTER)
 K3D_IMAGE_TAG ?= local
+K3D_TIMEOUT ?= 15m
 K3D_LLM_BASE_URL ?= http://host.k3d.internal:11434
 K3D_APP_URL ?= https://tutormatch.127.0.0.1.nip.io
 K3D_AUTH_URL ?= https://auth.tutormatch.127.0.0.1.nip.io
@@ -309,19 +310,22 @@ k3d-helm-upgrade: ## Install or upgrade TutorMatch in local k3d
 		--set-string global.imageRegistry="$(IMAGE_PREFIX)" \
 		--set-string global.imageTag="$(K3D_IMAGE_TAG)" \
 		--set-string ingress.hostAliasIP="$$ingress_ip" \
-		--set-string ai.llmBaseUrl="$(K3D_LLM_BASE_URL)"
+		--set-string ai.llmBaseUrl="$(K3D_LLM_BASE_URL)" \
+		--timeout "$(K3D_TIMEOUT)"
 
 .PHONY: k3d-rollout-status
 k3d-rollout-status: ## Wait for all local deployments
 	@kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
-		rollout status deployment --timeout=15m
+		rollout status deployment --timeout="$(K3D_TIMEOUT)"
 
 .PHONY: k3d-smoke-test
 k3d-smoke-test: ## Smoke-test the local web, Keycloak, and API endpoints
-	@curl --silent --show-error --fail --insecure "$(K3D_APP_URL)" >/dev/null
-	@curl --silent --show-error --fail --insecure \
+	@curl --silent --show-error --fail --insecure --connect-timeout 5 --max-time 30 \
+		"$(K3D_APP_URL)" >/dev/null
+	@curl --silent --show-error --fail --insecure --connect-timeout 5 --max-time 30 \
 		"$(K3D_AUTH_URL)/realms/tutormatch/.well-known/openid-configuration" >/dev/null
-	@curl --silent --show-error --fail --insecure "$(K3D_API_URL)" >/dev/null
+	@curl --silent --show-error --fail --insecure --connect-timeout 5 --max-time 30 \
+		"$(K3D_API_URL)" >/dev/null
 	@echo "Local Kubernetes smoke tests passed"
 
 .PHONY: k3d-local-deploy

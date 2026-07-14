@@ -48,6 +48,10 @@ spec:
               value: "https://auth.{{ $root.Values.ingress.host }}/realms/tutormatch"
             - name: KEYCLOAK_JWK_SET_URI
               value: "http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs"
+            - name: SPRING_FLYWAY_CONNECTRETRIES
+              value: "20"
+            - name: SPRING_FLYWAY_CONNECTRETRIESINTERVAL
+              value: "10s"
             - name: {{ $server.dbPrefix }}_DB_URL
               value: "jdbc:postgresql://postgres:5432/{{ $root.Values.postgres.db }}"
             - name: {{ $server.dbPrefix }}_DB_USER
