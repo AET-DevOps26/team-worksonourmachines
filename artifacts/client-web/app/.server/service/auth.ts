@@ -23,27 +23,55 @@ import {
 
 const FALLBACK_ACCESS_TOKEN_LIFETIME_MS = 60 * 60 * 1000;
 const OIDC_SCOPE = 'openid profile email';
+const OIDC_DISCOVERY_RETRY_INTERVAL_MS = 10 * 1000;
+const OIDC_DISCOVERY_MAX_RETRIES = 20;
 
-const oidcConfig = await client
-    .discovery(
-        new URL(env.get('KEYCLOAK_ISSUER')),
-        env.get('KEYCLOAK_CLIENT_ID'),
-        {
-            client_secret: env.get('KEYCLOAK_CLIENT_SECRET'),
-            token_endpoint_auth_method: 'client_secret_post',
-        },
-        client.ClientSecretPost(env.get('KEYCLOAK_CLIENT_SECRET')),
-    )
-    .then((config) => {
-        logger.info('OIDC configuration discovered successfully');
-        return config;
-    })
-    .catch((error) => {
-        logger.error('Failed to discover OIDC configuration', {
-            error: error instanceof Error ? error : new Error(String(error)),
-        });
-        throw error;
-    });
+function sleep(delayMs: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+async function discoverOidcConfiguration(): Promise<client.Configuration> {
+    const issuer = new URL(env.get('KEYCLOAK_ISSUER'));
+    const clientSecret = env.get('KEYCLOAK_CLIENT_SECRET');
+    let attempt = 1;
+
+    while (true) {
+        try {
+            const config = await client.discovery(
+                issuer,
+                env.get('KEYCLOAK_CLIENT_ID'),
+                {
+                    client_secret: clientSecret,
+                    token_endpoint_auth_method: 'client_secret_post',
+                },
+                client.ClientSecretPost(clientSecret),
+            );
+
+            logger.info('OIDC configuration discovered successfully', { attempt });
+            return config;
+        } catch (error) {
+            const normalizedError = error instanceof Error ? error : new Error(String(error));
+
+            if (attempt > OIDC_DISCOVERY_MAX_RETRIES) {
+                logger.error('Failed to discover OIDC configuration', {
+                    attempt,
+                    error: normalizedError,
+                });
+                throw error;
+            }
+
+            logger.warn('OIDC discovery failed; retrying', {
+                attempt,
+                error: normalizedError,
+                retryDelayMs: OIDC_DISCOVERY_RETRY_INTERVAL_MS,
+            });
+            await sleep(OIDC_DISCOVERY_RETRY_INTERVAL_MS);
+            attempt += 1;
+        }
+    }
+}
+
+const oidcConfig = await discoverOidcConfiguration();
 
 function buildCallbackUrl(): string {
     return `${env.get('APP_BASE_URL')}/auth/callback`;

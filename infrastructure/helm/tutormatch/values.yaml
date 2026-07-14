@@ -24,14 +24,35 @@ clientWeb:
 serverCommunication:
   imageDigest: ""
   port: 8083
+  resources:
+    requests:
+      cpu: 75m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
 
 serverMarketplace:
   imageDigest: ""
   port: 8082
+  resources:
+    requests:
+      cpu: 75m
+      memory: 384Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
 
 serverStudent:
   imageDigest: ""
   port: 8081
+  resources:
+    requests:
+      cpu: 75m
+      memory: 320Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
 
 apiUi:
   imageDigest: ""

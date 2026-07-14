@@ -14,6 +14,11 @@ metadata:
   namespace: {{ $root.Values.namespace }}
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: {{ $server.name }}
@@ -43,6 +48,10 @@ spec:
               value: "https://auth.{{ $root.Values.ingress.host }}/realms/tutormatch"
             - name: KEYCLOAK_JWK_SET_URI
               value: "http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs"
+            - name: SPRING_FLYWAY_CONNECTRETRIES
+              value: "20"
+            - name: SPRING_FLYWAY_CONNECTRETRIESINTERVAL
+              value: "10s"
             - name: {{ $server.dbPrefix }}_DB_URL
               value: "jdbc:postgresql://postgres:5432/{{ $root.Values.postgres.db }}"
             - name: {{ $server.dbPrefix }}_DB_USER
@@ -76,12 +85,7 @@ spec:
             periodSeconds: 20
             failureThreshold: 3
           resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
+            {{- toYaml $server.config.resources | nindent 12 }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp
