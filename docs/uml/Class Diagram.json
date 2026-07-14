@@ -1,6 +1,6 @@
 {
   "id": "b4bbaa7c-40b7-45b2-8f2f-92569b202d32",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "title": "Class Diagram - Microservice Backlog Aligned",
   "type": "ClassDiagram",
   "nodes": [
@@ -322,12 +322,12 @@
     },
     {
       "id": "0338d0c8-5d46-4534-af89-0cd658ae9eb8",
-      "width": 340,
-      "height": 310,
+      "width": 350,
+      "height": 280,
       "type": "class",
       "position": {
         "x": 600,
-        "y": 60
+        "y": 55
       },
       "parentId": "2ee42a19-185d-42e1-b064-af6b37680bf3",
       "data": {
@@ -339,11 +339,7 @@
           },
           {
             "id": "e59b9c4d-a25d-42fc-afe6-637f06b02a5c",
-            "name": "- moduleId: String"
-          },
-          {
-            "id": "862ad264-cc83-45b5-a6f3-20bfee66aa1a",
-            "name": "- topicIds: List<String>"
+            "name": "- moduleCode: String"
           },
           {
             "id": "ce8c6ea4-a87c-4fae-8141-150114c63978",
@@ -374,8 +370,8 @@
         ]
       },
       "measured": {
-        "width": 340,
-        "height": 310
+        "width": 350,
+        "height": 280
       }
     },
     {
@@ -431,7 +427,7 @@
     {
       "id": "76a0cdd9-8f19-45e4-803f-4edde51e9e82",
       "width": 230,
-      "height": 190,
+      "height": 130,
       "type": "class",
       "position": {
         "x": 680,
@@ -452,22 +448,13 @@
           {
             "id": "356d87c1-8eb4-4fa3-9ba5-e957f13d5944",
             "name": "- dueDate: DateTime"
-          },
-          {
-            "id": "86b57dd9-b13f-4ef3-9085-e6a2b8ef62a8",
-            "name": "- completed: Boolean"
           }
         ],
-        "methods": [
-          {
-            "id": "f67e333a-5897-498a-b2e5-8c743383239a",
-            "name": "+ markComplete(): void"
-          }
-        ]
+        "methods": []
       },
       "measured": {
         "width": 230,
-        "height": 190
+        "height": 130
       }
     },
     {
@@ -640,7 +627,7 @@
     },
     {
       "id": "84ec899b-b818-4a17-8595-b215cb5f93f7",
-      "width": 180,
+      "width": 190,
       "height": 130,
       "type": "class",
       "position": {
@@ -668,13 +655,13 @@
         ]
       },
       "measured": {
-        "width": 180,
+        "width": 190,
         "height": 130
       }
     },
     {
       "id": "59185f9f-f770-4c36-8b0d-5a362b16a209",
-      "width": 180,
+      "width": 190,
       "height": 200,
       "type": "class",
       "position": {
@@ -684,7 +671,7 @@
       "parentId": "cf795c8d-af15-44ca-af2d-b8ac041a01fd",
       "data": {
         "name": "Notification",
-        "stereotype": "Interface",
+        "stereotype": "interface",
         "methods": [
           {
             "id": "d7d6e68f-403d-4e49-bf81-852850f17efc",
@@ -711,7 +698,7 @@
         ]
       },
       "measured": {
-        "width": 180,
+        "width": 190,
         "height": 200
       }
     }
@@ -827,20 +814,20 @@
       "data": {
         "points": [
           {
-            "x": -764,
-            "y": 71
+            "x": -765,
+            "y": 111
           },
           {
-            "x": -764,
-            "y": 255.5390625
-          },
-          {
-            "x": -590,
-            "y": 255.5390625
+            "x": -765,
+            "y": 256
           },
           {
             "x": -590,
-            "y": 309
+            "y": 256
+          },
+          {
+            "x": -590,
+            "y": 379
           }
         ],
         "sourceMultiplicity": "1",
@@ -886,19 +873,19 @@
         "points": [
           {
             "x": -389,
-            "y": 406
+            "y": 405
           },
           {
-            "x": -258.9568750000001,
-            "y": 406
+            "x": -259,
+            "y": 405
           },
           {
-            "x": -258.9568750000001,
-            "y": -54
+            "x": -259,
+            "y": -55
           },
           {
             "x": -419,
-            "y": -54
+            "y": -55
           }
         ]
       }
@@ -934,9 +921,9 @@
       "targetHandle": "left-bottom",
       "data": {
         "points": [],
-        "sourceMultiplicity": "1",
+        "sourceMultiplicity": "1..*",
         "sourceRole": "studyPlan",
-        "targetMultiplicity": "1..*",
+        "targetMultiplicity": "1",
         "targetRole": "learningGoals"
       }
     }
