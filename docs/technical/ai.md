@@ -26,43 +26,87 @@ The AI service (`artifacts/ai`) supports four providers configured via environme
 
 | Provider | Where it runs | VPN needed? | How to use |
 |---|---|---|---|
-| **Logos** | TUM cloud | Yes (TUM network/VPN) | Set `LLM_PROVIDER=logos`, `LLM_BASE_URL=https://logos.aet.cit.tum.de`, `LLM_API_KEY=lg-...` |
-| **Ollama** | Local Docker | No | Default in `docker-compose.yml`. Pulls the model on first start (~5 min, needs ~4 GB disk, slow without GPU) |
-| **LM Studio** | Local host app | No | Install LM Studio, load a model, enable the local server, set `LLM_PROVIDER=lmstudio`, `LLM_BASE_URL=http://host.docker.internal:1234/v1` |
+| **LM Studio** | Local host app | No | Default in `docker-compose.dev.yml`. Install LM Studio, load a model, enable local server. |
+| **Ollama** | Local Docker container | No | Pulls the model on first start (~5 min, needs ~4 GB disk, slow without GPU). |
+| **Logos** | TUM cloud | Yes (TUM network/VPN) | Fastest for dev. Requires TUM VPN. |
 | **OpenAI** | OpenAI cloud | No | Set `LLM_PROVIDER=openai`, `LLM_API_KEY=sk-...` |
 
-### Running locally with Logos (recommended for dev without GPU)
+### Switching providers
 
-If you want to test the full stack locally but want to skip the Ollama startup time, use Logos. **You must be on TUM VPN.**
+The LLM provider is baked into the container at startup from `.env`. **`docker compose restart` does not pick up `.env` changes** — you must force-recreate.
 
-1. Connect to TUM VPN.
-2. Edit `.env` (copy from `.env.dist` first if you haven't):
+Also, shell environment variables override `.env`. Always use `env -i` when recreating to strip stale shell exports:
 
 ```bash
+env -i HOME=$HOME PATH=$PATH docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --no-build --force-recreate ai
+```
+
+After recreating, verify the container has the right values:
+
+```bash
+docker exec tutormatch-ai-1 env | grep LLM
+```
+
+To confirm which provider handled a request, check the log line emitted after each successful plan generation:
+
+```bash
+docker logs tutormatch-ai-1 --tail=5 | grep "generate_plan completed"
+# example: generate_plan completed provider=logos model=openai/gpt-oss-120b latency_ms=2103.1 goal_id=905d...
+```
+
+#### LM Studio
+
+1. Open LM Studio, load a model, and start the local server (default port 1234).
+2. Set in `.env`:
+
+```
+LLM_PROVIDER=lmstudio
+LLM_BASE_URL=http://host.docker.internal:1234/v1
+LLM_MODEL=local-model
+```
+
+3. Recreate the container:
+
+```bash
+env -i HOME=$HOME PATH=$PATH docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --no-build --force-recreate ai
+```
+
+#### Ollama
+
+1. Set in `.env`:
+
+```
+LLM_PROVIDER=ollama
+LLM_BASE_URL=http://ollama:11434
+LLM_MODEL=llama3.2:latest
+```
+
+2. Recreate both the `ai` and `ollama` containers (ollama pulls the model on first start):
+
+```bash
+env -i HOME=$HOME PATH=$PATH docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --no-build --force-recreate ai ollama
+```
+
+3. Wait for the model pull to finish before testing (can take several minutes):
+
+```bash
+docker logs -f tutormatch-ollama-1
+```
+
+#### Logos (recommended for dev without GPU)
+
+1. Connect to TUM VPN.
+2. Set in `.env`:
+
+```
 LLM_PROVIDER=logos
-LLM_BASE_URL=https://logos.aet.cit.tum.de
+LLM_BASE_URL=https://logos.aet.cit.tum.de/v1
 LLM_MODEL=openai/gpt-oss-120b
 LLM_API_KEY=lg-...
 ```
 
-3. Start the stack — the `ollama` service still starts but the AI container ignores it:
+3. Recreate the container:
 
 ```bash
-make up
-```
-
-If you want to skip starting Ollama entirely (saves startup time and memory):
-
-```bash
-docker compose up --scale ollama=0
-```
-
-> The `ai` service has `depends_on: ollama: condition: service_healthy` in `docker-compose.yml`. If you skip Ollama with `--scale ollama=0`, Docker Compose will warn about the unmet dependency but the `ai` container will still start. This is safe when using Logos.
-
-### Switching providers at runtime
-
-The LLM provider is read from environment variables at startup. To switch, update `.env` and restart the AI service:
-
-```bash
-docker compose restart ai
+env -i HOME=$HOME PATH=$PATH docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --no-build --force-recreate ai
 ```

@@ -10,4 +10,7 @@ setup.cfg
 .flake8
 .gitignore
 src/openapi_server/main.py
+src/openapi_server/security_api.py
+src/openapi_server/apis/default_api.py
+src/openapi_server/apis/default_api_base.py
 tests/

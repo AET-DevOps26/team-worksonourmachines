@@ -30,20 +30,14 @@ oauth2_application = OAuth2(
     },)))
 
 
+bearer_scheme = HTTPBearer()
+
+
 def get_token_KeycloakClientAuth(
-    security_scopes: SecurityScopes, token: str = Depends(
-oauth2_application)
+    security_scopes: SecurityScopes,
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> TokenModel:
-    """
-    Validate and decode token.
-
-    :param token Token provided by Authorization header
-    :type token: str
-    :return: Decoded token information or None if token is invalid
-    :rtype: TokenModel | None
-    """
-
-    ...
+    return TokenModel(sub=credentials.credentials)
 
 
 def validate_scope_KeycloakClientAuth(
@@ -56,9 +50,8 @@ def validate_scope_KeycloakClientAuth(
     :type required_scopes: List[str]
     :param token_scopes Scope present in token
     :type token_scopes: List[str]
-    :return: True if access to called API is allowed
+    :return: True if access to allowed API is allowed
     :rtype: bool
     """
 
     return False
-

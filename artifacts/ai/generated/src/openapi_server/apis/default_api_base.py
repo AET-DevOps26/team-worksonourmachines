@@ -16,6 +16,7 @@ class BaseDefaultApi:
     async def generate_plan(
         self,
         shared_ai_generate_plan_request: SharedAiGeneratePlanRequest,
+        authorization: str = "",
     ) -> SharedAiGeneratePlanResponse:
         """Fetches the learning goal and student from the Student API, tutors from the Marketplace API, then calls the LLM to generate three study-plan suggestions (cheapest, within_budget, best_quality). Does not persist anything."""
         ...

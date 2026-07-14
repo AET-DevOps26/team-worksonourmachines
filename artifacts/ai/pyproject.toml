@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 testpaths = ["tests"]
 verbosity_assertions = 2
 pythonpath = [".", "generated/src"]
+asyncio_mode = "auto"
 
 [tool.ruff]
 exclude = ["generated/"]
