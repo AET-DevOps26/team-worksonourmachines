@@ -1,0 +1,31 @@
+alertmanager:
+  enabled: false
+prometheus-node-exporter:
+  enabled: false
+kube-state-metrics:
+  enabled: false
+prometheus-pushgateway:
+  enabled: false
+server:
+  fullnameOverride: prometheus
+  service:
+    servicePort: 9090
+  persistentVolume:
+    enabled: false
+  global:
+    scrape_interval: 30s
+serverFiles:
+  prometheus.yml:
+    scrape_configs:
+      - job_name: server-student
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets: ["server-student:8081"]
+      - job_name: server-marketplace
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets: ["server-marketplace:8082"]
+      - job_name: server-communication
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets: ["server-communication:8083"]
