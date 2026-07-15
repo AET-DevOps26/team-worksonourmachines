@@ -74,3 +74,60 @@ alerting:
     policies:
       - orgId: 1
         receiver: Email
+  rules.yaml:
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: microservice-availability
+        folder: Alerts
+        interval: 10s
+        rules:
+          - uid: microservice-down
+            title: Microservice Down
+            condition: C
+            data:
+              - refId: A
+                datasourceUid: prometheus
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                model:
+                  expr: up{job=~"server-student|server-marketplace|server-communication"}
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  refId: B
+                  expression: "A"
+                  reducer: last
+                  settings:
+                    mode: dropNN
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  refId: C
+                  expression: "B"
+                  conditions:
+                    - evaluator:
+                        type: lt
+                        params:
+                          - 1
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                      reducer:
+                        type: last
+            noDataState: NoData
+            execErrState: Error
+            for: 15s
+            annotations:
+              summary: "Microservice {{`{{ $labels.job }}`}} is down"
+              description: "The pod for {{`{{ $labels.job }}`}} has been unreachable for 15 seconds. Immediate action required."
+            labels:
+              severity: critical
