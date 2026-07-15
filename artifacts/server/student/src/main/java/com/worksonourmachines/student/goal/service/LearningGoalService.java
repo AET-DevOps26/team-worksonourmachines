@@ -14,6 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.worksonourmachines.server.common.security.AuthenticatedUser;
 import com.worksonourmachines.student.goal.mapper.LearningGoalMapper;
 import com.worksonourmachines.student.goal.persistence.repository.LearningGoalRepository;
+import com.worksonourmachines.student.profile.persistence.entity.StudentProfileEntity;
+import com.worksonourmachines.student.profile.persistence.repository.StudentProfileRepository;
 
 @Service
 public class LearningGoalService {
@@ -21,14 +23,17 @@ public class LearningGoalService {
     private final AuthenticatedUser authenticatedUser;
     private final LearningGoalRepository learningGoalRepository;
     private final LearningGoalMapper learningGoalMapper;
+    private final StudentProfileRepository studentProfileRepository;
 
     public LearningGoalService(
             AuthenticatedUser authenticatedUser,
             LearningGoalRepository learningGoalRepository,
-            LearningGoalMapper learningGoalMapper) {
+            LearningGoalMapper learningGoalMapper,
+            StudentProfileRepository studentProfileRepository) {
         this.authenticatedUser = authenticatedUser;
         this.learningGoalRepository = learningGoalRepository;
         this.learningGoalMapper = learningGoalMapper;
+        this.studentProfileRepository = studentProfileRepository;
     }
 
     @Transactional(readOnly = true)
@@ -59,6 +64,12 @@ public class LearningGoalService {
     public SharedStudentLearningGoal createGoal(SharedStudentLearningGoalInput input) {
         validateInput(input);
         UUID studentId = authenticatedUser.id();
+        if (!studentProfileRepository.existsById(studentId)) {
+            StudentProfileEntity stub = new StudentProfileEntity(studentId);
+            stub.setDisplayName(authenticatedUser.getUsername());
+            stub.setBio("");
+            studentProfileRepository.save(stub);
+        }
         return learningGoalMapper.toDto(learningGoalRepository.save(
                 learningGoalMapper.toCreateEntity(studentId, input)));
     }

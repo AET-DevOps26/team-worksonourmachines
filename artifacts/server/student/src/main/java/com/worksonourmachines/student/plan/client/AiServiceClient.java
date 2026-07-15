@@ -3,39 +3,42 @@ package com.worksonourmachines.student.plan.client;
 import java.time.Duration;
 import java.util.UUID;
 
+import io.netty.channel.ChannelOption;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 @Component
 public class AiServiceClient {
 
-    private final RestClient restClient;
+    private final WebClient webClient;
     private final ServiceTokenProvider serviceTokenProvider;
 
     public AiServiceClient(
             @Value("${ai.service-url}") String serviceUrl,
             ServiceTokenProvider serviceTokenProvider) {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setReadTimeout(Duration.ofMinutes(5));
-        factory.setConnectTimeout(Duration.ofSeconds(10));
-        this.restClient = RestClient.builder()
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMinutes(5))
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000);
+        this.webClient = WebClient.builder()
                 .baseUrl(serviceUrl)
-                .requestFactory(factory)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
         this.serviceTokenProvider = serviceTokenProvider;
     }
 
     public AiGeneratePlanResponse generatePlan(String learningGoalId, UUID studentId) {
-        return restClient.post()
+        return webClient.post()
                 .uri("/v1/plan")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", serviceTokenProvider.getBearerToken())
-                .body(new GeneratePlanRequest(learningGoalId, studentId))
+                .bodyValue(new GeneratePlanRequest(learningGoalId, studentId))
                 .retrieve()
-                .body(AiGeneratePlanResponse.class);
+                .bodyToMono(AiGeneratePlanResponse.class)
+                .block();
     }
 
     private record GeneratePlanRequest(String learningGoalId, UUID studentId) {}

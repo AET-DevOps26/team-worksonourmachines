@@ -74,7 +74,7 @@ services:
     <<: *server-base
     environment:
       PORT: "8083"
-    entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl communication -am spring-boot:run"]
+    command: ["mvn", "-pl", "communication", "-am", "spring-boot:run"]
     ports:
       - 127.0.0.1:8083:8083
 
@@ -84,7 +84,9 @@ services:
       PORT: "8082"
       KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
-    entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl marketplace -am spring-boot:run"]
+    # entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl marketplace -am spring-boot:run"]
+    command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
+
     ports:
       - 127.0.0.1:8082:8082
 
@@ -98,7 +100,9 @@ services:
       KEYCLOAK_CLIENT_ID: server-student
       KEYCLOAK_CLIENT_SECRET: server-student-dev-secret
       AI_SERVICE_URL: http://ai:8000
-    entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl student -am spring-boot:run"]
+    # entrypoint: ["/bin/sh", "-c", "keytool -import -noprompt -alias caddy-local -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -file /caddy-data/caddy/pki/authorities/local/root.crt 2>/dev/null || true; exec mvn -pl student -am spring-boot:run"]
+    command: ["mvn", "-pl", "student", "-am", "spring-boot:run"]
+
     ports:
       - 127.0.0.1:8081:8081
 

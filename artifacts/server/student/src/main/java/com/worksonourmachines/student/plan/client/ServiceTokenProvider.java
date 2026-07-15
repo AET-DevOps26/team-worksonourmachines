@@ -8,12 +8,15 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class ServiceTokenProvider {
 
-    private final RestClient restClient;
+    private final WebClient webClient;
+    private final String clientId;
+    private final String clientSecret;
 
     private volatile String cachedToken;
     private volatile Instant tokenExpiry = Instant.EPOCH;
@@ -22,16 +25,12 @@ public class ServiceTokenProvider {
             @Value("${keycloak.token-url}") String tokenUrl,
             @Value("${keycloak.client-id}") String clientId,
             @Value("${keycloak.client-secret}") String clientSecret) {
-        this.restClient = RestClient.builder()
+        this.webClient = WebClient.builder()
                 .baseUrl(tokenUrl)
-                .defaultHeader("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
         this.clientId = clientId;
         this.clientSecret = clientSecret;
     }
-
-    private final String clientId;
-    private final String clientSecret;
 
     public synchronized String getBearerToken() {
         if (cachedToken != null && Instant.now().isBefore(tokenExpiry)) {
@@ -43,11 +42,12 @@ public class ServiceTokenProvider {
         form.add("client_secret", clientSecret);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> response = restClient.post()
+        Map<String, Object> response = webClient.post()
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(form)
+                .body(BodyInserters.fromFormData(form))
                 .retrieve()
-                .body(Map.class);
+                .bodyToMono(Map.class)
+                .block();
 
         cachedToken = (String) response.get("access_token");
         int expiresIn = ((Number) response.getOrDefault("expires_in", 60)).intValue();
