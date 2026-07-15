@@ -36,7 +36,7 @@ help: ## Show this help message
 # ----------------------------- app -----------------------------
 
 .PHONY: up
-up: ## Start all services (set OBSERVE=true to include Prometheus and Grafana)
+up: ## Start all services (set OBSERVE=true to include observability)
 	@$(COMPOSE_APP) up -d
 
 .PHONY: up-build
