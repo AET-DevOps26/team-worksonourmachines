@@ -172,8 +172,8 @@ services:
       LOG_LEVEL: INFO
       LLM_PROVIDER: ollama
       LLM_BASE_URL: http://ollama:11434
-      LLM_MODEL: llama3.2:latest
-      LLM_API_KEY: not-required
+      LLM_MODEL: ${LLM_MODEL:-llama3.2:latest}
+      LLM_API_KEY: ${LLM_API_KEY:-not-required}
       STUDENT_API_URL: http://server-student:8081
       MARKETPLACE_API_URL: http://server-marketplace:8082
       KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
@@ -183,6 +183,8 @@ services:
       AI_CLIENT_SECRET: server-ai-dev-secret
       EXPECTED_CALLER_CLIENT_ID: server-student
     depends_on:
+      ollama:
+        condition: service_healthy
       server-student:
         condition: service_started
       server-marketplace:
