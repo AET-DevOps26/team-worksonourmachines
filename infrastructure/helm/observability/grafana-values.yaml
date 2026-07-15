@@ -1,5 +1,8 @@
 fullnameOverride: grafana
 
+rbac:
+  namespaced: true
+
 admin:
   existingSecret: grafana-admin-secret
   userKey: admin-user

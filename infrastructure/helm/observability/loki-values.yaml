@@ -3,8 +3,9 @@ deploymentMode: SingleBinary
 rbac:
   pspEnabled: false
   sccEnabled: false
+  namespaced: true
 serviceAccount:
-  create: false
+  create: true
 loki:
   auth_enabled: false
   commonConfig:

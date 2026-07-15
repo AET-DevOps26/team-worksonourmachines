@@ -8,9 +8,6 @@ prometheus-pushgateway:
   enabled: false
 rbac:
   create: false
-serviceAccounts:
-  server:
-    create: false
 server:
   fullnameOverride: prometheus
   service:
