@@ -42,13 +42,13 @@ write:
   replicas: 0
 gateway:
   enabled: false
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 100m
-      memory: 128Mi
+sidecar:
+  rules:
+    enabled: false
+
+ruler:
+  enabled: false
+
 minio:
   enabled: false
 lokiCanary:

@@ -366,25 +366,27 @@ k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, L
 		--version 29.17.0 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)prometheus-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)prometheus.values.yaml" \
 		--timeout "$(K3D_TIMEOUT)" && \
 	helm upgrade --install loki grafana/loki \
 		--version 6.55.0 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)loki-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)loki.values.yaml" \
 		--timeout "$(K3D_TIMEOUT)" && \
-	helm upgrade --install promtail grafana/promtail \
-		--version 6.17.1 \
+	helm upgrade --install alloy grafana/alloy \
+		--version 1.10.1 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)promtail-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)alloy.values.yaml" \
 		--timeout "$(K3D_TIMEOUT)" && \
+	kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		apply -f "$(OBSERVABILITY_DIR)alloy.rbac.yaml" && \
 	helm upgrade --install grafana grafana/grafana \
 		--version 10.5.15 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)grafana-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)grafana.values.yaml" \
 		--set-file 'dashboards.default.spring-boot-observability.json=$(OBSERVABILITY_DASHBOARD)' \
 		--timeout "$(K3D_TIMEOUT)"
 
@@ -392,7 +394,7 @@ k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, L
 k3d-observability-uninstall: ## Remove observability stack from local k3d
 	@helm uninstall prometheus --kube-context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" --ignore-not-found
 	@helm uninstall loki --kube-context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" --ignore-not-found
-	@helm uninstall promtail --kube-context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" --ignore-not-found
+	@helm uninstall alloy --kube-context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" --ignore-not-found
 	@helm uninstall grafana --kube-context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" --ignore-not-found
 
 .PHONY: k3d-cluster-delete
@@ -426,24 +428,24 @@ rancher-observability-install: ## Deploy observability stack (Prometheus, Grafan
 		--version 29.17.0 \
 		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)prometheus-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)prometheus.values.yaml" \
 		--timeout "$(RANCHER_TIMEOUT)"
 	@helm upgrade --install loki grafana/loki \
 		--version 6.55.0 \
 		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)loki-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)loki.values.yaml" \
 		--timeout "$(RANCHER_TIMEOUT)"
-	@helm upgrade --install promtail grafana/promtail \
-		--version 6.17.1 \
+	@helm upgrade --install alloy grafana/alloy \
+		--version 1.10.1 \
 		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)promtail-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)alloy.values.yaml" \
 		--timeout "$(RANCHER_TIMEOUT)"
 	@helm upgrade --install grafana grafana/grafana \
 		--version 10.5.15 \
 		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
-		--values "$(OBSERVABILITY_DIR)grafana-values.yaml" \
+		--values "$(OBSERVABILITY_DIR)grafana.values.yaml" \
 		--set-file 'dashboards.default.spring-boot-observability.json=$(OBSERVABILITY_DASHBOARD)' \
 		--timeout "$(RANCHER_TIMEOUT)"

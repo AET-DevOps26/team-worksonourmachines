@@ -11,6 +11,24 @@ resources:
     cpu: 200m
     memory: 256Mi
 
+initChownData:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 25m
+      memory: 32Mi
+
+downloadDashboards:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 25m
+      memory: 32Mi
+
 admin:
   existingSecret: grafana-admin-secret
   userKey: admin-user
@@ -40,14 +58,14 @@ datasources:
         uid: prometheus
         type: prometheus
         access: proxy
-        url: http://prometheus:9090
+        url: http://prometheus.team-worksonourmachines.svc.cluster.local:9090
         isDefault: true
         editable: false
       - name: Loki
         uid: loki
         type: loki
         access: proxy
-        url: http://loki:3100
+        url: http://loki.team-worksonourmachines.svc.cluster.local:3100
         editable: false
 
 dashboardProviders:
@@ -66,10 +84,16 @@ dashboardProviders:
 ingress:
   enabled: true
   ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
-    - grafana.tutormatch.127.0.0.1.nip.io
+    - grafana.team-worksonourmachines.stud.k8s.aet.cit.tum.de
   path: /
   pathType: Prefix
+  tls:
+    - hosts:
+        - grafana.team-worksonourmachines.stud.k8s.aet.cit.tum.de
+      secretName: grafana-tls
 
 alerting:
   contactpoints.yaml:

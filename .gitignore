@@ -7,6 +7,7 @@ api/output/
 .vscode/
 .venv/
 .env
+infrastructure/Makefile.local
 .make/
 .pnpm-store/
 .vite/
