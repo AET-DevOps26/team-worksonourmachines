@@ -27,12 +27,28 @@ loki:
           period: 24h
 singleBinary:
   replicas: 1
+  resources:
+    requests:
+      cpu: 75m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
 backend:
   replicas: 0
 read:
   replicas: 0
 write:
   replicas: 0
+gateway:
+  enabled: false
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
 minio:
   enabled: false
 lokiCanary:

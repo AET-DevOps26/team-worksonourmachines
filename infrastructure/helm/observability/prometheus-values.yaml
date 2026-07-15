@@ -16,6 +16,22 @@ server:
     enabled: false
   global:
     scrape_interval: 10s
+  resources:
+    requests:
+      cpu: 25m
+      memory: 128Mi
+    limits:
+      cpu: 50m
+      memory: 256Mi
+configmapReload:
+  prometheus:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        cpu: 25m
+        memory: 32Mi
 serverFiles:
   prometheus.yml:
     scrape_configs:

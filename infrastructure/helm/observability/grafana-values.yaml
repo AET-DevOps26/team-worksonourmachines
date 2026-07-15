@@ -3,6 +3,14 @@ fullnameOverride: grafana
 rbac:
   namespaced: true
 
+resources:
+  requests:
+    cpu: 75m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
 admin:
   existingSecret: grafana-admin-secret
   userKey: admin-user
