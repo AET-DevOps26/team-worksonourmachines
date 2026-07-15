@@ -356,6 +356,12 @@ k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, L
 		create secret generic grafana-smtp-secret \
 		--from-literal=GRAFANA_SMTP_USER="$${GRAFANA_SMTP_USER}" \
 		--from-literal=GRAFANA_SMTP_PASSWORD="$${GRAFANA_SMTP_PASSWORD}" && \
+	kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		delete secret grafana-admin-secret --ignore-not-found && \
+	kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		create secret generic grafana-admin-secret \
+		--from-literal=admin-user="$${GRAFANA_ADMIN_USER}" \
+		--from-literal=admin-password="$${GRAFANA_ADMIN_PASSWORD}" && \
 	helm upgrade --install prometheus prometheus-community/prometheus \
 		--version 29.17.0 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
@@ -399,6 +405,8 @@ k3d-cluster-delete: ## Delete the local k3d cluster
 rancher-observability-install: ## Deploy observability stack (Prometheus, Grafana, Loki, Promtail) to Rancher
 	@: "$${GRAFANA_SMTP_USER:?Set GRAFANA_SMTP_USER}"
 	@: "$${GRAFANA_SMTP_PASSWORD:?Set GRAFANA_SMTP_PASSWORD}"
+	@: "$${GRAFANA_ADMIN_USER:?Set GRAFANA_ADMIN_USER}"
+	@: "$${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD}"
 	@helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
 	@helm repo add grafana https://grafana.github.io/helm-charts --force-update
 	@helm repo update prometheus-community grafana
@@ -408,6 +416,12 @@ rancher-observability-install: ## Deploy observability stack (Prometheus, Grafan
 		create secret generic grafana-smtp-secret \
 		--from-literal=GRAFANA_SMTP_USER="$${GRAFANA_SMTP_USER}" \
 		--from-literal=GRAFANA_SMTP_PASSWORD="$${GRAFANA_SMTP_PASSWORD}"
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		delete secret grafana-admin-secret --ignore-not-found
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		create secret generic grafana-admin-secret \
+		--from-literal=admin-user="$${GRAFANA_ADMIN_USER}" \
+		--from-literal=admin-password="$${GRAFANA_ADMIN_PASSWORD}"
 	@helm upgrade --install prometheus prometheus-community/prometheus \
 		--version 29.17.0 \
 		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
