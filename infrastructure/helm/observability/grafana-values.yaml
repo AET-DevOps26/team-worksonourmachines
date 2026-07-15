@@ -1,6 +1,23 @@
 fullnameOverride: grafana
 adminUser: admin
 adminPassword: admin
+
+envFromSecret: grafana-smtp-secret
+
+grafana.ini:
+  smtp:
+    enabled: true
+    host: smtp.gmail.com:465
+    user: $__env{GRAFANA_SMTP_USER}
+    password: $__env{GRAFANA_SMTP_PASSWORD}
+    from_address: $__env{GRAFANA_SMTP_USER}
+    from_name: Grafana
+    startTLS_policy: NoStartTLS
+    skip_verify: false
+
+persistence:
+  enabled: false
+
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -18,6 +35,7 @@ datasources:
         access: proxy
         url: http://loki:3100
         editable: false
+
 dashboardProviders:
   dashboardproviders.yaml:
     apiVersion: 1
@@ -30,6 +48,7 @@ dashboardProviders:
         editable: true
         options:
           path: /var/lib/grafana/dashboards/default
+
 ingress:
   enabled: true
   ingressClassName: nginx
@@ -37,3 +56,21 @@ ingress:
     - grafana.tutormatch.127.0.0.1.nip.io
   path: /
   pathType: Prefix
+
+alerting:
+  contactpoints.yaml:
+    apiVersion: 1
+    contactPoints:
+      - orgId: 1
+        name: Email
+        receivers:
+          - uid: email-receiver
+            type: email
+            settings:
+              addresses: amritanshu.sikdar@gmail.com;hristina.ivanova1003@gmail.com
+              singleEmail: true
+  policies.yaml:
+    apiVersion: 1
+    policies:
+      - orgId: 1
+        receiver: Email

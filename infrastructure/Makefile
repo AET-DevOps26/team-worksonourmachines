@@ -4,6 +4,7 @@ KUBERNETES_REPO_ROOT := $(abspath $(KUBERNETES_DIR)/..)
 KUBERNETES_CHART := $(KUBERNETES_DIR)helm/tutormatch
 OBSERVABILITY_DIR := $(KUBERNETES_DIR)helm/observability/
 OBSERVABILITY_DASHBOARD := $(KUBERNETES_REPO_ROOT)/artifacts/observability/grafana/dashboards/spring-boot-observability.json
+OBSERVABILITY_ENV ?= $(KUBERNETES_REPO_ROOT)/.env
 
 IMAGE_PREFIX ?= ghcr.io/aet-devops26/team-worksonourmachines
 NAMESPACE ?= team-worksonourmachines
@@ -344,28 +345,36 @@ k3d-local-deploy: \
 
 .PHONY: k3d-observability-install
 k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, Loki, Promtail) to local k3d
-	@helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
-	@helm repo add grafana https://grafana.github.io/helm-charts --force-update
-	@helm repo update prometheus-community grafana
-	@helm upgrade --install prometheus prometheus-community/prometheus \
+	@test -f "$(OBSERVABILITY_ENV)" || { echo "Missing $(OBSERVABILITY_ENV) — copy observability.env.example and fill in values" >&2; exit 1; }
+	@set -a; . "$(OBSERVABILITY_ENV)"; set +a; \
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update && \
+	helm repo add grafana https://grafana.github.io/helm-charts --force-update && \
+	helm repo update prometheus-community grafana && \
+	kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		delete secret grafana-smtp-secret --ignore-not-found && \
+	kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		create secret generic grafana-smtp-secret \
+		--from-literal=GRAFANA_SMTP_USER="$${GRAFANA_SMTP_USER}" \
+		--from-literal=GRAFANA_SMTP_PASSWORD="$${GRAFANA_SMTP_PASSWORD}" && \
+	helm upgrade --install prometheus prometheus-community/prometheus \
 		--version 29.17.0 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
 		--values "$(OBSERVABILITY_DIR)prometheus-values.yaml" \
-		--timeout "$(K3D_TIMEOUT)"
-	@helm upgrade --install loki grafana/loki \
+		--timeout "$(K3D_TIMEOUT)" && \
+	helm upgrade --install loki grafana/loki \
 		--version 6.55.0 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
 		--values "$(OBSERVABILITY_DIR)loki-values.yaml" \
-		--timeout "$(K3D_TIMEOUT)"
-	@helm upgrade --install promtail grafana/promtail \
+		--timeout "$(K3D_TIMEOUT)" && \
+	helm upgrade --install promtail grafana/promtail \
 		--version 6.17.1 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
 		--values "$(OBSERVABILITY_DIR)promtail-values.yaml" \
-		--timeout "$(K3D_TIMEOUT)"
-	@helm upgrade --install grafana grafana/grafana \
+		--timeout "$(K3D_TIMEOUT)" && \
+	helm upgrade --install grafana grafana/grafana \
 		--version 10.5.15 \
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
@@ -383,3 +392,44 @@ k3d-observability-uninstall: ## Remove observability stack from local k3d
 .PHONY: k3d-cluster-delete
 k3d-cluster-delete: ## Delete the local k3d cluster
 	@k3d cluster delete "$(K3D_CLUSTER)"
+
+# ----------------------------- Rancher observability -----------------------------
+
+.PHONY: rancher-observability-install
+rancher-observability-install: ## Deploy observability stack (Prometheus, Grafana, Loki, Promtail) to Rancher
+	@: "$${GRAFANA_SMTP_USER:?Set GRAFANA_SMTP_USER}"
+	@: "$${GRAFANA_SMTP_PASSWORD:?Set GRAFANA_SMTP_PASSWORD}"
+	@helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
+	@helm repo add grafana https://grafana.github.io/helm-charts --force-update
+	@helm repo update prometheus-community grafana
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		delete secret grafana-smtp-secret --ignore-not-found
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		create secret generic grafana-smtp-secret \
+		--from-literal=GRAFANA_SMTP_USER="$${GRAFANA_SMTP_USER}" \
+		--from-literal=GRAFANA_SMTP_PASSWORD="$${GRAFANA_SMTP_PASSWORD}"
+	@helm upgrade --install prometheus prometheus-community/prometheus \
+		--version 29.17.0 \
+		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
+		--namespace "$(NAMESPACE)" \
+		--values "$(OBSERVABILITY_DIR)prometheus-values.yaml" \
+		--timeout "$(RANCHER_TIMEOUT)"
+	@helm upgrade --install loki grafana/loki \
+		--version 6.55.0 \
+		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
+		--namespace "$(NAMESPACE)" \
+		--values "$(OBSERVABILITY_DIR)loki-values.yaml" \
+		--timeout "$(RANCHER_TIMEOUT)"
+	@helm upgrade --install promtail grafana/promtail \
+		--version 6.17.1 \
+		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
+		--namespace "$(NAMESPACE)" \
+		--values "$(OBSERVABILITY_DIR)promtail-values.yaml" \
+		--timeout "$(RANCHER_TIMEOUT)"
+	@helm upgrade --install grafana grafana/grafana \
+		--version 10.5.15 \
+		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
+		--namespace "$(NAMESPACE)" \
+		--values "$(OBSERVABILITY_DIR)grafana-values.yaml" \
+		--set-file 'dashboards.default.spring-boot-observability.json=$(OBSERVABILITY_DASHBOARD)' \
+		--timeout "$(RANCHER_TIMEOUT)"
