@@ -39,10 +39,6 @@ api.{$APP_HOSTNAME} {
 		reverse_proxy server-communication:8083
 	}
 
-	handle /v1/communication* {
-		reverse_proxy server-communication:8083
-	}
-
 	handle /v1/plan* {
 		reverse_proxy ai:8000
 	}

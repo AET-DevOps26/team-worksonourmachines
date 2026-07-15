@@ -1,13 +1,1 @@
-src/main/java/org/openapitools/api/StudentApiV1.java
-src/main/java/org/openapitools/model/SharedErrorsErrorBody.java
-src/main/java/org/openapitools/model/SharedMarketplaceLocation.java
-src/main/java/org/openapitools/model/SharedStudentGeneratedPlan.java
-src/main/java/org/openapitools/model/SharedStudentGeneratedPlanMilestone.java
-src/main/java/org/openapitools/model/SharedStudentGeneratedPlanSuggestion.java
-src/main/java/org/openapitools/model/SharedStudentGeneratedPlanTutor.java
-src/main/java/org/openapitools/model/SharedStudentLearningGoal.java
-src/main/java/org/openapitools/model/SharedStudentLearningGoalInput.java
-src/main/java/org/openapitools/model/SharedStudentPlanTier.java
-src/main/java/org/openapitools/model/SharedStudentStudentProfile.java
-src/main/java/org/openapitools/model/SharedStudentStudentProfileInput.java
-src/main/java/org/openapitools/model/SharedStudyFocusStudyFocus.java
+src/main/java/org/openapitools/api/StudentInternalApiV1.java

@@ -32,7 +32,7 @@ class SharedAiGeneratePlanRequest(BaseModel):
     SharedAiGeneratePlanRequest
     """ # noqa: E501
     learning_goal_id: StrictStr = Field(alias="learningGoalId")
-    student_id: StrictStr = Field(alias="studentId")
+    student_id: StrictStr = Field(description="UUID of the student for whom the plan is generated. Provided by the student service; the AI must not derive identity from the inbound token.", alias="studentId")
     __properties: ClassVar[List[str]] = ["learningGoalId", "studentId"]
 
     model_config = {
@@ -85,7 +85,7 @@ class SharedAiGeneratePlanRequest(BaseModel):
 
         _obj = cls.model_validate({
             "learningGoalId": obj.get("learningGoalId"),
-            "studentId": obj.get("studentId"),
+            "studentId": obj.get("studentId")
         })
         return _obj
 

@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: Student Internal API
+  version: v1
+tags: []
+paths:
+  /v1/internal/students/{studentId}:
+    get:
+      operationId: getStudentProfile
+      summary: Get a student profile by ID
+      description: Returns the profile of any student by ID. Requires the 'service' role.
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.StudentProfile'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+  /v1/internal/students/{studentId}/goals/{goalId}:
+    get:
+      operationId: getLearningGoal
+      summary: Get a learning goal by student and goal ID
+      description: Returns a specific learning goal for a student. Requires the 'service' role.
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Student.LearningGoal'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
+security:
+  - KeycloakClientAuth:
+      - openid
+      - profile
+      - email
+      - roles
+components:
+  schemas:
+    Shared.Errors.ErrorBody:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    Shared.Marketplace.Location:
+      type: string
+      enum:
+        - online
+        - garching
+        - munich
+        - weihenstephan
+        - straubing
+        - ottobrunn
+    Shared.Student.LearningGoal:
+      type: object
+      required:
+        - id
+        - moduleId
+        - description
+        - targetDate
+        - selfAssessedLevel
+        - locations
+      properties:
+        id:
+          type: string
+        moduleId:
+          type: string
+        description:
+          type: string
+        targetDate:
+          type: string
+          format: date-time
+        selfAssessedLevel:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Self-assessed level from 1 (beginner) to 5 (expert).
+        budgetEur:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Budget in EUR (whole euros).
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Marketplace.Location'
+    Shared.Student.StudentProfile:
+      type: object
+      required:
+        - displayName
+        - bio
+        - languages
+      properties:
+        displayName:
+          type: string
+        bio:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        studyFocus:
+          allOf:
+            - $ref: '#/components/schemas/Shared.StudyFocus.StudyFocus'
+          description: Self-assessed strength in each study skill (1 = needs work, 5 = confident).
+    Shared.StudyFocus.StudyFocus:
+      type: object
+      required:
+        - memorization
+        - formalReasoning
+        - conceptualUnderstanding
+        - problemSolving
+      properties:
+        memorization:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Recalling definitions, formulas, and terminology.
+        formalReasoning:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Proofs, logic, derivations, and symbolic manipulation.
+        conceptualUnderstanding:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Building mental models and understanding why concepts work.
+        problemSolving:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Applying theory to exercises and exam-style problems.
+      description: Ratings for study-skill dimensions on a 1 (low) to 5 (high) scale.
+  securitySchemes:
+    KeycloakClientAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+          scopes:
+            openid: ''
+            profile: ''
+            email: ''
+            roles: ''
+      description: Keycloak OAuth2 client credentials auth for Scalar/API testing
+servers:
+  - url: https://api.tutormatch.localhost
+    description: Student Internal API
+    variables: {}
