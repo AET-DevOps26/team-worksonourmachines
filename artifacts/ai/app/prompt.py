@@ -135,12 +135,13 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         f"R3. Each milestone's dueDate MUST be strictly after {today}"
         f" and strictly before {target_date}.",
         "    Space them evenly across that range. Never use a date in the past.",
-        "R4. estimatedCost = sessions × tutorHourlyRate,"
-        " where sessions is between 1 and 5.",
-        "    Keep costs realistic: a tutor charging"
-        " €2/h for 3 sessions costs €6, not €600.",
+        "R4. Each milestone covers exactly 1 or 2 sessions (lessons)"
+        " with the assigned tutor.",
+        "    estimatedCost MUST equal sessions × tutorHourlyRate.",
+        "    Allowed values: 1 session = 1× hourlyRate, 2 sessions = 2× hourlyRate.",
+        "    Example: tutor charges €20/h → estimatedCost is €20 or €40. Nothing else.",
         "    Never produce an estimatedCost that is not"
-        " a multiple of the tutor's hourlyRate.",
+        " 1× or 2× the tutor's hourlyRate.",
         "",
         "### Tutors",
         "R5. hourlyRate in proposedTutors MUST be the exact integer"
