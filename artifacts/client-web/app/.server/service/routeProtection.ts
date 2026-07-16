@@ -12,7 +12,7 @@ function hasRole(session: SessionPayload, role: string): boolean {
     return session.user.roles.includes(role);
 }
 
-export function forbiddenResponse(): Response {
+function forbiddenResponse(): Response {
     return new Response('Forbidden', { status: HttpStatusCode.Forbidden });
 }
 

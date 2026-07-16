@@ -2,12 +2,11 @@ import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { listAdminModules } from '~/.server/service/marketplace';
 import { roleProtectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 import { cn } from '~/lib/ui/utils';
-
-const adminModulesPageClassName = 'mx-auto flex w-full max-w-3xl flex-col gap-6';
 
 export const loader = roleProtectedLoader('admin', async () => {
     const result = await listAdminModules();
@@ -19,7 +18,7 @@ export default function AdminModulesRoute() {
     const { modules } = useLoaderData<typeof loader>();
 
     return (
-        <div className={adminModulesPageClassName}>
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex flex-col gap-1">
@@ -63,6 +62,6 @@ export default function AdminModulesRoute() {
                     ))}
                 </div>
             )}
-        </div>
+        </PageContainer>
     );
 }

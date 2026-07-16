@@ -2,6 +2,7 @@ import { useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { getModule } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 
@@ -18,7 +19,7 @@ export default function ModuleDetailRoute() {
     const { module } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6" size="wide">
             <Card>
                 <div className="flex items-center gap-3">
                     <CardTitle>{module.code}</CardTitle>
@@ -52,6 +53,6 @@ export default function ModuleDetailRoute() {
                     ))}
                 </div>
             </section>
-        </div>
+        </PageContainer>
     );
 }

@@ -1,3 +1,5 @@
+import { PageContainer } from '~/components/shell';
+
 import { LOREM_PARAGRAPHS } from './lorem';
 
 type PlaceholderPageProps = {
@@ -10,7 +12,7 @@ export function PlaceholderPage({ title, description, paragraphCount = 2 }: Plac
     const paragraphs = LOREM_PARAGRAPHS.slice(0, paragraphCount);
 
     return (
-        <div className="mx-auto w-full max-w-3xl">
+        <PageContainer>
             <header className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm">
                 <p className="w-fit rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
                     Placeholder
@@ -24,6 +26,6 @@ export function PlaceholderPage({ title, description, paragraphCount = 2 }: Plac
                     <p key={paragraph.slice(0, 24)}>{paragraph}</p>
                 ))}
             </div>
-        </div>
+        </PageContainer>
     );
 }

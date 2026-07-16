@@ -6,6 +6,7 @@ import {
     rejectTutorApplication,
 } from '~/.server/service/marketplace';
 import { roleProtectedAction, roleProtectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
@@ -46,7 +47,7 @@ export default function AdminTutorApprovalsRoute() {
     const fetcher = useFetcher();
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Tutor approvals</CardTitle>
                 <CardDescription>Review pending tutor applications and certificates.</CardDescription>
@@ -90,6 +91,6 @@ export default function AdminTutorApprovalsRoute() {
                     </Card>
                 ))
             )}
-        </div>
+        </PageContainer>
     );
 }

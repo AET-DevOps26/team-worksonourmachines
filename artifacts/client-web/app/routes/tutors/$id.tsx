@@ -3,6 +3,7 @@ import { isErr } from '~/.server/lib/result';
 import { startConversation } from '~/.server/service/communication';
 import { getTutor } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { formatLocationLabel, TutorAvailabilityDisplay } from '~/components/tutor';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -35,7 +36,7 @@ export default function PublicTutorProfileRoute() {
     const { tutor, isSelf } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>{tutor.displayName}</CardTitle>
                 <CardDescription className="mt-1">
@@ -84,6 +85,6 @@ export default function PublicTutorProfileRoute() {
                     <TutorAvailabilityDisplay availability={tutor.availability} />
                 </div>
             </Card>
-        </div>
+        </PageContainer>
     );
 }

@@ -3,6 +3,7 @@ import { redirect, useActionData, useLoaderData, useNavigation } from 'react-rou
 import { isErr } from '~/.server/lib/result';
 import { getMyTutorProfile, updateMyTutorProfile } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import {
     parseAvailabilityFromFormData,
     parseLocationsFromFormData,
@@ -15,7 +16,11 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Textarea } from '~/components/ui/textarea';
 
-export const loader = protectedLoader(async () => {
+export const loader = protectedLoader(async ({ session }) => {
+    if (!session.user.roles.includes('tutor')) {
+        throw redirect('/tutor/apply');
+    }
+
     const result = await getMyTutorProfile();
     if (isErr(result)) throw result.error;
     if (!result.value.profile) {
@@ -24,7 +29,11 @@ export const loader = protectedLoader(async () => {
     return { profile: result.value.profile };
 });
 
-export const action = protectedAction(async ({ request }) => {
+export const action = protectedAction(async ({ request, session }) => {
+    if (!session.user.roles.includes('tutor')) {
+        throw redirect('/tutor/apply');
+    }
+
     const formData = await request.formData();
     const availability = parseAvailabilityFromFormData(formData);
     const locations = parseLocationsFromFormData(formData);
@@ -58,7 +67,7 @@ export default function TutorProfileRoute() {
     const hourlyRateId = useId();
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Tutor profile</CardTitle>
                 <CardDescription>Edit your bio, rates, languages, locations, and availability.</CardDescription>
@@ -109,6 +118,6 @@ export default function TutorProfileRoute() {
                     </Button>
                 </form>
             </Card>
-        </div>
+        </PageContainer>
     );
 }

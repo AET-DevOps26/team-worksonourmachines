@@ -11,10 +11,10 @@ import {
     StudentProfileForm,
     StudyFocusStarsDisplay,
 } from '~/components/profile';
+import { PageContainer } from '~/components/shell';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 import { cn } from '~/lib/ui/utils';
-
 export const PROFILE_EDIT_SEARCH = '?edit=1';
 
 export const loader = protectedLoader(async ({ request, session }) => {
@@ -78,14 +78,12 @@ export const action = protectedAction(async ({ request }) => {
     return redirect('/me/profile');
 });
 
-const profilePageClassName = 'mx-auto flex w-full max-w-2xl flex-col gap-6';
-
 export default function MyProfileRoute() {
     const { edit, profile } = useLoaderData<typeof loader>();
 
     if (edit) {
         return (
-            <div className={`${profilePageClassName} gap-4`}>
+            <PageContainer className="flex flex-col gap-4">
                 <StudentProfileForm
                     bio={profile.bio}
                     description="Manage your display name, bio, languages, and study focus."
@@ -99,12 +97,12 @@ export default function MyProfileRoute() {
                 <Link className={cn(buttonVariants({ variant: 'outline' }))} to="/me/profile">
                     Cancel
                 </Link>
-            </div>
+            </PageContainer>
         );
     }
 
     return (
-        <div className={profilePageClassName}>
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex flex-col gap-1">
@@ -147,6 +145,6 @@ export default function MyProfileRoute() {
                     </div>
                 ) : null}
             </Card>
-        </div>
+        </PageContainer>
     );
 }

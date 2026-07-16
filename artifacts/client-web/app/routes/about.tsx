@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { contentMaxWidth } from '~/components/shell';
 import { buttonVariants } from '~/components/ui/button';
 import { cn } from '~/lib/ui/utils';
 
@@ -31,7 +32,7 @@ export default function AboutRoute() {
     return (
         <div className="-mx-6 flex flex-col">
             <section className="border-b border-border bg-muted/30">
-                <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-16 md:py-24">
+                <div className={cn('mx-auto flex w-full flex-col gap-6 px-6 py-16 md:py-24', contentMaxWidth.wide)}>
                     <div className="flex max-w-3xl flex-col gap-4">
                         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">About us</p>
                         <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
@@ -51,7 +52,7 @@ export default function AboutRoute() {
             </section>
 
             <section className="border-b border-border">
-                <div className="mx-auto w-full max-w-6xl px-6 py-16">
+                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
                     <div className="mb-10 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">Why we built this</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -72,7 +73,7 @@ export default function AboutRoute() {
             </section>
 
             <section className="border-b border-border bg-muted/20">
-                <div className="mx-auto w-full max-w-6xl px-6 py-16">
+                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
                     <div className="grid gap-10 md:grid-cols-2 md:items-start">
                         <div className="flex flex-col gap-3">
                             <h2 className="text-2xl font-semibold tracking-tight text-foreground">Our mission</h2>
@@ -100,7 +101,12 @@ export default function AboutRoute() {
             </section>
 
             <section>
-                <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
+                <div
+                    className={cn(
+                        'mx-auto flex w-full flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between',
+                        contentMaxWidth.wide,
+                    )}
+                >
                     <div className="flex max-w-xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">
                             That is what we are working toward.

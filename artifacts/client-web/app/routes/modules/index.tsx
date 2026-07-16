@@ -2,6 +2,7 @@ import { Link, useLoaderData, useSearchParams } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { listModules } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
@@ -26,7 +27,7 @@ export default function ModulesIndexRoute() {
     const q = searchParams.get('q') ?? '';
 
     return (
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6" size="wide">
             <Card>
                 <CardTitle>Course modules</CardTitle>
                 <CardDescription>
@@ -51,6 +52,6 @@ export default function ModulesIndexRoute() {
                     </Link>
                 ))}
             </div>
-        </div>
+        </PageContainer>
     );
 }

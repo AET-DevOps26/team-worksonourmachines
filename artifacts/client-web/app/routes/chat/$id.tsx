@@ -5,6 +5,7 @@ import type { SharedCommunicationChatMessage } from '~/.server/api/server-commun
 import { isErr } from '~/.server/lib/result';
 import { getConversation, listMessages, sendMessage } from '~/.server/service/communication';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Button, buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
@@ -104,7 +105,7 @@ export default function ChatThreadRoute() {
     }, [accessToken, conversation.id]);
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+        <PageContainer className="flex flex-col gap-4">
             <Card>
                 <div className="flex items-center justify-between gap-4">
                     <div>
@@ -157,6 +158,6 @@ export default function ChatThreadRoute() {
                 </div>
                 {actionData?.error ? <p className="text-sm text-destructive">{actionData.error}</p> : null}
             </Form>
-        </div>
+        </PageContainer>
     );
 }

@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from 'react-router';
 import { Link, redirect } from 'react-router';
 import { getSessionUser } from '~/.server/service/session';
+import { contentMaxWidth } from '~/components/shell';
 import { buttonVariants } from '~/components/ui/button';
 import { cn } from '~/lib/ui/utils';
 
@@ -75,7 +76,7 @@ export default function HomeRoute() {
     return (
         <div className="-mx-6 flex flex-col">
             <section className="border-b border-border bg-muted/30">
-                <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-16 md:py-24">
+                <div className={cn('mx-auto flex w-full flex-col gap-8 px-6 py-16 md:py-24', contentMaxWidth.wide)}>
                     <div className="flex max-w-3xl flex-col gap-4">
                         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                             Personal tutoring for your courses
@@ -108,7 +109,7 @@ export default function HomeRoute() {
             </section>
 
             <section className="border-b border-border">
-                <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 py-16 md:grid-cols-3">
+                <div className={cn('mx-auto grid w-full gap-8 px-6 py-16 md:grid-cols-3', contentMaxWidth.wide)}>
                     {valuePillars.map((pillar) => (
                         <div className="flex flex-col gap-2" key={pillar.title}>
                             <h2 className="text-base font-semibold text-foreground">{pillar.title}</h2>
@@ -120,7 +121,7 @@ export default function HomeRoute() {
 
             {/* biome-ignore lint/correctness/useUniqueElementIds: stable in-page anchor linked from public nav */}
             <section className="border-b border-border" id="how-it-works">
-                <div className="mx-auto w-full max-w-6xl px-6 py-16">
+                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
                     <div className="mb-10 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">How it works</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -149,14 +150,14 @@ export default function HomeRoute() {
             </section>
 
             <section className="border-b border-border bg-muted/20">
-                <div className="mx-auto w-full max-w-6xl px-6 py-16">
+                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
                     <div className="mb-8 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">
                             Course modules we know well
                         </h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
-                            Explore topics from popular university courses — including many taken at TUM — and see where
-                            students struggle most before you choose a tutor.
+                            Explore topics from popular university courses and see where your fellow students struggle
+                            most before you choose a tutor to tackle these obstacles.
                         </p>
                     </div>
                     <Link className={cn(buttonVariants({ variant: 'outline' }))} to="/modules">
@@ -166,7 +167,7 @@ export default function HomeRoute() {
             </section>
 
             <section className="border-b border-border">
-                <div className="mx-auto w-full max-w-6xl px-6 py-16">
+                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
                     <div className="mb-8 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">For students</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -188,7 +189,12 @@ export default function HomeRoute() {
             </section>
 
             <section className="border-b border-border bg-muted/20">
-                <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-16 md:flex-row md:items-center md:justify-between">
+                <div
+                    className={cn(
+                        'mx-auto flex w-full flex-col gap-4 px-6 py-16 md:flex-row md:items-center md:justify-between',
+                        contentMaxWidth.wide,
+                    )}
+                >
                     <div className="flex max-w-xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">For tutors</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -203,7 +209,12 @@ export default function HomeRoute() {
             </section>
 
             <section>
-                <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
+                <div
+                    className={cn(
+                        'mx-auto flex w-full flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between',
+                        contentMaxWidth.wide,
+                    )}
+                >
                     <div className="flex max-w-xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">
                             Ready to stop searching WhatsApp groups?

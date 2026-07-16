@@ -4,6 +4,7 @@ import { isErr } from '~/.server/lib/result';
 import { getModule, updateAdminModule } from '~/.server/service/marketplace';
 import { roleProtectedAction, roleProtectedLoader } from '~/.server/service/routeProtection';
 import { ModuleTopicEditor, parseTopicsFromFormData, topicToDraft } from '~/components/module';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { Button, buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
@@ -11,8 +12,6 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Textarea } from '~/components/ui/textarea';
 import { cn } from '~/lib/ui/utils';
-
-const adminModuleFormPageClassName = 'mx-auto flex w-full max-w-3xl flex-col gap-6';
 
 export const loader = roleProtectedLoader('admin', async ({ params }) => {
     const code = params.code ?? '';
@@ -58,7 +57,7 @@ export default function AdminEditModuleRoute() {
     const difficultyId = useId();
 
     return (
-        <div className={adminModuleFormPageClassName}>
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <div className="flex flex-wrap items-center gap-2">
                     <CardTitle>Edit {module.code}</CardTitle>
@@ -103,6 +102,6 @@ export default function AdminEditModuleRoute() {
                     </div>
                 </Form>
             </Card>
-        </div>
+        </PageContainer>
     );
 }

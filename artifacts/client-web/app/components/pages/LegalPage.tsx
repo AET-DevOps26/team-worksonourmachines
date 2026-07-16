@@ -1,3 +1,5 @@
+import { PageContainer } from '~/components/shell';
+
 import { LOREM_PARAGRAPHS } from './lorem';
 
 type LegalPageProps = {
@@ -6,7 +8,7 @@ type LegalPageProps = {
 
 export function LegalPage({ title }: LegalPageProps) {
     return (
-        <div className="mx-auto w-full max-w-3xl px-6 py-12">
+        <PageContainer className="py-4">
             <header className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm">
                 <p className="w-fit rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                     Legal placeholder
@@ -28,6 +30,6 @@ export function LegalPage({ title }: LegalPageProps) {
                     </section>
                 ))}
             </div>
-        </div>
+        </PageContainer>
     );
 }
