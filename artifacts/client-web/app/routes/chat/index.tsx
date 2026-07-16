@@ -29,7 +29,7 @@ export default function ChatIndexRoute() {
                         <Card className="transition-colors hover:border-primary/40">
                             <CardTitle className="text-base">{conv.partner.displayName}</CardTitle>
                             <CardDescription className="mt-1 line-clamp-1">{conv.lastMessage}</CardDescription>
-                            <p className="mt-2 text-xs text-muted-foreground">
+                            <p className="mt-2 text-xs text-muted-foreground" suppressHydrationWarning>
                                 {new Date(conv.updatedAt).toLocaleString()}
                             </p>
                         </Card>
