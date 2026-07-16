@@ -70,9 +70,13 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         within_budget = (
             f"2. **within_budget** — total cost MUST be ≤ €{budget}."
             f" The cheapest tutor charges €{cheapest_rate}/h."
-            f" If €{budget} is less than one session at that rate,"
-            f' set description to "Budget of €{budget} is too low — minimum session'
-            f' costs €{cheapest_rate}", set totalEstimatedCost to 0,'
+            f" If the budget covers at least one session but not all topics,"
+            f" include only as many topics (milestones) as the budget allows,"
+            f" prioritising earlier topics first. Set the description to explain"
+            f' how many topics are covered, e.g. "Budget covers X of {n_topics}'
+            f' topics." If €{budget} is less than one session at that rate,'
+            f' set description to "Budget of €{budget} is too low — minimum'
+            f' session costs €{cheapest_rate}", set totalEstimatedCost to 0,'
             " and return empty proposedTutors and milestones arrays."
         )
 
@@ -119,7 +123,9 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "",
         "## Topics to cover",
         f"There are exactly {n_topics} topic(s)."
-        f" You MUST produce exactly {n_topics} milestone(s).",
+        f" For cheapest and best_quality, produce exactly {n_topics} milestone(s)."
+        f" For within_budget, produce as many milestones as the budget allows"
+        f" (up to {n_topics}), prioritising earlier topics.",
         topics_block,
         "",
         "## Available tutors",
@@ -128,19 +134,23 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "## Rules — follow every rule exactly, no exceptions",
         "",
         "### Milestones",
-        f"R1. Produce EXACTLY {n_topics} milestone(s)"
+        f"R1. For cheapest and best_quality: produce EXACTLY {n_topics} milestone(s)"
         " — one per topic, in the same order.",
+        "    For within_budget: produce as many milestones as the budget allows"
+        f" (up to {n_topics}), in topic order (exception to the exact count).",
         "R2. Each milestone's topicId MUST match the id"
         " of the corresponding topic above.",
         f"R3. Each milestone's dueDate MUST be strictly after {today}"
-        f" and strictly before {target_date}.",
-        "    Space them evenly across that range. Never use a date in the past.",
-        "R4. estimatedCost = sessions × tutorHourlyRate,"
-        " where sessions is between 1 and 5.",
-        "    Keep costs realistic: a tutor charging"
-        " €2/h for 3 sessions costs €6, not €600.",
+        f" and strictly before {target_date}."
+        " Space included milestones evenly across that range."
+        " Never use a date in the past.",
+        "R4. Each milestone covers exactly 1 or 2 sessions (lessons)"
+        " with the assigned tutor.",
+        "    estimatedCost MUST equal sessions × tutorHourlyRate.",
+        "    Allowed values: 1 session = 1× hourlyRate, 2 sessions = 2× hourlyRate.",
+        "    Example: tutor charges 20/h → estimatedCost is 20 or €40. Nothing else.",
         "    Never produce an estimatedCost that is not"
-        " a multiple of the tutor's hourlyRate.",
+        " 1× or 2× the tutor's hourlyRate.",
         "",
         "### Tutors",
         "R5. hourlyRate in proposedTutors MUST be the exact integer"
@@ -161,6 +171,10 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "### Budget",
         "R9. For within_budget: the sum of all estimatedCosts"
         " MUST be ≤ the stated budget.",
+        "    If the budget cannot cover all topics, include only the topics"
+        " it can cover (prioritise earlier topics). Fewer milestones than"
+        f" {n_topics} is acceptable for within_budget when the budget is"
+        " too small for the full plan.",
         "",
         "## Plan tiers — generate all three",
         "1. **cheapest** — use the lowest-rate tutor for every topic.",

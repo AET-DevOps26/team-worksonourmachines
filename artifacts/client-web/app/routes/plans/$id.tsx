@@ -24,7 +24,13 @@ export const loader = protectedLoader(async ({ params }) => {
 export const action = protectedAction(async ({ params }) => {
     const goalId = params.id ?? '';
     const result = await generatePlan(goalId);
-    if (isErr(result)) return { error: 'Generation failed. Please try again.', ok: false };
+    if (isErr(result)) {
+        const detail = result.error.detail;
+        if (result.error.type === 'badRequest' && detail) {
+            return { error: detail, ok: false };
+        }
+        return { error: 'Generation failed. Please try again.', ok: false };
+    }
     return { error: null, ok: true };
 });
 

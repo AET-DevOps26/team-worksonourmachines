@@ -38,6 +38,21 @@ spec:
                 secretKeyRef:
                   name: ai-secrets
                   key: LLM_API_KEY
+            - name: KEYCLOAK_ISSUER
+              value: "https://auth.{{ .Values.ingress.host }}/realms/tutormatch"
+            - name: KEYCLOAK_JWKS_URI
+              value: "http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs"
+            - name: KEYCLOAK_TOKEN_URL
+              value: "http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token"
+            - name: AI_CLIENT_ID
+              value: "server-ai"
+            - name: AI_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ai-secrets
+                  key: AI_CLIENT_SECRET
+            - name: EXPECTED_CALLER_CLIENT_ID
+              value: "server-student"
           readinessProbe:
             httpGet:
               path: /health

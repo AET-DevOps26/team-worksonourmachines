@@ -11,9 +11,10 @@ ingress:
 ai:
   imageDigest: ""
   llmProvider: logos
-  llmBaseUrl: https://logos.aet.cit.tum.de
+  llmBaseUrl: https://logos.aet.cit.tum.de/v1
   llmModel: openai/gpt-oss-120b
   llmApiKey: ""  # Set via the LLM_API_KEY GitHub Actions secret
+  aiClientSecret: ""  # Set via the AI_CLIENT_SECRET GitHub Actions secret
 
 clientWeb:
   imageDigest: ""
@@ -70,3 +71,4 @@ keycloak:
   adminUser: admin
   adminPassword: admin  # Override in production
   clientWebSecret: client-web-secret  # Override in production
+  serverStudentSecret: server-student-dev-secret  # Override via SERVER_STUDENT_SECRET GitHub Actions secret
