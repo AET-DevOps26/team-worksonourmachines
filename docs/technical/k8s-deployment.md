@@ -97,6 +97,9 @@ The production GitHub environment must define these secrets:
 | `KEYCLOAK_DB_PASSWORD` | Keycloak database user |
 | `KEYCLOAK_ADMIN_PASSWORD` | Keycloak administration and config import |
 | `KEYCLOAK_CLIENT_WEB_SECRET` | Confidential OIDC client |
+| `AI_CLIENT_SECRET` | AI service account client |
+| `SERVER_STUDENT_SECRET` | Student service account client |
+| `SERVER_MARKETPLACE_ADMIN_SECRET` | Marketplace Admin API client (tutor role assignment) |
 
 `IMAGE_TAG` and `RANCHER_DIGEST_FILE` are managed automatically by CI. For an existing persistent database, the three database/administration credentials must initially match the values already stored by PostgreSQL and Keycloak. Changing Kubernetes Secrets alone does not rotate persisted credentials.
 
@@ -108,6 +111,9 @@ To deploy from your local machine, download the `rancher-image-digests` artifact
 IMAGE_TAG=<git-sha> \
 RANCHER_DIGEST_FILE=/path/to/rancher-image-digests.env \
 LLM_API_KEY=<your-logos-api-key> \
+AI_CLIENT_SECRET=<ai-client-secret> \
+SERVER_STUDENT_SECRET=<student-client-secret> \
+SERVER_MARKETPLACE_ADMIN_SECRET=<marketplace-admin-client-secret> \
 POSTGRES_PASSWORD=<current-postgres-password> \
 KEYCLOAK_DB_PASSWORD=<current-keycloak-db-password> \
 KEYCLOAK_ADMIN_PASSWORD=<current-keycloak-admin-password> \

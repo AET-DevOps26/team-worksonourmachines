@@ -68,6 +68,19 @@ spec:
             - name: REDIS_URL
               value: "redis://redis:6379"
             {{- end }}
+            {{- if eq $server.name "server-marketplace" }}
+            - name: KEYCLOAK_BASE_URL
+              value: "http://keycloak:8080"
+            - name: KEYCLOAK_REALM
+              value: "tutormatch"
+            - name: KEYCLOAK_ADMIN_CLIENT_ID
+              value: "server-marketplace-admin"
+            - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET
+            {{- end }}
             {{- if eq $server.name "server-student" }}
             - name: AI_SERVICE_URL
               value: "http://ai:8000"

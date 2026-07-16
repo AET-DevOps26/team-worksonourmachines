@@ -73,3 +73,4 @@ keycloak:
   adminPassword: admin  # Override in production
   clientWebSecret: client-web-secret  # Override in production
   serverStudentSecret: server-student-dev-secret  # Override via SERVER_STUDENT_SECRET GitHub Actions secret
+  serverMarketplaceAdminSecret: server-marketplace-admin-secret  # Override via SERVER_MARKETPLACE_ADMIN_SECRET GitHub Actions secret

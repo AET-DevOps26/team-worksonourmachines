@@ -94,6 +94,10 @@ services:
       PORT: "8082"
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://keycloak:8080}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-tutormatch}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
     command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
     ports:
       - 127.0.0.1:8082:8082
