@@ -155,8 +155,8 @@ export default function HomeRoute() {
                             Course modules we know well
                         </h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
-                            Explore topics from popular university courses — including many taken at TUM — and see where
-                            students struggle most before you choose a tutor.
+                            Explore topics from popular university courses and see where your fellow students struggle
+                            most before you choose a tutor to tackle these obstacles.
                         </p>
                     </div>
                     <Link className={cn(buttonVariants({ variant: 'outline' }))} to="/modules">

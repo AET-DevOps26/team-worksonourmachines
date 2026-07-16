@@ -17,6 +17,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <head>
                 <meta charSet="utf-8" />
                 <meta content="width=device-width, initial-scale=1" name="viewport" />
+                <link rel="icon" type="image/png" href="/favicon.png" />
                 <script dangerouslySetInnerHTML={{ __html: themeScript }} />
                 <Meta />
                 <Links />
