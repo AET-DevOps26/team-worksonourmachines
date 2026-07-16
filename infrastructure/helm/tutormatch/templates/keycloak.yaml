@@ -45,7 +45,8 @@ data:
         "realm": [
           { "name": "student", "description": "Learner role for TUtorMatch students." },
           { "name": "tutor",   "description": "Teaching role for TUtorMatch tutors." },
-          { "name": "admin",   "description": "Administrative role for local TUtorMatch development." }
+          { "name": "admin",   "description": "Administrative role for local TUtorMatch development." },
+          { "name": "service", "description": "Internal service-to-service role, assigned to service accounts." }
         ]
       },
       "groups": [
@@ -84,6 +85,30 @@ data:
           "implicitFlowEnabled": false,
           "directAccessGrantsEnabled": true,
           "serviceAccountsEnabled": false
+        },
+        {
+          "clientId": "server-student",
+          "name": "TUtorMatch Student Service",
+          "enabled": true,
+          "protocol": "openid-connect",
+          "publicClient": false,
+          "clientAuthenticatorType": "client-secret",
+          "secret": "server-student-dev-secret",
+          "standardFlowEnabled": false,
+          "directAccessGrantsEnabled": false,
+          "serviceAccountsEnabled": true
+        },
+        {
+          "clientId": "server-ai",
+          "name": "TUtorMatch AI Service",
+          "enabled": true,
+          "protocol": "openid-connect",
+          "publicClient": false,
+          "clientAuthenticatorType": "client-secret",
+          "secret": {{ .Values.ai.aiClientSecret | quote }},
+          "standardFlowEnabled": false,
+          "directAccessGrantsEnabled": false,
+          "serviceAccountsEnabled": true
         }
       ],
       "users": [
@@ -166,6 +191,18 @@ data:
           "enabled": true, "emailVerified": true,
           "groups": ["/tutors"], "realmRoles": ["tutor"],
           "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
+        },
+        {
+          "username": "service-account-server-student",
+          "enabled": true,
+          "serviceAccountClientId": "server-student",
+          "realmRoles": ["service"]
+        },
+        {
+          "username": "service-account-server-ai",
+          "enabled": true,
+          "serviceAccountClientId": "server-ai",
+          "realmRoles": ["service"]
         }
       ]
     }
