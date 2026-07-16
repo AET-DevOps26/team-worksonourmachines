@@ -77,11 +77,21 @@ jobs:
       - name: Deploy to Rancher
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          AI_CLIENT_SECRET: ${{ secrets.AI_CLIENT_SECRET }}
+          SERVER_STUDENT_SECRET: ${{ secrets.SERVER_STUDENT_SECRET }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           KEYCLOAK_DB_PASSWORD: ${{ secrets.KEYCLOAK_DB_PASSWORD }}
           KEYCLOAK_ADMIN_PASSWORD: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
           KEYCLOAK_CLIENT_WEB_SECRET: ${{ secrets.KEYCLOAK_CLIENT_WEB_SECRET }}
         run: make -C infrastructure rancher-prod-deploy
+
+      - name: Deploy observability stack to Rancher
+        env:
+          GRAFANA_SMTP_USER: ${{ secrets.GRAFANA_SMTP_USER }}
+          GRAFANA_SMTP_PASSWORD: ${{ secrets.GRAFANA_SMTP_PASSWORD }}
+          GRAFANA_ADMIN_USER: ${{ secrets.GRAFANA_ADMIN_USER }}
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+        run: make -C infrastructure rancher-observability-install
 
       - name: Deployment diagnostics
         if: failure()

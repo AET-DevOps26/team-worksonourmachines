@@ -5,4 +5,5 @@ export const HttpStatusCode = {
     NotFound: 404,
     ServiceUnavailable: 503,
     Unauthorized: 401,
+    UnprocessableEntity: 422,
 };

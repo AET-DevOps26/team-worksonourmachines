@@ -1,0 +1,171 @@
+fullnameOverride: grafana
+
+rbac:
+  namespaced: true
+
+resources:
+  requests:
+    cpu: 75m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+initChownData:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 25m
+      memory: 32Mi
+
+downloadDashboards:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 25m
+      memory: 32Mi
+
+admin:
+  existingSecret: grafana-admin-secret
+  userKey: admin-user
+  passwordKey: admin-password
+
+envFromSecret: grafana-smtp-secret
+
+grafana.ini:
+  smtp:
+    enabled: true
+    host: smtp.gmail.com:465
+    user: $__env{GRAFANA_SMTP_USER}
+    password: $__env{GRAFANA_SMTP_PASSWORD}
+    from_address: $__env{GRAFANA_SMTP_USER}
+    from_name: Grafana
+    startTLS_policy: NoStartTLS
+    skip_verify: false
+
+persistence:
+  enabled: false
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        uid: prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus.team-worksonourmachines.svc.cluster.local:9090
+        isDefault: true
+        editable: false
+      - name: Loki
+        uid: loki
+        type: loki
+        access: proxy
+        url: http://loki.team-worksonourmachines.svc.cluster.local:3100
+        editable: false
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - grafana.team-worksonourmachines.stud.k8s.aet.cit.tum.de
+  path: /
+  pathType: Prefix
+  tls:
+    - hosts:
+        - grafana.team-worksonourmachines.stud.k8s.aet.cit.tum.de
+      secretName: grafana-tls
+
+alerting:
+  contactpoints.yaml:
+    apiVersion: 1
+    contactPoints:
+      - orgId: 1
+        name: Email
+        receivers:
+          - uid: email-receiver
+            type: email
+            settings:
+              addresses: amritanshu.sikdar@gmail.com;hristina.ivanova1003@gmail.com;julian.wilke@tum.de
+              singleEmail: true
+  policies.yaml:
+    apiVersion: 1
+    policies:
+      - orgId: 1
+        receiver: Email
+  rules.yaml:
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: microservice-availability
+        folder: Alerts
+        interval: 10s
+        rules:
+          - uid: microservice-down
+            title: Microservice Down
+            condition: C
+            data:
+              - refId: A
+                datasourceUid: prometheus
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                model:
+                  expr: up{job=~"server-student|server-marketplace|server-communication"}
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  refId: B
+                  expression: "A"
+                  reducer: last
+                  settings:
+                    mode: dropNN
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  refId: C
+                  expression: "B"
+                  conditions:
+                    - evaluator:
+                        type: lt
+                        params:
+                          - 1
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - B
+                      reducer:
+                        type: last
+            noDataState: NoData
+            execErrState: Error
+            for: 15s
+            annotations:
+              summary: "Microservice {{`{{ $labels.job }}`}} is down"
+              description: "The pod for {{`{{ $labels.job }}`}} has been unreachable for 15 seconds. Immediate action required."
+            labels:
+              severity: critical
