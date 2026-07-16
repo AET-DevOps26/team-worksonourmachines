@@ -74,9 +74,19 @@ services:
     <<: *server-base
     environment:
       PORT: "8083"
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
+      KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
+      REDIS_URL: redis://redis:6379
     command: ["mvn", "-pl", "communication", "-am", "spring-boot:run"]
     ports:
       - 127.0.0.1:8083:8083
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak-config-cli:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
 
   server-marketplace:
     <<: *server-base
@@ -85,7 +95,6 @@ services:
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
     command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
-
     ports:
       - 127.0.0.1:8082:8082
 
@@ -100,7 +109,6 @@ services:
       KEYCLOAK_CLIENT_SECRET: server-student-dev-secret
       AI_SERVICE_URL: http://ai:8000
     command: ["mvn", "-pl", "student", "-am", "spring-boot:run"]
-
     ports:
       - 127.0.0.1:8081:8081
 
