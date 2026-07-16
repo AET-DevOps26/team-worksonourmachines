@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'react-router';
+import { Link, redirect, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { getMyTutorProfile } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
@@ -14,7 +14,11 @@ function statusVariant(status: string) {
     return 'warning' as const;
 }
 
-export const loader = protectedLoader(async () => {
+export const loader = protectedLoader(async ({ session }) => {
+    if (!session.user.roles.includes('tutor')) {
+        throw redirect('/tutor/apply');
+    }
+
     const result = await getMyTutorProfile();
     if (isErr(result)) throw result.error;
     return result.value;

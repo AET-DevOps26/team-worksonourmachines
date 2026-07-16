@@ -28,7 +28,7 @@ export const loader = protectedLoader(async () => {
     };
 });
 
-export const action = protectedAction(async ({ request }) => {
+export const action = protectedAction(async ({ request, session }) => {
     const formData = await request.formData();
     const moduleId = String(formData.get('moduleId') ?? '');
     const certificateRef = String(formData.get('certificateRef') ?? '').trim();
@@ -70,7 +70,7 @@ export const action = protectedAction(async ({ request }) => {
         return { error: 'Could not submit application. Please try again.' };
     }
 
-    throw redirect('/tutor/dashboard');
+    throw redirect(session.user.roles.includes('tutor') ? '/tutor/dashboard' : '/dashboard');
 });
 
 export default function TutorApplyRoute() {

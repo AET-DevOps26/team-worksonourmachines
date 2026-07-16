@@ -16,7 +16,11 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Textarea } from '~/components/ui/textarea';
 
-export const loader = protectedLoader(async () => {
+export const loader = protectedLoader(async ({ session }) => {
+    if (!session.user.roles.includes('tutor')) {
+        throw redirect('/tutor/apply');
+    }
+
     const result = await getMyTutorProfile();
     if (isErr(result)) throw result.error;
     if (!result.value.profile) {
@@ -25,7 +29,11 @@ export const loader = protectedLoader(async () => {
     return { profile: result.value.profile };
 });
 
-export const action = protectedAction(async ({ request }) => {
+export const action = protectedAction(async ({ request, session }) => {
+    if (!session.user.roles.includes('tutor')) {
+        throw redirect('/tutor/apply');
+    }
+
     const formData = await request.formData();
     const availability = parseAvailabilityFromFormData(formData);
     const locations = parseLocationsFromFormData(formData);
