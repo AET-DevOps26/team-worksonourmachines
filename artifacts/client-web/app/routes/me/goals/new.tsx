@@ -4,6 +4,7 @@ import { isErr } from '~/.server/lib/result';
 import { listModules } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { createGoal } from '~/.server/service/student';
+import { PageContainer } from '~/components/shell';
 import { Button, buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
@@ -69,7 +70,7 @@ export default function NewLearningGoalRoute() {
     };
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>New learning goal</CardTitle>
                 <CardDescription className="mt-1">
@@ -160,6 +161,6 @@ export default function NewLearningGoalRoute() {
                     </div>
                 </Form>
             </Card>
-        </div>
+        </PageContainer>
     );
 }

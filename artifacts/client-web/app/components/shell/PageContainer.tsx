@@ -1,0 +1,19 @@
+import type { ReactNode } from 'react';
+
+import { cn } from '~/lib/ui/utils';
+
+/** Page content widths. Wide matches the site header/footer. */
+export const contentMaxWidth = {
+    narrow: 'max-w-3xl',
+    wide: 'max-w-6xl',
+} as const;
+
+type PageContainerProps = {
+    children: ReactNode;
+    className?: string;
+    size?: keyof typeof contentMaxWidth;
+};
+
+export function PageContainer({ children, className, size = 'narrow' }: PageContainerProps) {
+    return <div className={cn('mx-auto w-full', contentMaxWidth[size], className)}>{children}</div>;
+}

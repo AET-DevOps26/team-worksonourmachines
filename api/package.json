@@ -9,7 +9,7 @@
     "api-client:generate": "pnpm run api-client-communication:generate && pnpm run api-client-marketplace:generate && pnpm run api-client-student:generate",
     "api-server:generate": "pnpm run api-server-communication:generate && pnpm run api-server-marketplace:generate && pnpm run api-server-student:generate && pnpm run api-server-student-internal:generate",
     "api-ai:generate": "openapi-generator-cli generate -i specs/openapi.Ai.v1.yaml -g python-fastapi -o ../artifacts/ai/generated -t templates/python-fastapi --additional-properties=hideGenerationTimestamp=true",
-    "api-client:add-ts-nocheck": "sh -c 'find \"$@\" -name \"*.ts\" -exec sed -i \"1i// @ts-nocheck\" {} +' _",
+    "api-client:add-ts-nocheck": "sh -c 'find \"$@\" -name \"*.ts\" -exec grep -L \"^// @ts-nocheck\" {} + | xargs -r sed -i \"1i// @ts-nocheck\"'",
     "api-client-communication:generate": "openapi-generator-cli generate -i specs/openapi.Communication.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-communication/generated && pnpm run api-client:add-ts-nocheck -- ../artifacts/client-web/app/.server/api/server-communication/generated",
     "api-client-marketplace:generate": "openapi-generator-cli generate -i specs/openapi.Marketplace.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-marketplace/generated && pnpm run api-client:add-ts-nocheck -- ../artifacts/client-web/app/.server/api/server-marketplace/generated",
     "api-client-student:generate": "openapi-generator-cli generate -i specs/openapi.Student.v1.yaml -g typescript-fetch -o ../artifacts/client-web/app/.server/api/server-student/generated && pnpm run api-client:add-ts-nocheck -- ../artifacts/client-web/app/.server/api/server-student/generated",

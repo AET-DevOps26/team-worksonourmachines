@@ -87,6 +87,16 @@
                 "knip.jsonc",
                 "components.json"
             ]
+        },
+        {
+            "includes": ["**/*.test.ts", "app/.server/test/**"],
+            "linter": {
+                "rules": {
+                    "style": {
+                        "noProcessEnv": "off"
+                    }
+                }
+            }
         }
     ]
 }

@@ -12,14 +12,16 @@ export type ErrorType =
 
 export class ErrorResponse<T extends ErrorType> extends Error {
     readonly type: T;
+    readonly detail: string | undefined;
 
-    constructor(type: T) {
+    constructor(type: T, detail?: string) {
         super(`ErrorResponse(${type})`);
         this.type = type;
+        this.detail = detail;
     }
 }
 
-export class FetchError extends ErrorResponse<'unknown'> {
+class FetchError extends ErrorResponse<'unknown'> {
     constructor() {
         super('unknown');
     }
@@ -48,11 +50,27 @@ export function errorMiddlewareConfiguration(): Middleware {
             }
 
             if (context.response.status === HttpStatusCode.BadRequest) {
-                throw new ErrorResponse('badRequest');
+                let detail: string | undefined;
+                try {
+                    const body: unknown = await context.response.json();
+                    if (typeof body === 'object' && body !== null) {
+                        const b = body as Record<string, unknown>;
+                        if ('detail' in b && typeof b.detail === 'string') {
+                            detail = b.detail;
+                        } else if ('message' in b && typeof b.message === 'string') {
+                            detail = b.message;
+                        }
+                    }
+                } catch {}
+                throw new ErrorResponse('badRequest', detail);
             }
 
             if (context.response.status === HttpStatusCode.ServiceUnavailable) {
                 throw new ErrorResponse('serviceUnavailable');
+            }
+
+            if (context.response.status === HttpStatusCode.UnprocessableEntity) {
+                throw new ErrorResponse('unknown');
             }
 
             if (context.response.status === HttpStatusCode.InternalServerError) {

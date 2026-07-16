@@ -15,7 +15,7 @@ COMPOSE_APP_FILES := -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docker-com
 ifneq ($(filter 1 true yes,$(OBSERVE)),)
 COMPOSE_APP_FILES += -f $(ROOT_DIR)/docker-compose.observability.yml
 endif
-COMPOSE_APP := $(COMPOSE) $(COMPOSE_APP_FILES)
+COMPOSE_APP := env -u LLM_PROVIDER -u LLM_BASE_URL -u LLM_MODEL -u LLM_API_KEY -u COMPOSE_PROFILES $(COMPOSE) --env-file $(ROOT_DIR)/.env $(COMPOSE_APP_FILES)
 COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) -f $(ROOT_DIR)/docker-compose.tooling.yml
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
 SERVER_MVN := $(RUN_TOOLING) server-tooling mvn -q

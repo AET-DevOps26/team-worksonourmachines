@@ -1,7 +1,8 @@
-import { Link, useLoaderData } from 'react-router';
+import { Link, redirect, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { getMyTutorProfile } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
@@ -13,7 +14,11 @@ function statusVariant(status: string) {
     return 'warning' as const;
 }
 
-export const loader = protectedLoader(async () => {
+export const loader = protectedLoader(async ({ session }) => {
+    if (!session.user.roles.includes('tutor')) {
+        throw redirect('/tutor/apply');
+    }
+
     const result = await getMyTutorProfile();
     if (isErr(result)) throw result.error;
     return result.value;
@@ -23,7 +28,7 @@ export default function TutorDashboardRoute() {
     const { applications, profile } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Tutor dashboard</CardTitle>
                 <CardDescription>Overview of your applications, profile status, and activity.</CardDescription>
@@ -84,6 +89,6 @@ export default function TutorDashboardRoute() {
                     ))
                 )}
             </section>
-        </div>
+        </PageContainer>
     );
 }

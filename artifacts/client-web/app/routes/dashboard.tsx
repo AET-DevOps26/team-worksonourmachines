@@ -1,9 +1,9 @@
 import { Link, useLoaderData } from 'react-router';
-import type { SharedMarketplaceTutorApplication } from '~/.server/api/server-marketplace/generated';
 import { isErr } from '~/.server/lib/result';
 import { listConversations } from '~/.server/service/communication';
-import { getMyTutorProfile } from '~/.server/service/marketplace';
+import { listMyTutorApplications } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
@@ -13,31 +13,32 @@ function hasRole(roles: readonly string[], role: string) {
     return roles.includes(role);
 }
 
+function statusVariant(status: string) {
+    if (status === 'approved') return 'success' as const;
+    if (status === 'rejected') return 'danger' as const;
+    return 'warning' as const;
+}
+
 export const loader = protectedLoader(async ({ session }) => {
-    const conversationsResult = await listConversations();
+    const [conversationsResult, applicationsResult] = await Promise.all([
+        listConversations(),
+        listMyTutorApplications(),
+    ]);
     if (isErr(conversationsResult)) throw conversationsResult.error;
-
-    const isTutor = hasRole(session.user.roles, 'tutor');
-    let pendingApplications: SharedMarketplaceTutorApplication[] = [];
-
-    if (isTutor) {
-        const tutorResult = await getMyTutorProfile();
-        if (isErr(tutorResult)) throw tutorResult.error;
-        pendingApplications = tutorResult.value.applications.filter((app) => app.status === 'pending');
-    }
+    if (isErr(applicationsResult)) throw applicationsResult.error;
 
     return {
+        applications: applicationsResult.value,
         conversations: conversationsResult.value,
-        isTutor,
-        pendingApplications,
+        isTutor: hasRole(session.user.roles, 'tutor'),
     };
 });
 
 export default function DashboardRoute() {
-    const { conversations, isTutor, pendingApplications } = useLoaderData<typeof loader>();
+    const { applications, conversations, isTutor } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Dashboard</CardTitle>
                 <CardDescription>Your messages and activity at a glance.</CardDescription>
@@ -88,35 +89,44 @@ export default function DashboardRoute() {
                 )}
             </section>
 
-            {isTutor ? (
-                <section className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between gap-2">
-                        <h2 className="text-lg font-semibold">Open applications</h2>
-                        <Link className="text-sm text-muted-foreground hover:text-foreground" to="/tutor/dashboard">
-                            View all
-                        </Link>
-                    </div>
-                    {pendingApplications.length === 0 ? (
-                        <Card>
-                            <CardDescription>No pending module applications.</CardDescription>
+            <section className="flex flex-col gap-3">
+                <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-lg font-semibold">Tutor applications</h2>
+                    <Link
+                        className="text-sm text-muted-foreground hover:text-foreground"
+                        to={isTutor ? '/tutor/dashboard' : '/tutor/apply'}
+                    >
+                        {isTutor ? 'View all' : 'Apply'}
+                    </Link>
+                </div>
+                {applications.length === 0 ? (
+                    <Card>
+                        <CardDescription>
+                            No tutor applications yet.{' '}
+                            <Link className="underline hover:text-foreground" to="/tutor/apply">
+                                Apply for a module
+                            </Link>
+                        </CardDescription>
+                    </Card>
+                ) : (
+                    applications.map((app) => (
+                        <Card key={app.id}>
+                            <div className="flex items-center justify-between gap-2">
+                                <CardTitle className="text-base">
+                                    {app.moduleCode} — {app.moduleTitle}
+                                </CardTitle>
+                                <Badge variant={statusVariant(app.status)}>{app.status}</Badge>
+                            </div>
+                            <CardDescription className="mt-2">
+                                Submitted {new Date(app.submittedAt).toLocaleDateString()}
+                            </CardDescription>
+                            {app.rejectionReason ? (
+                                <p className="mt-2 text-sm text-destructive">Reason: {app.rejectionReason}</p>
+                            ) : null}
                         </Card>
-                    ) : (
-                        pendingApplications.map((app) => (
-                            <Card key={app.id}>
-                                <div className="flex items-center justify-between gap-2">
-                                    <CardTitle className="text-base">
-                                        {app.moduleCode} — {app.moduleTitle}
-                                    </CardTitle>
-                                    <Badge variant="warning">{app.status}</Badge>
-                                </div>
-                                <CardDescription className="mt-2">
-                                    Submitted {new Date(app.submittedAt).toLocaleDateString()}
-                                </CardDescription>
-                            </Card>
-                        ))
-                    )}
-                </section>
-            ) : null}
-        </div>
+                    ))
+                )}
+            </section>
+        </PageContainer>
     );
 }

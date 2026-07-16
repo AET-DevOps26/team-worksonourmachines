@@ -195,7 +195,7 @@ export function wrapAsyncThrowing<T, Args extends unknown[], E = Error>(
     };
 }
 
-export type AsyncResultWrapper<T, E = Error> = PromiseLike<Result<T, E>> & {
+type AsyncResultWrapper<T, E = Error> = PromiseLike<Result<T, E>> & {
     map<U>(fn: (value: T) => U): AsyncResultWrapper<U, E>;
     mapErr<F>(fn: (error: E) => F): AsyncResultWrapper<T, F>;
     andThen<U, F>(fn: (value: T) => Result<U, F>): AsyncResultWrapper<U, E | F>;
