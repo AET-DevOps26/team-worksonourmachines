@@ -1,10 +1,24 @@
 {
 	local_certs
+	servers {
+		protocols h1
+	}
 }
 
 {$APP_HOSTNAME} {
 	tls internal
-	reverse_proxy client-web:5173
+
+	handle /stomp* {
+		reverse_proxy server-communication:8083 {
+			transport http {
+				versions 1.1
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy client-web:5173
+	}
 }
 
 auth.{$APP_HOSTNAME} {
