@@ -64,6 +64,10 @@ spec:
                 secretKeyRef:
                   name: postgres-secrets
                   key: POSTGRES_PASSWORD
+            {{- if eq $server.name "server-student" }}
+            - name: AI_SERVICE_URL
+              value: "http://ai:8000"
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

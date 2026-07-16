@@ -40,6 +40,51 @@ namespace Shared.Student {
   }
 
   model LearningGoalInput is OmitProperties<LearningGoal, "id">;
+
+  model GeneratedPlanMilestone {
+    title: string;
+    dueDate: utcDateTime;
+    topicId: string;
+    tutorId: string;
+
+    @doc("Estimated cost in EUR (whole euros).")
+    @minValue(0)
+    estimatedCost: int32;
+  }
+
+  model GeneratedPlanTutor {
+    id: string;
+    displayName: string;
+
+    @doc("Hourly rate in EUR (whole euros).")
+    @minValue(0)
+    hourlyRate: int32;
+  }
+
+  enum PlanTier {
+    cheapest,
+    within_budget,
+    best_quality,
+  }
+
+  model GeneratedPlanSuggestion {
+    tier: PlanTier;
+    description: string;
+
+    @doc("Total estimated cost in EUR (whole euros).")
+    @minValue(0)
+    totalEstimatedCost: int32;
+
+    proposedTutors: GeneratedPlanTutor[];
+    milestones: GeneratedPlanMilestone[];
+  }
+
+  model GeneratedPlan {
+    id: string;
+    learningGoalId: string;
+    createdAt: utcDateTime;
+    suggestions: GeneratedPlanSuggestion[];
+  }
 }
 
 enum StudentVersions {
@@ -104,4 +149,21 @@ namespace Student {
   @delete
   @route("/students/me/goals/{id}")
   op deleteGoal(@path id: string): void | NotFoundError | UnauthorizedError;
+
+  @summary("Generate and persist a study plan for a learning goal")
+  @doc("Calls the AI service to generate a study plan and persists it. Replaces any existing plan for the goal.")
+  @post
+  @route("/students/me/goals/{id}/plan")
+  op generatePlan(@path id: string):
+    | GeneratedPlan
+    | NotFoundError
+    | UnauthorizedError;
+
+  @summary("Get the persisted study plan for a learning goal")
+  @get
+  @route("/students/me/goals/{id}/plan")
+  op getPlan(@path id: string):
+    | GeneratedPlan
+    | NotFoundError
+    | UnauthorizedError;
 }

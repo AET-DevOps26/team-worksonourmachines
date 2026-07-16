@@ -131,7 +131,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuGroup>
                                         <Form action="/auth/logout" method="post">
-                                            <DropdownMenuItem render={<button type="submit">Sign out</button>} />
+                                            <DropdownMenuItem
+                                                nativeButton
+                                                render={<button type="submit">Sign out</button>}
+                                            />
                                         </Form>
                                     </DropdownMenuGroup>
                                 </DropdownMenuContent>

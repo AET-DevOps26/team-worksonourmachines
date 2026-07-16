@@ -4,6 +4,7 @@ x-server-base: &server-base
   volumes:
     - ./artifacts/server:/app/server:Z
     - server-maven-repository:/root/.m2
+    - caddy_data:/caddy-data:ro
   depends_on:
     postgres:
       condition: service_healthy
@@ -84,6 +85,7 @@ services:
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
     command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
+
     ports:
       - 127.0.0.1:8082:8082
 
@@ -93,7 +95,12 @@ services:
       PORT: "8081"
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
+      KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token
+      KEYCLOAK_CLIENT_ID: server-student
+      KEYCLOAK_CLIENT_SECRET: server-student-dev-secret
+      AI_SERVICE_URL: http://ai:8000
     command: ["mvn", "-pl", "student", "-am", "spring-boot:run"]
+
     ports:
       - 127.0.0.1:8081:8081
 
@@ -171,9 +178,12 @@ services:
       LLM_API_KEY: ${LLM_API_KEY:-not-required}
       STUDENT_API_URL: http://server-student:8081
       MARKETPLACE_API_URL: http://server-marketplace:8082
-      KEYCLOAK_TOKEN_URL: https://auth.tutormatch.localhost/realms/tutormatch/protocol/openid-connect/token
+      KEYCLOAK_ISSUER: https://auth.tutormatch.localhost/realms/tutormatch
+      KEYCLOAK_JWKS_URI: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs
+      KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token
       AI_CLIENT_ID: server-ai
       AI_CLIENT_SECRET: server-ai-dev-secret
+      EXPECTED_CALLER_CLIENT_ID: server-student
     depends_on:
       ollama:
         condition: service_healthy

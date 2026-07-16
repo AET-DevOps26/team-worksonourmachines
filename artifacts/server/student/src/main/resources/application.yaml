@@ -25,3 +25,11 @@ spring:
 
 server:
   port: ${PORT:8081}
+
+ai:
+  service-url: ${AI_SERVICE_URL:http://ai:8000}
+
+keycloak:
+  token-url: ${KEYCLOAK_TOKEN_URL:http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token}
+  client-id: ${KEYCLOAK_CLIENT_ID:server-student}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:server-student-dev-secret}

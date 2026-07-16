@@ -32,6 +32,13 @@ public class StudentProfileService {
     }
 
     @Transactional(readOnly = true)
+    public SharedStudentStudentProfile getProfileById(UUID studentId) {
+        return this.studentProfileRepository.findById(studentId)
+                .map(this.studentProfileMapper::toDto)
+                .orElseGet(() -> this.studentProfileMapper.defaultDto(studentId.toString()));
+    }
+
+    @Transactional(readOnly = true)
     public SharedStudentStudentProfile getCurrentStudentProfile() {
         UUID studentId = this.authenticatedUser.id();
         return this.studentProfileRepository.findById(studentId)

@@ -6,8 +6,10 @@ All URIs are relative to *https://api.tutormatch.localhost*
 |------------- | ------------- | -------------|
 | [**createGoal**](DefaultApi.md#creategoal) | **POST** /v1/students/me/goals | Create a learning goal |
 | [**deleteGoal**](DefaultApi.md#deletegoal) | **DELETE** /v1/students/me/goals/{id} | Delete a learning goal |
+| [**generatePlan**](DefaultApi.md#generateplan) | **POST** /v1/students/me/goals/{id}/plan | Generate and persist a study plan for a learning goal |
 | [**getGoal**](DefaultApi.md#getgoal) | **GET** /v1/students/me/goals/{id} | Get a learning goal |
 | [**getMyProfile**](DefaultApi.md#getmyprofile) | **GET** /v1/students/me | Get my student profile |
+| [**getPlan**](DefaultApi.md#getplan) | **GET** /v1/students/me/goals/{id}/plan | Get the persisted study plan for a learning goal |
 | [**listMyGoals**](DefaultApi.md#listmygoals) | **GET** /v1/students/me/goals | List my learning goals |
 | [**updateGoal**](DefaultApi.md#updategoal) | **PUT** /v1/students/me/goals/{id} | Update a learning goal |
 | [**updateMyProfile**](DefaultApi.md#updatemyprofile) | **PUT** /v1/students/me | Update my student profile |
@@ -156,6 +158,79 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## generatePlan
+
+> SharedStudentGeneratedPlan generatePlan(id)
+
+Generate and persist a study plan for a learning goal
+
+Calls the AI service to generate a study plan and persists it. Replaces any existing plan for the goal.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  DefaultApi,
+} from '';
+import type { GeneratePlanRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    accessToken: "YOUR ACCESS TOKEN",
+  });
+  const api = new DefaultApi(config);
+
+  const body = {
+    // string
+    id: id_example,
+  } satisfies GeneratePlanRequest;
+
+  try {
+    const data = await api.generatePlan(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**SharedStudentGeneratedPlan**](SharedStudentGeneratedPlan.md)
+
+### Authorization
+
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The request has succeeded. |  -  |
+| **401** | Access is unauthorized. |  -  |
+| **404** | The server cannot find the requested resource. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## getGoal
 
 > SharedStudentLearningGoal getGoal(id)
@@ -287,6 +362,77 @@ This endpoint does not need any parameter.
 |-------------|-------------|------------------|
 | **200** | The request has succeeded. |  -  |
 | **401** | Access is unauthorized. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getPlan
+
+> SharedStudentGeneratedPlan getPlan(id)
+
+Get the persisted study plan for a learning goal
+
+### Example
+
+```ts
+import {
+  Configuration,
+  DefaultApi,
+} from '';
+import type { GetPlanRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure OAuth2 access token for authorization: KeycloakAuth accessCode
+    accessToken: "YOUR ACCESS TOKEN",
+  });
+  const api = new DefaultApi(config);
+
+  const body = {
+    // string
+    id: id_example,
+  } satisfies GetPlanRequest;
+
+  try {
+    const data = await api.getPlan(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**SharedStudentGeneratedPlan**](SharedStudentGeneratedPlan.md)
+
+### Authorization
+
+[KeycloakAuth accessCode](../README.md#KeycloakAuth-accessCode)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The request has succeeded. |  -  |
+| **401** | Access is unauthorized. |  -  |
+| **404** | The server cannot find the requested resource. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

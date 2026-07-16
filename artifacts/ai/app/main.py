@@ -3,8 +3,10 @@ import os
 
 from fastapi import FastAPI
 from openapi_server.apis.default_api import router as v1_router
+from openapi_server.security_api import get_token_KeycloakClientAuth
 
 import app.ai_impl  # noqa: F401 — registers DefaultApiImpl with BaseDefaultApi
+from app.auth import verify_service_token
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
@@ -12,6 +14,9 @@ logging.basicConfig(
 )
 
 app = FastAPI(title="TutorMatch AI Service", version="0.0.1")
+
+# Replace the no-op generated security function with real JWT validation.
+app.dependency_overrides[get_token_KeycloakClientAuth] = verify_service_token
 
 
 @app.get("/health")

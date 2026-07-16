@@ -29,15 +29,15 @@ def _raise_for_status(response: httpx.Response, context: str) -> None:
     raise HTTPException(status_code=502, detail=f"Upstream service error ({context})")
 
 
-async def get_learning_goal(goal_id: str, authorization: str) -> dict:
-    url = f"{STUDENT_API_URL}/v1/students/me/goals/{goal_id}"
+async def get_learning_goal(goal_id: str, student_id: str, authorization: str) -> dict:
+    url = f"{STUDENT_API_URL}/v1/internal/students/{student_id}/goals/{goal_id}"
     response = await _client.get(url, headers=_auth_headers(authorization))
     _raise_for_status(response, f"get_learning_goal goal_id={goal_id}")
     return response.json()
 
 
-async def get_student_profile(authorization: str) -> dict:
-    url = f"{STUDENT_API_URL}/v1/students/me"
+async def get_student_profile(student_id: str, authorization: str) -> dict:
+    url = f"{STUDENT_API_URL}/v1/internal/students/{student_id}"
     response = await _client.get(url, headers=_auth_headers(authorization))
     _raise_for_status(response, "get_student_profile")
     return response.json()
@@ -52,7 +52,14 @@ async def get_module(module_id: str, authorization: str) -> dict:
     _raise_for_status(response, f"get_module module_id={module_id}")
     data = response.json()
     items = data.get("items", data) if isinstance(data, dict) else data
-    summary = next((item for item in items if item.get("id") == module_id), None)
+    summary = next(
+        (
+            item
+            for item in items
+            if item.get("id") == module_id or item.get("code") == module_id
+        ),
+        None,
+    )
     if summary is None:
         raise HTTPException(status_code=404, detail=f"Module {module_id} not found")
     code = summary.get("code")

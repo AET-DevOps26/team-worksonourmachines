@@ -47,9 +47,13 @@ components:
       type: object
       required:
         - learningGoalId
+        - studentId
       properties:
         learningGoalId:
           type: string
+        studentId:
+          type: string
+          description: UUID of the student for whom the plan is generated. Provided by the student service; the AI must not derive identity from the inbound token.
     Shared.Ai.GeneratePlanResponse:
       type: object
       required:

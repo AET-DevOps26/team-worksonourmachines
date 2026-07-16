@@ -21,7 +21,7 @@ from pydantic import ValidationError
 from app.clients import get_learning_goal, get_module, get_student_profile, list_tutors
 from app.llm import get_llm, get_llm_info
 from app.prompt import build_prompt
-from app.token_exchange import exchange_token
+from app.token_exchange import get_service_token
 
 logger = logging.getLogger(__name__)
 
@@ -36,28 +36,91 @@ def _extract_json(text: str) -> dict:
     return json.loads(candidate)
 
 
-def _map_response(data: dict) -> SharedAiGeneratePlanResponse:
+def _fix_rates(
+    result: SharedAiGeneratePlanResponse,
+    valid_tutors: list[dict],
+) -> SharedAiGeneratePlanResponse:
+    """Enforce valid tutors and correct costs on a structured-output result."""
+    tutor_by_id = {t["id"]: t for t in valid_tutors if t.get("id")}
+    fallback_id = valid_tutors[0]["id"] if valid_tutors else None
+
+    for suggestion in result.suggestions:
+        # Replace any invented tutor with the closest valid one.
+        fixed_tutors = []
+        seen_ids: set[str] = set()
+        for tutor in suggestion.proposed_tutors:
+            tid = tutor.id if tutor.id in tutor_by_id else fallback_id
+            if tid and tid not in seen_ids:
+                seen_ids.add(tid)
+                src = tutor_by_id[tid]
+                tutor.id = tid
+                tutor.display_name = src["displayName"]
+                tutor.hourly_rate = int(src["hourlyRate"])
+                fixed_tutors.append(tutor)
+        suggestion.proposed_tutors = fixed_tutors
+
+        # Fix milestone tutorIds that reference invented tutors.
+        for milestone in suggestion.milestones:
+            if milestone.tutor_id not in tutor_by_id and fallback_id:
+                milestone.tutor_id = fallback_id
+
+        suggestion.total_estimated_cost = sum(
+            m.estimated_cost for m in suggestion.milestones
+        )
+    return result
+
+
+def _map_response(data: dict, valid_tutors: list[dict]) -> SharedAiGeneratePlanResponse:
+    """Map raw LLM JSON to the response model, enforcing valid tutors throughout."""
+    tutor_by_id = {t["id"]: t for t in valid_tutors if t.get("id")}
+    fallback_id = valid_tutors[0]["id"] if valid_tutors else None
+
     suggestions = []
     for s in data.get("suggestions", []):
-        tutors = [
-            SharedAiProposedTutor.from_dict(
-                {**t, "hourlyRate": int(t["hourlyRate"])} if "hourlyRate" in t else t
+        # Only keep tutors whose id is in the valid set; remap name and rate.
+        seen_ids: set[str] = set()
+        tutors = []
+        for t in s.get("proposedTutors", []):
+            tid = t.get("id", "")
+            if tid not in tutor_by_id:
+                tid = fallback_id
+            if not tid or tid in seen_ids:
+                continue
+            seen_ids.add(tid)
+            src = tutor_by_id[tid]
+            tutors.append(
+                SharedAiProposedTutor.from_dict(
+                    {
+                        "id": tid,
+                        "displayName": src["displayName"],
+                        "hourlyRate": int(src["hourlyRate"]),
+                    }
+                )
             )
-            for t in s.get("proposedTutors", [])
-        ]
-        milestones = [
-            SharedAiPlanMilestone.from_dict(
-                {**m, "estimatedCost": int(m["estimatedCost"])}
-                if "estimatedCost" in m
-                else m
+
+        milestones = []
+        for m in s.get("milestones", []):
+            tutor_id = m.get("tutorId", "")
+            if tutor_id not in tutor_by_id:
+                tutor_id = fallback_id or tutor_id
+            milestones.append(
+                SharedAiPlanMilestone.from_dict(
+                    {
+                        **m,
+                        "tutorId": tutor_id,
+                        "estimatedCost": int(m["estimatedCost"])
+                        if "estimatedCost" in m
+                        else 0,
+                    }
+                )
             )
-            for m in s.get("milestones", [])
-        ]
+
+        total = sum(m.estimated_cost for m in milestones)
         suggestions.append(
             SharedAiPlanSuggestion(
                 tier=s["tier"],
                 description=s.get("description", ""),
-                totalEstimatedCost=int(s.get("totalEstimatedCost", 0)),
+                totalEstimatedCost=total,
                 proposedTutors=tutors,
                 milestones=milestones,
             )
@@ -75,13 +138,14 @@ class DefaultApiImpl(BaseDefaultApi):
         authorization: str = "",
     ) -> SharedAiGeneratePlanResponse:
         goal_id = shared_ai_generate_plan_request.learning_goal_id
+        student_id = shared_ai_generate_plan_request.student_id
         llm_info = get_llm_info()
         start = time.perf_counter()
 
-        student_token = await exchange_token(authorization)
+        service_token = await get_service_token()
         goal, student = await asyncio.gather(
-            get_learning_goal(goal_id, student_token),
-            get_student_profile(student_token),
+            get_learning_goal(goal_id, student_id, service_token),
+            get_student_profile(student_id, service_token),
         )
         module_id = goal.get("moduleId")
         if not module_id:
@@ -90,11 +154,11 @@ class DefaultApiImpl(BaseDefaultApi):
                 detail=f"Learning goal {goal_id} has no moduleId",
             )
         module, tutors = await asyncio.gather(
-            get_module(module_id, authorization),
+            get_module(module_id, service_token),
             list_tutors(
                 module_id=module_id,
                 languages=student.get("languages", []),
-                authorization=authorization,
+                authorization=service_token,
             ),
         )
 
@@ -142,9 +206,11 @@ class DefaultApiImpl(BaseDefaultApi):
         llm = get_llm()
         if get_llm_info()["provider"] in ("openai",):
             structured = llm.with_structured_output(SharedAiGeneratePlanResponse)
-            result: SharedAiGeneratePlanResponse = await structured.ainvoke(
+            raw_result: SharedAiGeneratePlanResponse = await structured.ainvoke(
                 [HumanMessage(content=prompt)]
             )
+            result = _fix_rates(raw_result, tutors)
+            result.learning_goal_id = goal_id
             latency_ms = round((time.perf_counter() - start) * 1000, 1)
             logger.info(
                 "generate_plan completed (structured) provider=%s model=%s"
@@ -193,7 +259,9 @@ class DefaultApiImpl(BaseDefaultApi):
             goal_id,
         )
         try:
-            return _map_response(data)
+            # Always enforce the correct learningGoalId regardless of LLM output.
+            data["learningGoalId"] = goal_id
+            return _map_response(data, tutors)
         except (ValidationError, KeyError) as exc:
             logger.error(
                 "generate_plan response mapping failed goal_id=%s error=%s",

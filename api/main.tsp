@@ -5,3 +5,4 @@ import "./services/ai.tsp";
 import "./services/communication.tsp";
 import "./services/marketplace.tsp";
 import "./services/student.tsp";
+import "./services/student-internal.tsp";

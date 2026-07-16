@@ -20,6 +20,11 @@ import {
     SharedErrorsErrorBodyToJSON,
 } from '../models/SharedErrorsErrorBody';
 import {
+    type SharedStudentGeneratedPlan,
+    SharedStudentGeneratedPlanFromJSON,
+    SharedStudentGeneratedPlanToJSON,
+} from '../models/SharedStudentGeneratedPlan';
+import {
     type SharedStudentLearningGoal,
     SharedStudentLearningGoalFromJSON,
     SharedStudentLearningGoalToJSON,
@@ -48,7 +53,15 @@ export interface DeleteGoalRequest {
     id: string;
 }
 
+export interface GeneratePlanRequest {
+    id: string;
+}
+
 export interface GetGoalRequest {
+    id: string;
+}
+
+export interface GetPlanRequest {
     id: string;
 }
 
@@ -168,6 +181,58 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for generatePlan without sending the request
+     */
+    async generatePlanRequestOpts(requestParameters: GeneratePlanRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling generatePlan().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/students/me/goals/{id}/plan`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Calls the AI service to generate a study plan and persists it. Replaces any existing plan for the goal.
+     * Generate and persist a study plan for a learning goal
+     */
+    async generatePlanRaw(requestParameters: GeneratePlanRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentGeneratedPlan>> {
+        const requestOptions = await this.generatePlanRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedStudentGeneratedPlanFromJSON(jsonValue));
+    }
+
+    /**
+     * Calls the AI service to generate a study plan and persists it. Replaces any existing plan for the goal.
+     * Generate and persist a study plan for a learning goal
+     */
+    async generatePlan(requestParameters: GeneratePlanRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentGeneratedPlan> {
+        const response = await this.generatePlanRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getGoal without sending the request
      */
     async getGoalRequestOpts(requestParameters: GetGoalRequest): Promise<runtime.RequestOpts> {
@@ -258,6 +323,56 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async getMyProfile(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentStudentProfile> {
         const response = await this.getMyProfileRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getPlan without sending the request
+     */
+    async getPlanRequestOpts(requestParameters: GetPlanRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getPlan().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakAuth", ["openid", "basic", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/students/me/goals/{id}/plan`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get the persisted study plan for a learning goal
+     */
+    async getPlanRaw(requestParameters: GetPlanRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedStudentGeneratedPlan>> {
+        const requestOptions = await this.getPlanRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedStudentGeneratedPlanFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the persisted study plan for a learning goal
+     */
+    async getPlan(requestParameters: GetPlanRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedStudentGeneratedPlan> {
+        const response = await this.getPlanRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

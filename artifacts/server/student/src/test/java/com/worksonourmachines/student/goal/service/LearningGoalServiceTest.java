@@ -26,6 +26,7 @@ import com.worksonourmachines.student.goal.mapper.LearningGoalMapper;
 import com.worksonourmachines.student.goal.persistence.entity.LearningGoalEntity;
 import com.worksonourmachines.student.goal.persistence.entity.LearningGoalLocation;
 import com.worksonourmachines.student.goal.persistence.repository.LearningGoalRepository;
+import com.worksonourmachines.student.profile.persistence.repository.StudentProfileRepository;
 
 class LearningGoalServiceTest {
 
@@ -34,10 +35,12 @@ class LearningGoalServiceTest {
 
     private final AuthenticatedUser authenticatedUser = org.mockito.Mockito.mock(AuthenticatedUser.class);
     private final LearningGoalRepository repository = org.mockito.Mockito.mock(LearningGoalRepository.class);
+    private final StudentProfileRepository studentProfileRepository = org.mockito.Mockito.mock(StudentProfileRepository.class);
     private final LearningGoalService service = new LearningGoalService(
             authenticatedUser,
             repository,
-            new LearningGoalMapper());
+            new LearningGoalMapper(),
+            studentProfileRepository);
 
     @Test
     void getsGoalOwnedByAuthenticatedStudent() {
@@ -115,6 +118,7 @@ class LearningGoalServiceTest {
     void createsGoalForAuthenticatedStudent() {
         SharedStudentLearningGoalInput input = goalInput();
         when(authenticatedUser.id()).thenReturn(STUDENT_ID);
+        when(studentProfileRepository.existsById(STUDENT_ID)).thenReturn(true);
         when(repository.save(any(LearningGoalEntity.class))).thenAnswer(invocation -> {
             LearningGoalEntity entity = invocation.getArgument(0);
             ReflectionTestUtils.setField(entity, "id", GOAL_ID);
