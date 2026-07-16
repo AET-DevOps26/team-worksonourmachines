@@ -106,7 +106,6 @@ services:
       - client-web-node-modules:/app/node_modules
       - client-web-react-router-cache:/app/.react-router
       - client-web-vite-cache:/app/.vite
-      - caddy_data:/caddy-data:ro
     environment:
       CI: "true"
       LOG_FORMAT: json
