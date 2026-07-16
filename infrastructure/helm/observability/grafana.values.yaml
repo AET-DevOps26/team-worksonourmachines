@@ -105,7 +105,7 @@ alerting:
           - uid: email-receiver
             type: email
             settings:
-              addresses: amritanshu.sikdar@gmail.com;hristina.ivanova1003@gmail.com
+              addresses: amritanshu.sikdar@gmail.com;hristina.ivanova1003@gmail.com;julian.wilke@tum.de
               singleEmail: true
   policies.yaml:
     apiVersion: 1
