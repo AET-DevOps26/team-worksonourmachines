@@ -52,7 +52,7 @@ export function errorMiddlewareConfiguration(): Middleware {
             if (context.response.status === HttpStatusCode.BadRequest) {
                 let detail: string | undefined;
                 try {
-                    const body: unknown = await context.response.clone().json();
+                    const body: unknown = await context.response.json();
                     if (typeof body === 'object' && body !== null) {
                         const b = body as Record<string, unknown>;
                         if ('detail' in b && typeof b.detail === 'string') {
