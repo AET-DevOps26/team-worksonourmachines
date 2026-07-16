@@ -8,7 +8,6 @@ export type ErrorType =
     | 'notFound'
     | 'serviceUnavailable'
     | 'unauthorized'
-    | 'unprocessableContent'
     | 'unknown';
 
 export class ErrorResponse<T extends ErrorType> extends Error {
@@ -51,14 +50,6 @@ export function errorMiddlewareConfiguration(): Middleware {
             }
 
             if (context.response.status === HttpStatusCode.BadRequest) {
-                throw new ErrorResponse('badRequest');
-            }
-
-            if (context.response.status === HttpStatusCode.ServiceUnavailable) {
-                throw new ErrorResponse('serviceUnavailable');
-            }
-
-            if (context.response.status === HttpStatusCode.UnprocessableEntity) {
                 let detail: string | undefined;
                 try {
                     const body: unknown = await context.response.clone().json();
@@ -71,7 +62,15 @@ export function errorMiddlewareConfiguration(): Middleware {
                         }
                     }
                 } catch {}
-                throw new ErrorResponse('unprocessableContent', detail);
+                throw new ErrorResponse('badRequest', detail);
+            }
+
+            if (context.response.status === HttpStatusCode.ServiceUnavailable) {
+                throw new ErrorResponse('serviceUnavailable');
+            }
+
+            if (context.response.status === HttpStatusCode.UnprocessableEntity) {
+                throw new ErrorResponse('unknown');
             }
 
             if (context.response.status === HttpStatusCode.InternalServerError) {

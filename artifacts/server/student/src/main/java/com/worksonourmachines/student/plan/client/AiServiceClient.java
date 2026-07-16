@@ -48,7 +48,7 @@ public class AiServiceClient {
         } catch (WebClientResponseException e) {
             if (e.getStatusCode().value() == 422) {
                 String detail = extractDetail(e);
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, detail, e);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, detail, e);
             }
             throw e;
         }

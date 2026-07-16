@@ -157,6 +157,7 @@ namespace Student {
   op generatePlan(@path id: string):
     | GeneratedPlan
     | NotFoundError
+    | BadRequestError
     | UnauthorizedError;
 
   @summary("Get the persisted study plan for a learning goal")

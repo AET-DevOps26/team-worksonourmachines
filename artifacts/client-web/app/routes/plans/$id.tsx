@@ -26,7 +26,7 @@ export const action = protectedAction(async ({ params }) => {
     const result = await generatePlan(goalId);
     if (isErr(result)) {
         const detail = result.error.detail;
-        if (result.error.type === 'unprocessableContent' && detail) {
+        if (result.error.type === 'badRequest' && detail) {
             return { error: detail, ok: false };
         }
         return { error: 'Generation failed. Please try again.', ok: false };
