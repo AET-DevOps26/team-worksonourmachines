@@ -8,14 +8,17 @@ export type ErrorType =
     | 'notFound'
     | 'serviceUnavailable'
     | 'unauthorized'
+    | 'unprocessableContent'
     | 'unknown';
 
 export class ErrorResponse<T extends ErrorType> extends Error {
     readonly type: T;
+    readonly detail: string | undefined;
 
-    constructor(type: T) {
+    constructor(type: T, detail?: string) {
         super(`ErrorResponse(${type})`);
         this.type = type;
+        this.detail = detail;
     }
 }
 
@@ -53,6 +56,22 @@ export function errorMiddlewareConfiguration(): Middleware {
 
             if (context.response.status === HttpStatusCode.ServiceUnavailable) {
                 throw new ErrorResponse('serviceUnavailable');
+            }
+
+            if (context.response.status === 422) {
+                let detail: string | undefined;
+                try {
+                    const body: unknown = await context.response.clone().json();
+                    if (
+                        typeof body === 'object' &&
+                        body !== null &&
+                        'detail' in body &&
+                        typeof (body as Record<string, unknown>).detail === 'string'
+                    ) {
+                        detail = (body as Record<string, unknown>).detail as string;
+                    }
+                } catch {}
+                throw new ErrorResponse('unprocessableContent', detail);
             }
 
             if (context.response.status === HttpStatusCode.InternalServerError) {
