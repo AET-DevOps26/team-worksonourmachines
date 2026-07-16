@@ -70,9 +70,13 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         within_budget = (
             f"2. **within_budget** — total cost MUST be ≤ €{budget}."
             f" The cheapest tutor charges €{cheapest_rate}/h."
-            f" If €{budget} is less than one session at that rate,"
-            f' set description to "Budget of €{budget} is too low — minimum session'
-            f' costs €{cheapest_rate}", set totalEstimatedCost to 0,'
+            f" If the budget covers at least one session but not all topics,"
+            f" include only as many topics (milestones) as the budget allows,"
+            f" prioritising earlier topics first. Set the description to explain"
+            f' how many topics are covered, e.g. "Budget covers X of {n_topics}'
+            f' topics." If €{budget} is less than one session at that rate,'
+            f' set description to "Budget of €{budget} is too low — minimum'
+            f' session costs €{cheapest_rate}", set totalEstimatedCost to 0,'
             " and return empty proposedTutors and milestones arrays."
         )
 
@@ -162,6 +166,10 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "### Budget",
         "R9. For within_budget: the sum of all estimatedCosts"
         " MUST be ≤ the stated budget.",
+        "    If the budget cannot cover all topics, include only the topics"
+        " it can cover (prioritise earlier topics). Fewer milestones than"
+        f" {n_topics} is acceptable for within_budget when the budget is"
+        " too small for the full plan.",
         "",
         "## Plan tiers — generate all three",
         "1. **cheapest** — use the lowest-rate tutor for every topic.",
