@@ -40,24 +40,12 @@ alloy:
         }
 
         rule {
-          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+          source_labels = ["__meta_kubernetes_pod_label_app"]
           target_label  = "service_name"
-        }
-
-        rule {
-          source_labels = ["__meta_kubernetes_pod_node_name"]
-          target_label  = "__host__"
-        }
-
-        rule {
-          source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
-          separator     = "/"
-          target_label  = "__path__"
-          replacement   = "/var/log/pods/*$1/*.log"
         }
       }
 
-      loki.source.file "pods" {
+      loki.source.kubernetes "pods" {
         targets    = discovery.relabel.tutormatch_logs.output
         forward_to = [loki.write.loki.receiver]
       }
