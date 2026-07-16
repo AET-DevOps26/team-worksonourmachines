@@ -12,6 +12,16 @@ auth.{$APP_HOSTNAME} {
 	reverse_proxy keycloak:8080
 }
 
+grafana.{$APP_HOSTNAME} {
+	tls internal
+	reverse_proxy grafana:3000
+}
+
+prometheus.{$APP_HOSTNAME} {
+	tls internal
+	reverse_proxy prometheus:9090
+}
+
 api.{$APP_HOSTNAME} {
 	tls internal
 

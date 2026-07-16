@@ -11,7 +11,11 @@ AZURE_VM_SCRIPT := $(ROOT_DIR)/infrastructure/terraform/scripts/azure-vm.sh
 
 CONTAINER ?= docker
 COMPOSE := $(CONTAINER) compose
-COMPOSE_APP := $(COMPOSE) -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docker-compose.dev.yml
+COMPOSE_APP_FILES := -f $(ROOT_DIR)/docker-compose.yml -f $(ROOT_DIR)/docker-compose.dev.yml
+ifneq ($(filter 1 true yes,$(OBSERVE)),)
+COMPOSE_APP_FILES += -f $(ROOT_DIR)/docker-compose.observability.yml
+endif
+COMPOSE_APP := $(COMPOSE) $(COMPOSE_APP_FILES)
 COMPOSE_TOOLING := HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(COMPOSE) -f $(ROOT_DIR)/docker-compose.tooling.yml
 RUN_TOOLING := $(COMPOSE_TOOLING) run --rm
 SERVER_MVN := $(RUN_TOOLING) server-tooling mvn -q
@@ -32,11 +36,11 @@ help: ## Show this help message
 # ----------------------------- app -----------------------------
 
 .PHONY: up
-up: ## Start all services
+up: ## Start all services (set OBSERVE=true to include observability)
 	@$(COMPOSE_APP) up -d
 
 .PHONY: up-build
-up-build: ## Start all services
+up-build: ## Build and start all services (set OBSERVE=true to include observability)
 	@$(COMPOSE_APP) up -d --build
 
 .PHONY: down

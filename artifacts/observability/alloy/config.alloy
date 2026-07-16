@@ -1,0 +1,37 @@
+discovery.docker "tutormatch" {
+  host = "unix:///var/run/docker.sock"
+
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=tutormatch"]
+  }
+}
+
+discovery.relabel "tutormatch_logs" {
+  targets = []
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service_name"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+}
+
+loki.source.docker "tutormatch" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.tutormatch.targets
+  labels        = { environment = "local" }
+  relabel_rules = discovery.relabel.tutormatch_logs.rules
+  forward_to    = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

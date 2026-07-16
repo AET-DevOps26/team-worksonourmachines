@@ -26,3 +26,15 @@ spring:
 
 server:
   port: ${PORT:8082}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true

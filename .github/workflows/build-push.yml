@@ -83,6 +83,14 @@ jobs:
           KEYCLOAK_CLIENT_WEB_SECRET: ${{ secrets.KEYCLOAK_CLIENT_WEB_SECRET }}
         run: make -C infrastructure rancher-prod-deploy
 
+      - name: Deploy observability stack to Rancher
+        env:
+          GRAFANA_SMTP_USER: ${{ secrets.GRAFANA_SMTP_USER }}
+          GRAFANA_SMTP_PASSWORD: ${{ secrets.GRAFANA_SMTP_PASSWORD }}
+          GRAFANA_ADMIN_USER: ${{ secrets.GRAFANA_ADMIN_USER }}
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+        run: make -C infrastructure rancher-observability-install
+
       - name: Deployment diagnostics
         if: failure()
         run: make -C infrastructure rancher-diagnostics
