@@ -37,7 +37,6 @@ export const footerSections: NavSection[] = [
         links: [
             { href: '/become-a-tutor', label: 'Become a tutor' },
             { href: '/tutor/apply', label: 'Apply now' },
-            { href: '/tutor/dashboard', label: 'Tutor dashboard' },
         ],
         title: 'For tutors',
     },

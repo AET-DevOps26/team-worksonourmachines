@@ -15,6 +15,7 @@ import { cn } from '~/lib/ui/utils';
 import { HeaderSearch } from './HeaderSearch';
 import { Logo } from './Logo';
 import { appNavLinks, getProfileMenuGroups, publicNavLinks } from './nav';
+import { contentMaxWidth } from './PageContainer';
 import { ThemeToggle } from './ThemeToggle';
 import type { ShellUser } from './types';
 
@@ -38,7 +39,12 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
     return (
         <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-            <div className="mx-auto grid h-14 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-6">
+            <div
+                className={cn(
+                    'mx-auto grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4',
+                    contentMaxWidth.wide,
+                )}
+            >
                 <Logo to={user ? '/dashboard' : '/'} />
 
                 <div className="flex min-w-0 items-center justify-center">

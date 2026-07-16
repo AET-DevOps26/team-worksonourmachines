@@ -1,13 +1,16 @@
 import { Link } from 'react-router';
 
+import { cn } from '~/lib/ui/utils';
+
 import { footerSections } from './nav';
+import { contentMaxWidth } from './PageContainer';
 
 export function SiteFooter() {
     const year = new Date().getFullYear();
 
     return (
         <footer className="border-t border-border/60 bg-card/30">
-            <div className="mx-auto max-w-6xl px-6 py-10">
+            <div className={cn('mx-auto py-10', contentMaxWidth.wide)}>
                 <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
                         <p className="text-sm font-medium text-foreground">TUtorMatch</p>

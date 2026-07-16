@@ -3,7 +3,7 @@ import { Link, redirect, useLoaderData } from 'react-router';
 import { logger } from '~/.server/lib/logger';
 import { safeRedirectPath } from '~/.server/lib/redirect';
 import { getSession } from '~/.server/service/session';
-import { Logo } from '~/components/shell';
+import { contentMaxWidth, Logo } from '~/components/shell';
 import { buttonVariants } from '~/components/ui/button';
 import { cn } from '~/lib/ui/utils';
 
@@ -50,7 +50,12 @@ export default function LoginRoute() {
     return (
         <div className="flex min-h-svh flex-col bg-background text-foreground">
             <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-                <div className="mx-auto grid h-14 max-w-6xl grid-cols-[auto_minmax(0,1fr)_auto] items-center px-6">
+                <div
+                    className={cn(
+                        'mx-auto grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center px-6',
+                        contentMaxWidth.wide,
+                    )}
+                >
                     <Logo />
                 </div>
             </header>

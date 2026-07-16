@@ -30,5 +30,4 @@ function createLogger(logFormat: LogFormat, logLevel: LogLevel) {
     });
 }
 
-export type Logger = ReturnType<typeof createLogger>;
 export const logger = createLogger(env.get('LOG_FORMAT'), env.get('LOG_LEVEL'));
