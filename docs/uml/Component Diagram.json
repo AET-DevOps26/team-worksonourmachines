@@ -1,6 +1,6 @@
 {
   "id": "dffed0f5-9051-4a90-b595-7d53b8bf063f",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "title": "Tutor Matcher Component Diagram",
   "type": "ComponentDiagram",
   "nodes": [
@@ -33,7 +33,7 @@
       },
       "parentId": "20ede45a-7a15-4a9c-b830-994a51e3577f",
       "data": {
-        "name": "BFF + SSR of Frontend:3000",
+        "name": "BFF + SSR of Frontend:5173",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -88,7 +88,7 @@
       },
       "parentId": "8a033d98-371e-4fba-b589-ea952f821d3c",
       "data": {
-        "name": "Communication Service :8081",
+        "name": "Communication Service :8083",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -126,7 +126,7 @@
       },
       "parentId": "8a033d98-371e-4fba-b589-ea952f821d3c",
       "data": {
-        "name": "Student Service :8083",
+        "name": "Student Service :8081",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -203,7 +203,7 @@
       },
       "parentId": "e11389a6-9d1e-4fd4-839a-7732429fb50f",
       "data": {
-        "name": "Communication DBPostgreSQL :5432",
+        "name": "Communication DB PostgreSQL :5432",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -222,7 +222,7 @@
       },
       "parentId": "e11389a6-9d1e-4fd4-839a-7732429fb50f",
       "data": {
-        "name": "Marketplace DBPostgreSQL :5432",
+        "name": "Marketplace DB PostgreSQL :5432",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -279,7 +279,7 @@
       },
       "parentId": "775f5c59-ef90-41e0-99d2-1a2ae64920f9",
       "data": {
-        "name": "GenAI Orchestrator Service :8085",
+        "name": "GenAI Orchestrator Service :8000",
         "isComponentHeaderShown": true,
         "strokeColor": "#26de81"
       },

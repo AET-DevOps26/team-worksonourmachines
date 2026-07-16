@@ -23,19 +23,19 @@
     },
     {
       "id": "2ee42a19-185d-42e1-b064-af6b37680bf3",
-      "width": 970,
-      "height": 790,
+      "width": 985,
+      "height": 965,
       "type": "package",
       "position": {
-        "x": 20,
-        "y": -220
+        "x": -5,
+        "y": -185
       },
       "data": {
         "name": "Student Service"
       },
       "measured": {
-        "width": 970,
-        "height": 790
+        "width": 985,
+        "height": 965
       }
     },
     {
@@ -57,7 +57,7 @@
     },
     {
       "id": "92e3f95f-33c6-43ee-b0b0-db50fd114d82",
-      "width": 270,
+      "width": 280,
       "height": 340,
       "type": "class",
       "position": {
@@ -90,15 +90,15 @@
           },
           {
             "id": "494ecff9-1922-4be9-b996-cace6b776d97",
-            "name": "- locations: List<String>"
+            "name": "- locations: List<Location>"
           },
           {
             "id": "e98d2e6c-eca8-4590-aa02-aa402377d64d",
-            "name": "- hourlyRate: BigDecimal"
+            "name": "- hourlyRate: int"
           },
           {
             "id": "6bff161c-a54f-42b7-baf0-e434084233fc",
-            "name": "- availability: List<TimeSlot>"
+            "name": "- availability: List<AvailabilitySlot>"
           }
         ],
         "methods": [
@@ -113,7 +113,7 @@
         ]
       },
       "measured": {
-        "width": 270,
+        "width": 280,
         "height": 340
       }
     },
@@ -169,8 +169,8 @@
       "height": 170,
       "type": "class",
       "position": {
-        "x": 720,
-        "y": 60
+        "x": 710,
+        "y": 75
       },
       "parentId": "f66bb3f5-fc94-41bc-b41d-3ee6a399d689",
       "data": {
@@ -351,15 +351,15 @@
           },
           {
             "id": "c79d093d-ddd2-4ce7-8f03-b9d0a60cb606",
-            "name": "- selfAssessedLevel: String"
+            "name": "- selfAssessedLevel: Integer"
           },
           {
             "id": "988e9a6d-09ca-4534-900a-dada459c475b",
-            "name": "- budgetPreference: Optional<BigDecimal>"
+            "name": "- budgetEur: Integer"
           },
           {
             "id": "88e85760-15fd-4fe7-9ce0-69d1d3190e39",
-            "name": "- locations: List<String>"
+            "name": "- locations: List<Location>"
           }
         ],
         "methods": [
@@ -377,19 +377,19 @@
     {
       "id": "b7602774-89c1-4329-a0e8-e448de643465",
       "width": 260,
-      "height": 250,
+      "height": 280,
       "type": "class",
       "position": {
-        "x": 30,
-        "y": 475
+        "x": 90,
+        "y": 650
       },
       "parentId": "2ee42a19-185d-42e1-b064-af6b37680bf3",
       "data": {
-        "name": "GenAI StudyPlan",
+        "name": "PlanSuggestion",
         "attributes": [
           {
             "id": "1f67abc4-d499-433b-ab27-19e0fafdf9bf",
-            "name": "- planId: String"
+            "name": "- planSuggestionId: String"
           },
           {
             "id": "7a7b72c4-6330-4927-b416-41dac83adb2a",
@@ -397,7 +397,7 @@
           },
           {
             "id": "94f443d3-f1fb-41d0-b7d8-e24c3f4665d6",
-            "name": "- generatedAt: DateTime"
+            "name": "- createdAt: DateTime"
           },
           {
             "id": "ae5039a6-9a81-4400-a29c-300b757ec8c7",
@@ -406,6 +406,10 @@
           {
             "id": "320bff44-2b96-457f-b65e-1c4a936fe40a",
             "name": "- proposedTutors: List<Tutor>"
+          },
+          {
+            "id": "068671c3-380b-49fd-a0bd-965f7945dcf2",
+            "name": "- tier: PlanTier"
           }
         ],
         "methods": [
@@ -421,26 +425,22 @@
       },
       "measured": {
         "width": 260,
-        "height": 250
+        "height": 280
       }
     },
     {
       "id": "76a0cdd9-8f19-45e4-803f-4edde51e9e82",
       "width": 230,
-      "height": 220,
+      "height": 190,
       "type": "class",
       "position": {
-        "x": 680,
-        "y": 490
+        "x": 730,
+        "y": 695
       },
       "parentId": "2ee42a19-185d-42e1-b064-af6b37680bf3",
       "data": {
         "name": "PlanMilestone",
         "attributes": [
-          {
-            "id": "457af1ae-b406-48be-8955-50f0f0f27d56",
-            "name": "- milestoneId: String"
-          },
           {
             "id": "e5ba7531-52fb-4b25-81fe-f7bfce7b15ae",
             "name": "- title: String"
@@ -451,78 +451,32 @@
           },
           {
             "id": "bc58a4e8-1639-47d1-a856-93c8e9630794",
-            "name": "-tutorID: String"
+            "name": "- tutorID: String"
           },
           {
             "id": "17f78e53-6732-4115-8ff2-6a5b416bfe7c",
-            "name": "-topicId: String"
+            "name": "- topicId: String"
           },
           {
             "id": "0e92f563-2b08-471b-b7ef-66c125a66eae",
-            "name": "-cost: int"
+            "name": "- estimatedCost: int"
           }
         ],
         "methods": []
       },
       "measured": {
         "width": 230,
-        "height": 220
-      }
-    },
-    {
-      "id": "a0b14bc0-517e-4414-ac9f-ba8b7fc20a33",
-      "width": 230,
-      "height": 220,
-      "type": "class",
-      "position": {
-        "x": 600,
-        "y": 100
-      },
-      "parentId": "cf795c8d-af15-44ca-af2d-b8ac041a01fd",
-      "data": {
-        "name": "EmailMessage",
-        "attributes": [
-          {
-            "id": "29cd7396-e83a-476d-b68f-1dca941db136",
-            "name": "- emailId: String"
-          },
-          {
-            "id": "45a48e87-5cf1-4e4d-bd21-998546b29e07",
-            "name": "- recipientId: String"
-          },
-          {
-            "id": "cbea3806-cf0c-43bc-a171-91da8e7f1069",
-            "name": "- subject: String"
-          },
-          {
-            "id": "a712b5fc-c383-4095-80bf-c5d8f3ae3db0",
-            "name": "- body: String"
-          },
-          {
-            "id": "7e258853-8319-4cbc-a1b2-a730415d97ad",
-            "name": "- deliveryStatus: String"
-          }
-        ],
-        "methods": [
-          {
-            "id": "b5f9668c-94fc-48d2-b389-6b9f91d769e5",
-            "name": "+ send(): void"
-          }
-        ]
-      },
-      "measured": {
-        "width": 230,
-        "height": 220
+        "height": 190
       }
     },
     {
       "id": "7a709aa9-d817-4861-8879-a3e08b159ba8",
-      "width": 260,
-      "height": 160,
+      "width": 280,
+      "height": 340,
       "type": "class",
       "position": {
-        "x": 60,
-        "y": 530
+        "x": 55,
+        "y": 275
       },
       "parentId": "cf795c8d-af15-44ca-af2d-b8ac041a01fd",
       "data": {
@@ -534,11 +488,35 @@
           },
           {
             "id": "4d29b473-3f91-4c93-979f-426757be8109",
-            "name": "- participantIds: List<String>"
+            "name": "- participantAId: UUID"
+          },
+          {
+            "id": "d3898271-b5cd-490e-913c-3d9541be965d",
+            "name": "- participantBId: UUID"
           },
           {
             "id": "d68920ed-7c4d-42be-a846-e98e5aeb0759",
             "name": "- createdAt: DateTime"
+          },
+          {
+            "id": "0023729f-bb80-47af-9d65-c7e32c4ea365",
+            "name": "- participantADisplayName: String"
+          },
+          {
+            "id": "0ebb743f-e7c4-419f-8989-57b0a67a1966",
+            "name": "- participantBDisplayName: String"
+          },
+          {
+            "id": "2f993793-31fd-4510-82dc-7d0209c87da0",
+            "name": "- participantATutorId: UUID?"
+          },
+          {
+            "id": "3f2e2461-f162-4969-a272-563bc6bca5c3",
+            "name": "- participantBTutorId: UUID?"
+          },
+          {
+            "id": "5587c0a0-f7b5-496f-92a8-5ae0c1fb3595",
+            "name": "- updatedAt: DateTime"
           }
         ],
         "methods": [
@@ -549,18 +527,18 @@
         ]
       },
       "measured": {
-        "width": 260,
-        "height": 160
+        "width": 280,
+        "height": 340
       }
     },
     {
       "id": "38fea599-f2fc-411a-9cec-085db9cf6f31",
       "width": 220,
-      "height": 190,
+      "height": 160,
       "type": "class",
       "position": {
-        "x": 610,
-        "y": 500
+        "x": 625,
+        "y": 365
       },
       "parentId": "cf795c8d-af15-44ca-af2d-b8ac041a01fd",
       "data": {
@@ -583,21 +561,16 @@
             "name": "- sentAt: DateTime"
           }
         ],
-        "methods": [
-          {
-            "id": "68810909-24a7-4801-bc60-fff8c6f417d0",
-            "name": "+ edit(): void"
-          }
-        ]
+        "methods": []
       },
       "measured": {
         "width": 220,
-        "height": 190
+        "height": 160
       }
     },
     {
       "id": "7041e61b-f8b2-4239-a3ab-66993b2c66c8",
-      "width": 210,
+      "width": 400,
       "height": 190,
       "type": "class",
       "position": {
@@ -606,7 +579,7 @@
       },
       "parentId": "f66bb3f5-fc94-41bc-b41d-3ee6a399d689",
       "data": {
-        "name": "TutorApproval",
+        "name": "TutorApplication",
         "methods": [
           {
             "id": "ed64354c-feb0-427e-a5b9-294003ba1ec1",
@@ -620,11 +593,11 @@
         "attributes": [
           {
             "id": "4559a02a-7058-42ec-86ff-2d32908815f6",
-            "name": "- passCertificate: File"
+            "name": "- certificateRef: String"
           },
           {
             "id": "56d50a3c-791f-49d6-ac2b-461e87586196",
-            "name": "- isApproved: boolean"
+            "name": "- status: enum (PENDING/APPROVED/REJECTED)"
           },
           {
             "id": "4267fa2b-9de7-4dc0-be4a-dad1224f08db",
@@ -633,85 +606,46 @@
         ]
       },
       "measured": {
-        "width": 210,
-        "height": 190
+        "width": 400,
+        "height": 0
       }
     },
     {
-      "id": "84ec899b-b818-4a17-8595-b215cb5f93f7",
-      "width": 190,
-      "height": 130,
+      "id": "727c79dd-8b29-4409-bcf4-6a1a7362fcee",
+      "width": 260,
+      "height": 160,
       "type": "class",
       "position": {
-        "x": 620,
-        "y": 350
+        "x": 95,
+        "y": 395
       },
-      "parentId": "cf795c8d-af15-44ca-af2d-b8ac041a01fd",
+      "parentId": "2ee42a19-185d-42e1-b064-af6b37680bf3",
       "data": {
-        "name": "BrowserNotification",
-        "methods": [
-          {
-            "id": "12665e58-7f67-4f28-a74d-22ce70a5f215",
-            "name": "+ markAsRead(): void"
-          },
-          {
-            "id": "9d3d0b52-841c-468b-8ce0-dd2ea9be4cf5",
-            "name": "+ dispatch(): void"
-          }
-        ],
+        "name": "GeneratedPlan",
         "attributes": [
           {
-            "id": "6f0712e5-d782-499a-94e9-a99bc721f199",
-            "name": "- readAt: DateTime"
+            "id": "1327588d-4158-4e1e-b0f1-f361b933ac36",
+            "name": "- planId: String"
+          },
+          {
+            "id": "008205a5-563a-4350-98c1-8aa254d75581",
+            "name": "- createdAt: DateTime"
+          }
+        ],
+        "methods": [
+          {
+            "id": "b86e4449-a0a0-45ba-9b04-db03b21c4338",
+            "name": "+ requestGeneration(): void"
+          },
+          {
+            "id": "115cb962-95ef-4492-81d2-1d822c2068de",
+            "name": "+ regenerate(): void"
           }
         ]
       },
       "measured": {
-        "width": 190,
-        "height": 130
-      }
-    },
-    {
-      "id": "59185f9f-f770-4c36-8b0d-5a362b16a209",
-      "width": 190,
-      "height": 200,
-      "type": "class",
-      "position": {
-        "x": 70,
-        "y": 120
-      },
-      "parentId": "cf795c8d-af15-44ca-af2d-b8ac041a01fd",
-      "data": {
-        "name": "Notification",
-        "stereotype": "interface",
-        "methods": [
-          {
-            "id": "d7d6e68f-403d-4e49-bf81-852850f17efc",
-            "name": "+ method()"
-          }
-        ],
-        "attributes": [
-          {
-            "id": "14693666-8d80-4911-8aa9-8eada78ca236",
-            "name": "- notificationId: String"
-          },
-          {
-            "id": "f259c594-be66-44f3-859f-b1af2a0438b3",
-            "name": "- recipientId: String"
-          },
-          {
-            "id": "bfc51028-8512-4f69-a412-ea14411f8fbf",
-            "name": "- type: String"
-          },
-          {
-            "id": "59fbc97d-5285-4f10-88b9-d9892dc2ea05",
-            "name": "- message: String"
-          }
-        ]
-      },
-      "measured": {
-        "width": 190,
-        "height": 200
+        "width": 260,
+        "height": 160
       }
     }
   ],
@@ -790,7 +724,7 @@
       "sourceHandle": "right",
       "targetHandle": "left",
       "data": {
-        "sourceRole": "studyPlan",
+        "sourceRole": "planSuggestion",
         "targetRole": "milestones",
         "sourceLabel": "contains",
         "targetLabel": "part of",
@@ -826,11 +760,11 @@
       "data": {
         "points": [
           {
-            "x": -765,
+            "x": -755,
             "y": 111
           },
           {
-            "x": -765,
+            "x": -755,
             "y": 256
           },
           {
@@ -880,7 +814,7 @@
       "target": "a16e6505-e410-46a4-b2e3-af2d6448e042",
       "type": "ClassDependency",
       "sourceHandle": "right-top",
-      "targetHandle": "right-bottom",
+      "targetHandle": "right",
       "data": {
         "points": [
           {
@@ -888,55 +822,60 @@
             "y": 405
           },
           {
-            "x": -259,
+            "x": -70,
             "y": 405
           },
           {
-            "x": -259,
-            "y": -55
+            "x": -70,
+            "y": -15
           },
           {
-            "x": -419,
-            "y": -55
+            "x": -420,
+            "y": -15
           }
-        ]
-      }
-    },
-    {
-      "id": "7fb1c897-7c8c-4cb9-a9b6-c8d45215c116",
-      "source": "a0b14bc0-517e-4414-ac9f-ba8b7fc20a33",
-      "target": "59185f9f-f770-4c36-8b0d-5a362b16a209",
-      "type": "ClassRealization",
-      "sourceHandle": "left",
-      "targetHandle": "right-top",
-      "data": {
-        "points": []
-      }
-    },
-    {
-      "id": "053ae9bd-05f7-4943-ab28-79848adf1660",
-      "source": "84ec899b-b818-4a17-8595-b215cb5f93f7",
-      "target": "59185f9f-f770-4c36-8b0d-5a362b16a209",
-      "type": "ClassRealization",
-      "sourceHandle": "left",
-      "targetHandle": "right-bottom",
-      "data": {
-        "points": []
+        ],
+        "targetAnchor": {
+          "side": "right",
+          "ratio": 0.9772727272727273
+        }
       }
     },
     {
       "id": "77d1922b-503f-4f37-b7c9-61de60f99f3c",
       "source": "b7602774-89c1-4329-a0e8-e448de643465",
-      "target": "0338d0c8-5d46-4534-af89-0cd658ae9eb8",
+      "target": "727c79dd-8b29-4409-bcf4-6a1a7362fcee",
       "type": "ClassBidirectional",
-      "sourceHandle": "right-top",
-      "targetHandle": "left-bottom",
+      "sourceHandle": "right",
+      "targetHandle": "right",
       "data": {
         "points": [],
         "sourceMultiplicity": "1..*",
-        "sourceRole": "studyPlan",
+        "sourceRole": "planSuggestion",
         "targetMultiplicity": "1",
-        "targetRole": "learningGoals"
+        "targetRole": "generatedPlan",
+        "targetAnchor": {
+          "side": "right",
+          "ratio": 0.6875
+        },
+        "sourceAnchor": {
+          "side": "right",
+          "ratio": 0.03571428571428571
+        }
+      }
+    },
+    {
+      "id": "d3ea9b48-1236-49ec-baa0-0a800f1009c9",
+      "source": "0338d0c8-5d46-4534-af89-0cd658ae9eb8",
+      "target": "727c79dd-8b29-4409-bcf4-6a1a7362fcee",
+      "type": "ClassBidirectional",
+      "sourceHandle": "bottom-left",
+      "targetHandle": "right-mid-top",
+      "data": {
+        "sourceRole": "learningGoal",
+        "sourceMultiplicity": "1",
+        "targetMultiplicity": "1",
+        "targetRole": "generatedPlan",
+        "points": []
       }
     }
   ],
