@@ -22,6 +22,7 @@ k8s/secrets.yml
 tsconfig.tsbuildinfo
 *.tmp
 *.log
+Makefile.local
 
 # Helm downloaded chart archives (Chart.lock is committed; charts/ dir is not)
 infrastructure/helm/tutormatch/charts/
