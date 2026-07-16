@@ -92,7 +92,3 @@ jobs:
           GRAFANA_ADMIN_USER: ${{ secrets.GRAFANA_ADMIN_USER }}
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
         run: make -C infrastructure rancher-observability-install
-
-      - name: Deployment diagnostics
-        if: failure()
-        run: make -C infrastructure rancher-diagnostics

@@ -103,10 +103,22 @@ lint: ## Lint all code
 
 .PHONY: test
 test: ## Run all tests
+	@$(MAKE) test-client-web
+	@$(MAKE) test-ai
+	@$(MAKE) test-server
+
+.PHONY: test-client-web
+test-client-web: ## Run client-web tests
 	@echo "Testing client-web code..."
 	@$(RUN_TOOLING) client-web-tooling run test
+
+.PHONY: test-ai
+test-ai: ## Run AI tests
 	@echo "Testing AI code..."
 	@$(RUN_TOOLING) ai-tooling run test
+
+.PHONY: test-server
+test-server: ## Run server microservice tests
 	@echo "Testing server microservices..."
 	@$(SERVER_TEST)
 
