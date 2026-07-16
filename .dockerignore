@@ -1,18 +1,47 @@
+# Dependencies & package-manager caches
 **/node_modules
+**/.pnpm-store
+
+# Build / toolchain outputs
 **/build
 **/dist
 **/target
 **/.vite
 **/.cache
+**/.react-router
+**/*.tsbuildinfo
+**/.gradle
+**/.pytest_cache
+**/.ruff_cache
+**/.make
+
+# VCS / IDE / OS / local env
 .git
 .gitignore
-**/pnpm-debug.log
-.DS_Store
+**/.DS_Store
+**/.idea
+**/.vscode
 **/.env
-.react-router/
-*.md
+**/.venv
+
+# Logs / temp
+**/pnpm-debug.log
+**/*.log
+**/*.tmp
+
+# Docs (not used by image builds)
+**/*.md
+docs/
+
+# Python bytecode
 **/__pycache__
 **/*.pyc
 **/*.pyo
-**/.venv
+
+# Infra local state (not used by app image builds)
+**/.terraform
+*.tfstate
+*.tfstate.*
+
+# Dockerfiles are not needed inside app layers
 Dockerfile

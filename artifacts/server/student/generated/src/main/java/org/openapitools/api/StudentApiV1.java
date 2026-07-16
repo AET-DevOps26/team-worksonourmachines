@@ -73,6 +73,7 @@ public interface StudentApiV1 {
      *
      * @param id  (required)
      * @return The request has succeeded. (status code 200)
+     *         or The server could not understand the request due to invalid syntax. (status code 400)
      *         or Access is unauthorized. (status code 401)
      *         or The server cannot find the requested resource. (status code 404)
      */

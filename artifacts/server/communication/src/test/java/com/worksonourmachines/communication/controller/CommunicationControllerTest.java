@@ -21,6 +21,7 @@ import org.openapitools.model.SharedCommunicationChatMessage;
 import org.openapitools.model.SharedCommunicationConversationDetail;
 import org.openapitools.model.SharedCommunicationConversationPartner;
 import org.openapitools.model.SharedCommunicationConversationSummary;
+import org.openapitools.model.SharedCommunicationWsTicket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -46,6 +47,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.worksonourmachines.communication.CommunicationController;
 import com.worksonourmachines.communication.service.ConversationService;
+import com.worksonourmachines.communication.websocket.WsTicketService;
 import com.worksonourmachines.server.common.exception.ApiExceptionHandler;
 import com.worksonourmachines.server.common.security.AuthenticatedUser;
 import com.worksonourmachines.server.common.security.KeycloakJwtGrantedAuthoritiesConverter;
@@ -67,12 +69,18 @@ class CommunicationControllerTest {
     private final MockMvc mockMvc;
     private final JwtDecoder jwtDecoder;
     private final ConversationService conversationService;
+    private final WsTicketService wsTicketService;
 
     @Autowired
-    CommunicationControllerTest(MockMvc mockMvc, JwtDecoder jwtDecoder, ConversationService conversationService) {
+    CommunicationControllerTest(
+            MockMvc mockMvc,
+            JwtDecoder jwtDecoder,
+            ConversationService conversationService,
+            WsTicketService wsTicketService) {
         this.mockMvc = mockMvc;
         this.jwtDecoder = jwtDecoder;
         this.conversationService = conversationService;
+        this.wsTicketService = wsTicketService;
     }
 
     @Test
@@ -233,6 +241,18 @@ class CommunicationControllerTest {
                 .andExpect(jsonPath("$.total").value(1));
     }
 
+    @Test
+    void createWsTicketReturnsTicket() throws Exception {
+        authenticate();
+        when(wsTicketService.issue()).thenReturn(new SharedCommunicationWsTicket("ticket-1", 60));
+
+        mockMvc.perform(post(CommunicationApiV1.PATH_CREATE_WS_TICKET)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer user-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ticket").value("ticket-1"))
+                .andExpect(jsonPath("$.expiresInSeconds").value(60));
+    }
+
     private void authenticate() {
         when(jwtDecoder.decode("user-token")).thenReturn(Jwt.withTokenValue("user-token")
                 .header("alg", "none")
@@ -246,6 +266,11 @@ class CommunicationControllerTest {
         @Bean
         ConversationService conversationService() {
             return mock(ConversationService.class);
+        }
+
+        @Bean
+        WsTicketService wsTicketService() {
+            return mock(WsTicketService.class);
         }
 
         @Bean

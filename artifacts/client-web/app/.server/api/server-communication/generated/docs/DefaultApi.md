@@ -4,12 +4,77 @@ All URIs are relative to *https://communication.example.local*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**createWsTicket**](DefaultApi.md#createwsticket) | **POST** /v1/conversations/ws-ticket | Create WebSocket ticket |
 | [**getConversation**](DefaultApi.md#getconversation) | **GET** /v1/conversations/{id} | Get conversation |
 | [**listConversations**](DefaultApi.md#listconversations) | **GET** /v1/conversations | List conversations |
 | [**listMessages**](DefaultApi.md#listmessages) | **GET** /v1/conversations/{id}/messages | List messages |
 | [**sendMessage**](DefaultApi.md#sendmessage) | **POST** /v1/conversations/{id}/messages | Send message |
 | [**startConversation**](DefaultApi.md#startconversation) | **POST** /v1/conversations | Start conversation |
 
+
+
+## createWsTicket
+
+> SharedCommunicationWsTicket createWsTicket()
+
+Create WebSocket ticket
+
+Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  DefaultApi,
+} from '';
+import type { CreateWsTicketRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure OAuth2 access token for authorization: KeycloakClientAuth application
+    accessToken: "YOUR ACCESS TOKEN",
+  });
+  const api = new DefaultApi(config);
+
+  try {
+    const data = await api.createWsTicket();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**SharedCommunicationWsTicket**](SharedCommunicationWsTicket.md)
+
+### Authorization
+
+[KeycloakClientAuth application](../README.md#KeycloakClientAuth-application)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The request has succeeded. |  -  |
+| **401** | Access is unauthorized. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## getConversation

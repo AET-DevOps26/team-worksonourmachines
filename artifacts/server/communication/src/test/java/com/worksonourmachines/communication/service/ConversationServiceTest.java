@@ -46,13 +46,15 @@ class ConversationServiceTest {
     private final MessageRepository messageRepository = mock(MessageRepository.class);
     private final StringRedisTemplate redis = mock(StringRedisTemplate.class);
     private final KeycloakUserClient keycloakUserClient = mock(KeycloakUserClient.class);
+    private final ConversationCreateHelper conversationCreateHelper = mock(ConversationCreateHelper.class);
     private final ConversationService service = new ConversationService(
             authenticatedUser,
             conversationRepository,
             messageRepository,
             redis,
             new JsonMapper(),
-            keycloakUserClient);
+            keycloakUserClient,
+            conversationCreateHelper);
 
     @Test
     void startConversationCreatesNewConversationWithBothParticipantNames() {
@@ -60,14 +62,24 @@ class ConversationServiceTest {
         when(authenticatedUser.getUsername()).thenReturn("Alice");
         when(keycloakUserClient.getDisplayName(PARTNER)).thenReturn("Bob");
         when(conversationRepository.findByParticipants(ME, PARTNER)).thenReturn(Optional.empty());
-        when(conversationRepository.save(any(ConversationEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(conversationCreateHelper.insert(any(), any(), any(), any()))
+                .thenAnswer(inv -> new ConversationEntity(
+                        CONV_ID,
+                        inv.getArgument(0),
+                        inv.getArgument(1),
+                        inv.getArgument(2),
+                        inv.getArgument(3),
+                        null,
+                        null,
+                        OffsetDateTime.parse("2026-07-15T10:00:00Z"),
+                        OffsetDateTime.parse("2026-07-15T10:00:00Z")));
 
         SharedCommunicationConversationDetail result = service.startConversation(
                 new SharedCommunicationStartConversationRequest(PARTNER.toString()));
 
         assertEquals(PARTNER.toString(), result.getPartner().getUserId());
         assertEquals("Bob", result.getPartner().getDisplayName());
-        verify(conversationRepository).save(any(ConversationEntity.class));
+        verify(conversationCreateHelper).insert(any(UUID.class), any(UUID.class), any(String.class), any(String.class));
     }
 
     @Test
@@ -77,6 +89,7 @@ class ConversationServiceTest {
 
         service.startConversation(new SharedCommunicationStartConversationRequest(PARTNER.toString()));
 
+        verify(conversationCreateHelper, never()).insert(any(), any(), any(), any());
         verify(conversationRepository, never()).save(any());
     }
 

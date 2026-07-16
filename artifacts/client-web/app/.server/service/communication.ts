@@ -28,3 +28,7 @@ export async function listMessages(id: string, page?: number, pageSize?: number)
 export async function sendMessage(id: string, body: SharedCommunicationSendMessageRequest) {
     return callApi(() => communicationApi.sendMessage({ id, sharedCommunicationSendMessageRequest: body }));
 }
+
+export async function createWsTicket() {
+    return callApi(() => communicationApi.createWsTicket());
+}

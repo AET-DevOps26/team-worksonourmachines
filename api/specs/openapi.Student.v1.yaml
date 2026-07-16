@@ -213,6 +213,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Shared.Student.GeneratedPlan'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
         '401':
           description: Access is unauthorized.
           content:

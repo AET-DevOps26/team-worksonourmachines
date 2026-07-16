@@ -21,6 +21,7 @@ clientWeb:
   serverCommunicationApiUrl: http://server-communication:8083
   serverMarketplaceApiUrl: http://server-marketplace:8082
   serverStudentApiUrl: http://server-student:8081
+  port: 3000
 
 serverCommunication:
   imageDigest: ""

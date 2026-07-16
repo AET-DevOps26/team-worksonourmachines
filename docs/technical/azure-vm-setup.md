@@ -184,7 +184,7 @@ docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azu
 
 from `/opt/tutormatch` as the `tutormatch` user. The playbook invokes this through `runuser` instead of Ansible's `become_user` to avoid temporary-file ACL issues when Ansible connects as one unprivileged SSH user and then switches to another unprivileged application user.
 
-The playbook writes `.env.azure` with mode `0600`. `docker-compose.azure.yml` requires production secrets instead of using development defaults. The AI service uses the same hosted LLM defaults as the Helm deployment; `LLM_API_KEY` is only included in `.env.azure` when it is non-empty, so the container keeps the AI code's safe fallback when no provider token is configured. Export `LLM_API_KEY` when the selected provider requires a token:
+The playbook writes `.env.azure` with mode `0600`. `docker-compose.azure.yml` requires production secrets instead of using development defaults. It also deploys the Spring microservices (`server-communication`, `server-marketplace`, `server-student`) from GHCR and routes `/stomp` through Caddy to communication for chat WebSockets. The AI service uses the same hosted LLM defaults as the Helm deployment; `LLM_API_KEY` is only included in `.env.azure` when it is non-empty, so the container keeps the AI code's safe fallback when no provider token is configured. Export `LLM_API_KEY` when the selected provider requires a token:
 
 ```bash
 export LLM_API_KEY="<provider-token>"
@@ -218,6 +218,7 @@ docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azu
 
 docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q client-web)" --format '{{ .Config.Image }}'
 docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q ai)" --format '{{ .Config.Image }}'
+docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q server-communication)" --format '{{ .Config.Image }}'
 ```
 
 The last two commands should print GHCR image references such as:

@@ -108,7 +108,7 @@ Browsers resolve `*.localhost` to `127.0.0.1` (RFC 6761), so no `/etc/hosts` ent
 
 Caddy uses an internal CA for local HTTPS (`tls internal`). Your browser may warn on the first visit — accept the certificate or trust Caddy's local root to continue.
 
-Configuration lives under `artifacts/gateway/`. Both Caddyfiles route `{$APP_HOSTNAME}` to the web app, `auth.{$APP_HOSTNAME}` to Keycloak, and `api.{$APP_HOSTNAME}` to the API reference UI. Default `APP_HOSTNAME` is `tutormatch.localhost`.
+Configuration lives under `artifacts/gateway/`. Both Caddyfiles route `{$APP_HOSTNAME}` to the web app (and `/stomp*` to `server-communication` for chat WebSockets), `auth.{$APP_HOSTNAME}` to Keycloak, and `api.{$APP_HOSTNAME}` to the API reference UI / microservice APIs. Default `APP_HOSTNAME` is `tutormatch.localhost`.
 
 - `Caddyfile.dev` — local development with `tls internal` (default)
 - `Caddyfile.prod` — VPS deployment with nip.io hostnames and automatic Let's Encrypt certificates

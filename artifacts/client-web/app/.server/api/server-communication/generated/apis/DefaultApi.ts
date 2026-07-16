@@ -45,6 +45,11 @@ import {
     SharedCommunicationStartConversationRequestToJSON,
 } from '../models/SharedCommunicationStartConversationRequest';
 import {
+    type SharedCommunicationWsTicket,
+    SharedCommunicationWsTicketFromJSON,
+    SharedCommunicationWsTicketToJSON,
+} from '../models/SharedCommunicationWsTicket';
+import {
     type SharedErrorsErrorBody,
     SharedErrorsErrorBodyFromJSON,
     SharedErrorsErrorBodyToJSON,
@@ -73,6 +78,50 @@ export interface StartConversationRequest {
  * 
  */
 export class DefaultApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for createWsTicket without sending the request
+     */
+    async createWsTicketRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("KeycloakClientAuth", ["openid", "profile", "email", "roles"]);
+        }
+
+
+        let urlPath = `/v1/conversations/ws-ticket`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+     * Create WebSocket ticket
+     */
+    async createWsTicketRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedCommunicationWsTicket>> {
+        const requestOptions = await this.createWsTicketRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharedCommunicationWsTicketFromJSON(jsonValue));
+    }
+
+    /**
+     * Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+     * Create WebSocket ticket
+     */
+    async createWsTicket(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedCommunicationWsTicket> {
+        const response = await this.createWsTicketRaw(initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for getConversation without sending the request

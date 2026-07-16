@@ -1,41 +1,25 @@
 {$APP_HOSTNAME} {
-	reverse_proxy client-web:3000
+	handle /stomp* {
+		reverse_proxy server-communication:8083 {
+			transport http {
+				versions 1.1
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy client-web:3000
+	}
 }
 
 auth.{$APP_HOSTNAME} {
 	reverse_proxy keycloak:8080
 }
 
+grafana.{$APP_HOSTNAME} {
+	reverse_proxy grafana:3000
+}
+
 api.{$APP_HOSTNAME} {
-	handle /v1/students* {
-		reverse_proxy server-student:8081
-	}
-
-	handle /v1/admin* {
-		reverse_proxy server-marketplace:8082
-	}
-
-	handle /v1/modules* {
-		reverse_proxy server-marketplace:8082
-	}
-
-	handle /v1/tutors* {
-		reverse_proxy server-marketplace:8082
-	}
-
-	handle /v1/tutor-applications* {
-		reverse_proxy server-marketplace:8082
-	}
-
-	handle /v1/conversations* {
-		reverse_proxy server-communication:8083
-	}
-
-	handle /v1/plan* {
-		reverse_proxy ai:8000
-	}
-
-	handle {
-		reverse_proxy api-ui:8080
-	}
+	reverse_proxy api-ui:8080
 }

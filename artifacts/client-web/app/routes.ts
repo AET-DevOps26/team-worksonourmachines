@@ -26,7 +26,11 @@ export default [
             route('profile', 'routes/tutor/profile.tsx'),
             route('dashboard', 'routes/tutor/dashboard.tsx'),
         ]),
-        ...prefix('chat', [index('routes/chat/index.tsx'), route(':id', 'routes/chat/$id.tsx')]),
+        ...prefix('chat', [
+            index('routes/chat/index.tsx'),
+            route('ws-ticket', 'routes/chat/ws-ticket.ts'),
+            route(':id', 'routes/chat/$id.tsx'),
+        ]),
         ...prefix('admin', [
             index('routes/admin/index.tsx'),
             route('tutor-approvals', 'routes/admin/tutor-approvals.tsx'),

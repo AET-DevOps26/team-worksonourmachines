@@ -64,6 +64,10 @@ spec:
                 secretKeyRef:
                   name: postgres-secrets
                   key: POSTGRES_PASSWORD
+            {{- if eq $server.name "server-communication" }}
+            - name: REDIS_URL
+              value: "redis://redis:6379"
+            {{- end }}
             {{- if eq $server.name "server-student" }}
             - name: AI_SERVICE_URL
               value: "http://ai:8000"
