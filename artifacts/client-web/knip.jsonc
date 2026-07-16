@@ -2,7 +2,7 @@
     "$schema": "https://unpkg.com/knip@5/schema.json",
     "entry": ["app/routes/**/*.{ts,tsx}"],
     "project": ["app/**/*.{ts,tsx}"],
-    "ignore": ["**/.server/**/*"], // todo remove when api is connected
+    "ignore": ["**/generated/**"],
     "ignoreDependencies": ["tailwindcss", "tw-animate-css", "shadcn"],
     "ignoreUnresolved": ["tslib"],
     "ignoreIssues": {

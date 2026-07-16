@@ -19,7 +19,7 @@ export class ErrorResponse<T extends ErrorType> extends Error {
     }
 }
 
-export class FetchError extends ErrorResponse<'unknown'> {
+class FetchError extends ErrorResponse<'unknown'> {
     constructor() {
         super('unknown');
     }
