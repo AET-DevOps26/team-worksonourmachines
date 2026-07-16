@@ -139,7 +139,7 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         " with the assigned tutor.",
         "    estimatedCost MUST equal sessions × tutorHourlyRate.",
         "    Allowed values: 1 session = 1× hourlyRate, 2 sessions = 2× hourlyRate.",
-        "    Example: tutor charges €20/h → estimatedCost is €20 or €40. Nothing else.",
+        "    Example: tutor charges 20/h → estimatedCost is 20 or €40. Nothing else.",
         "    Never produce an estimatedCost that is not"
         " 1× or 2× the tutor's hourlyRate.",
         "",
