@@ -3,7 +3,7 @@
     "entry": ["app/routes/**/*.{ts,tsx}"],
     "project": ["app/**/*.{ts,tsx}"],
     "ignore": ["**/.server/**/*"], // todo remove when api is connected
-    "ignoreDependencies": ["tailwindcss", "@fontsource-variable/inter", "tw-animate-css", "shadcn"],
+    "ignoreDependencies": ["tailwindcss", "tw-animate-css", "shadcn"],
     "ignoreUnresolved": ["tslib"],
     "ignoreIssues": {
         "app/.server/service/**": ["types"],

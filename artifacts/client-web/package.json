@@ -16,7 +16,9 @@
         "build": "react-router build",
         "typegen": "react-router typegen",
         "start": "react-router-serve ./build/server/index.js",
-        "test": "echo 'No tests yet'"
+        "test": "vitest run && pnpm run lint:deps:test",
+        "test:unit": "vitest run",
+        "test:watch": "vitest"
     },
     "keywords": [],
     "author": "worksounourmachine",
@@ -55,6 +57,7 @@
         "shadcn": "^4.11.0",
         "typescript": "^5.9.3",
         "vite": "^6.4.3",
-        "vite-tsconfig-paths": "^5.1.4"
+        "vite-tsconfig-paths": "^5.1.4",
+        "vitest": "^3.2.4"
     }
 }
