@@ -14,6 +14,7 @@ ai:
   llmBaseUrl: https://logos.aet.cit.tum.de
   llmModel: openai/gpt-oss-120b
   llmApiKey: ""  # Set via the LLM_API_KEY GitHub Actions secret
+  aiClientSecret: ""  # Set via the AI_CLIENT_SECRET GitHub Actions secret
 
 clientWeb:
   imageDigest: ""
