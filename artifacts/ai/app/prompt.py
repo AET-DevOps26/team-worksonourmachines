@@ -123,7 +123,9 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "",
         "## Topics to cover",
         f"There are exactly {n_topics} topic(s)."
-        f" You MUST produce exactly {n_topics} milestone(s).",
+        f" For cheapest and best_quality, produce exactly {n_topics} milestone(s)."
+        f" For within_budget, produce as many milestones as the budget allows"
+        f" (up to {n_topics}), prioritising earlier topics.",
         topics_block,
         "",
         "## Available tutors",
@@ -132,13 +134,16 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
         "## Rules — follow every rule exactly, no exceptions",
         "",
         "### Milestones",
-        f"R1. Produce EXACTLY {n_topics} milestone(s)"
+        f"R1. For cheapest and best_quality: produce EXACTLY {n_topics} milestone(s)"
         " — one per topic, in the same order.",
+        "    For within_budget: produce as many milestones as the budget allows"
+        f" (up to {n_topics}), in topic order (exception to the exact count).",
         "R2. Each milestone's topicId MUST match the id"
         " of the corresponding topic above.",
         f"R3. Each milestone's dueDate MUST be strictly after {today}"
-        f" and strictly before {target_date}.",
-        "    Space them evenly across that range. Never use a date in the past.",
+        f" and strictly before {target_date}."
+        " Space included milestones evenly across that range."
+        " Never use a date in the past.",
         "R4. Each milestone covers exactly 1 or 2 sessions (lessons)"
         " with the assigned tutor.",
         "    estimatedCost MUST equal sessions × tutorHourlyRate.",
