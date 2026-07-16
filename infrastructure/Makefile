@@ -140,6 +140,7 @@ rancher-check-deploy-env:
 	@: "$${IMAGE_TAG:?Set IMAGE_TAG to the traceability Git commit SHA}"
 	@: "$${LLM_API_KEY:?Set LLM_API_KEY}"
 	@: "$${AI_CLIENT_SECRET:?Set AI_CLIENT_SECRET}"
+	@: "$${SERVER_STUDENT_SECRET:?Set SERVER_STUDENT_SECRET}"
 	@: "$${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
 	@: "$${KEYCLOAK_DB_PASSWORD:?Set KEYCLOAK_DB_PASSWORD}"
 	@: "$${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD}"
@@ -206,6 +207,7 @@ rancher-helm-upgrade: rancher-check-deploy-env rancher-check-image-digests
 		--set-string serverStudent.imageDigest="$${SERVER_STUDENT_IMAGE_DIGEST}" \
 		--set-string ai.llmApiKey="$${LLM_API_KEY}" \
 		--set-string ai.aiClientSecret="$${AI_CLIENT_SECRET}" \
+		--set-string keycloak.serverStudentSecret="$${SERVER_STUDENT_SECRET}" \
 		--set-string postgres.password="$${POSTGRES_PASSWORD}" \
 		--set-string postgres.keycloakPassword="$${KEYCLOAK_DB_PASSWORD}" \
 		--set-string keycloak.adminPassword="$${KEYCLOAK_ADMIN_PASSWORD}" \

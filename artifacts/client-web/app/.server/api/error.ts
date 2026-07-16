@@ -58,17 +58,17 @@ export function errorMiddlewareConfiguration(): Middleware {
                 throw new ErrorResponse('serviceUnavailable');
             }
 
-            if (context.response.status === 422) {
+            if (context.response.status === HttpStatusCode.UnprocessableEntity) {
                 let detail: string | undefined;
                 try {
                     const body: unknown = await context.response.clone().json();
-                    if (
-                        typeof body === 'object' &&
-                        body !== null &&
-                        'detail' in body &&
-                        typeof (body as Record<string, unknown>).detail === 'string'
-                    ) {
-                        detail = (body as Record<string, unknown>).detail as string;
+                    if (typeof body === 'object' && body !== null) {
+                        const b = body as Record<string, unknown>;
+                        if ('detail' in b && typeof b.detail === 'string') {
+                            detail = b.detail;
+                        } else if ('message' in b && typeof b.message === 'string') {
+                            detail = b.message;
+                        }
                     }
                 } catch {}
                 throw new ErrorResponse('unprocessableContent', detail);

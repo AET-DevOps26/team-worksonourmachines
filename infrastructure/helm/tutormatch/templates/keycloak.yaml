@@ -93,7 +93,7 @@ data:
           "protocol": "openid-connect",
           "publicClient": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "server-student-dev-secret",
+          "secret": "{{ .Values.keycloak.serverStudentSecret }}",
           "standardFlowEnabled": false,
           "directAccessGrantsEnabled": false,
           "serviceAccountsEnabled": true
