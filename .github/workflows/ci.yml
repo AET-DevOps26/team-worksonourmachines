@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  lint-and-test:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +20,17 @@ jobs:
 
       - name: Lint
         run: make lint
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1 https://github.com/actions/checkout/releases/tag/v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Build tooling images
+        run: make build-tooling-images
 
       - name: Test
         run: make test
