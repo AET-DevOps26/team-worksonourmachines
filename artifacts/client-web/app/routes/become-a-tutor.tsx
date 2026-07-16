@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { contentMaxWidth } from '~/components/shell';
 import { buttonVariants } from '~/components/ui/button';
 import { cn } from '~/lib/ui/utils';
 
@@ -54,7 +55,7 @@ export default function BecomeATutorRoute() {
     return (
         <div className="-mx-6 flex flex-col">
             <section className="border-b border-border bg-muted/30">
-                <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-16 md:py-24">
+                <div className={cn('mx-auto flex w-full flex-col gap-8 px-6 py-16 md:py-24', contentMaxWidth.wide)}>
                     <div className="flex max-w-3xl flex-col gap-4">
                         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">For tutors</p>
                         <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
@@ -82,7 +83,7 @@ export default function BecomeATutorRoute() {
             </section>
 
             <section className="border-b border-border">
-                <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 py-16 md:grid-cols-3">
+                <div className={cn('mx-auto grid w-full gap-8 px-6 py-16 md:grid-cols-3', contentMaxWidth.wide)}>
                     {benefits.map((benefit) => (
                         <div className="flex flex-col gap-2" key={benefit.title}>
                             <h2 className="text-base font-semibold text-foreground">{benefit.title}</h2>
@@ -93,7 +94,7 @@ export default function BecomeATutorRoute() {
             </section>
 
             <section className="border-b border-border bg-muted/20">
-                <div className="mx-auto w-full max-w-6xl px-6 py-16">
+                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
                     <div className="mb-10 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">How it works</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -121,7 +122,7 @@ export default function BecomeATutorRoute() {
             </section>
 
             <section className="border-b border-border">
-                <div className="mx-auto w-full max-w-6xl px-6 py-16">
+                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
                     <div className="grid gap-10 md:grid-cols-2">
                         <div className="flex flex-col gap-2">
                             <h2 className="text-2xl font-semibold tracking-tight text-foreground">What we expect</h2>
@@ -144,7 +145,12 @@ export default function BecomeATutorRoute() {
             </section>
 
             <section>
-                <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
+                <div
+                    className={cn(
+                        'mx-auto flex w-full flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between',
+                        contentMaxWidth.wide,
+                    )}
+                >
                     <div className="flex max-w-xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">Ready to get started?</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">

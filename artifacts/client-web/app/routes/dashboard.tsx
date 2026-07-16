@@ -3,6 +3,7 @@ import { isErr } from '~/.server/lib/result';
 import { listConversations } from '~/.server/service/communication';
 import { listMyTutorApplications } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
@@ -37,7 +38,7 @@ export default function DashboardRoute() {
     const { applications, conversations, isTutor } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Dashboard</CardTitle>
                 <CardDescription>Your messages and activity at a glance.</CardDescription>
@@ -126,6 +127,6 @@ export default function DashboardRoute() {
                     ))
                 )}
             </section>
-        </div>
+        </PageContainer>
     );
 }

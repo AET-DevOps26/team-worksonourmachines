@@ -2,6 +2,7 @@ import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { listAdminModules, listAdminTutorApplications } from '~/.server/service/marketplace';
 import { roleProtectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 import { cn } from '~/lib/ui/utils';
@@ -20,7 +21,7 @@ export default function AdminDashboardRoute() {
     const { moduleCount, pendingCount } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Admin dashboard</CardTitle>
                 <CardDescription>Manage tutor approvals and course modules.</CardDescription>
@@ -44,6 +45,6 @@ export default function AdminDashboardRoute() {
                     </Link>
                 </Card>
             </div>
-        </div>
+        </PageContainer>
     );
 }

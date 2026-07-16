@@ -2,6 +2,7 @@ import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { listConversations } from '~/.server/service/communication';
 import { protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 
 export const loader = protectedLoader(async () => {
@@ -14,7 +15,7 @@ export default function ChatIndexRoute() {
     const { conversations } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Messages</CardTitle>
                 <CardDescription>Your conversations with tutors and students.</CardDescription>
@@ -36,6 +37,6 @@ export default function ChatIndexRoute() {
                     </Link>
                 ))
             )}
-        </div>
+        </PageContainer>
     );
 }

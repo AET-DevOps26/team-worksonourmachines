@@ -3,6 +3,7 @@ import { redirect, useActionData, useLoaderData, useNavigation } from 'react-rou
 import { isErr } from '~/.server/lib/result';
 import { getMyTutorProfile, listModules, submitTutorApplication } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import {
     parseAvailabilityFromFormData,
     parseLocationsFromFormData,
@@ -86,7 +87,7 @@ export default function TutorApplyRoute() {
 
     if (hasProfile) {
         return (
-            <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+            <PageContainer className="flex flex-col gap-6">
                 <Card>
                     <CardTitle>Apply for another module</CardTitle>
                     <CardDescription>Submit a certificate for an additional module you want to tutor.</CardDescription>
@@ -120,12 +121,12 @@ export default function TutorApplyRoute() {
                         </Button>
                     </form>
                 </Card>
-            </div>
+            </PageContainer>
         );
     }
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Apply as tutor</CardTitle>
                 <CardDescription>
@@ -215,6 +216,6 @@ export default function TutorApplyRoute() {
                     </Button>
                 </form>
             </Card>
-        </div>
+        </PageContainer>
     );
 }

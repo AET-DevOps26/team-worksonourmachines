@@ -3,6 +3,7 @@ import { isErr } from '~/.server/lib/result';
 import { listModules } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
 import { listMyGoals } from '~/.server/service/student';
+import { PageContainer } from '~/components/shell';
 import { Badge } from '~/components/ui/badge';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardDescription, CardTitle } from '~/components/ui/card';
@@ -28,7 +29,7 @@ export default function LearningGoalsRoute() {
     const { goals, moduleCodeById } = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6" size="wide">
             <Card>
                 <div className="flex items-center justify-between gap-4">
                     <div>
@@ -73,6 +74,6 @@ export default function LearningGoalsRoute() {
                     ))}
                 </div>
             )}
-        </div>
+        </PageContainer>
     );
 }

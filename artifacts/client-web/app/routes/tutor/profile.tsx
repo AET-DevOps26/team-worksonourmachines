@@ -3,6 +3,7 @@ import { redirect, useActionData, useLoaderData, useNavigation } from 'react-rou
 import { isErr } from '~/.server/lib/result';
 import { getMyTutorProfile, updateMyTutorProfile } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
+import { PageContainer } from '~/components/shell';
 import {
     parseAvailabilityFromFormData,
     parseLocationsFromFormData,
@@ -58,7 +59,7 @@ export default function TutorProfileRoute() {
     const hourlyRateId = useId();
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>Tutor profile</CardTitle>
                 <CardDescription>Edit your bio, rates, languages, locations, and availability.</CardDescription>
@@ -109,6 +110,6 @@ export default function TutorProfileRoute() {
                     </Button>
                 </form>
             </Card>
-        </div>
+        </PageContainer>
     );
 }
