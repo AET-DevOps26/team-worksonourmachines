@@ -37,7 +37,8 @@ export default function AppLayout() {
 }
 
 export function ErrorBoundary() {
-    const { user } = useLoaderData<typeof loader>();
+    const data = useLoaderData<typeof loader>() as { user: ShellUser | null } | undefined; // manual type assignment as the loader could break and therefore be undefined
+    const user = data?.user ?? null;
     return (
         <AppShell user={user}>
             <RouteErrorPage />
