@@ -104,7 +104,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+     * Issues a short-lived ticket (Redis TTL) for authenticating a STOMP WebSocket CONNECT.
      * Create WebSocket ticket
      */
     async createWsTicketRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharedCommunicationWsTicket>> {
@@ -115,7 +115,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+     * Issues a short-lived ticket (Redis TTL) for authenticating a STOMP WebSocket CONNECT.
      * Create WebSocket ticket
      */
     async createWsTicket(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharedCommunicationWsTicket> {

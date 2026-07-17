@@ -46,8 +46,27 @@ services:
     environment:
       APP_HOSTNAME: tutormatch.localhost
       KEYCLOAK_DEV_CLI_ENABLED: ${KEYCLOAK_DEV_CLI_ENABLED:-false}
+      KEYCLOAK_SCALAR_DEV_ENABLED: ${KEYCLOAK_SCALAR_DEV_ENABLED:-true}
+      KEYCLOAK_CLIENT_WEB_SECRET: ${KEYCLOAK_CLIENT_WEB_SECRET:-client-web-dev-secret}
+      KEYCLOAK_SERVER_STUDENT_SECRET: ${KEYCLOAK_SERVER_STUDENT_SECRET:-server-student-dev-secret}
+      KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET: ${KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET:-server-marketplace-admin-secret}
+      AI_CLIENT_SECRET: ${AI_CLIENT_SECRET:-server-ai-dev-secret}
       KEYCLOAK_PASSWORD: admin
       KEYCLOAK_USER: admin
+
+  demo-seed:
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      STUDENT_DB: student
+      STUDENT_USER: student
+      STUDENT_PASSWORD: student
+      MARKETPLACE_DB: marketplace
+      MARKETPLACE_USER: marketplace
+      MARKETPLACE_PASSWORD: marketplace
+      COMMUNICATION_DB: communication
+      COMMUNICATION_USER: communication
+      COMMUNICATION_PASSWORD: communication
 
   api-ui:
     volumes:

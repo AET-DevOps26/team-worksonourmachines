@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-seed
+  namespace: {{ .Values.namespace }}
+data:
+{{- include "tutormatch.requireDemoSeedFiles" . }}
+  demo-data.json: |
+{{ .Files.Get "files/demo-seed/demo-data.json" | nindent 4 }}
+  seed_demo_data.py: |
+{{ .Files.Get "files/demo-seed/seed_demo_data.py" | nindent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: demo-seed
+  namespace: {{ .Values.namespace }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "20"
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 5
+  activeDeadlineSeconds: 900
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: demo-seed
+          image: python:3.12-alpine
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              pip install --no-cache-dir 'psycopg[binary]==3.2.9' >/dev/null
+              python3 /demo-seed/seed_demo_data.py
+          env:
+            - name: DEMO_DATA_PATH
+              value: /demo-seed/demo-data.json
+            - name: KEYCLOAK_URL
+              value: http://keycloak:8080
+            - name: KEYCLOAK_REALM
+              value: tutormatch
+            - name: KEYCLOAK_USER
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_ADMIN
+            - name: KEYCLOAK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_ADMIN_PASSWORD
+            - name: PGHOST
+              value: postgres
+            # Helm uses one Postgres database with Flyway schemas.
+            - name: STUDENT_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_DB
+            - name: STUDENT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_USER
+            - name: STUDENT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
+            - name: MARKETPLACE_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_DB
+            - name: MARKETPLACE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_USER
+            - name: MARKETPLACE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
+            - name: COMMUNICATION_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_DB
+            - name: COMMUNICATION_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_USER
+            - name: COMMUNICATION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: demo-seed
+              mountPath: /demo-seed
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: demo-seed
+          configMap:
+            name: demo-seed
+            defaultMode: 0555
+            items:
+              - key: demo-data.json
+                path: demo-data.json
+              - key: seed_demo_data.py
+                path: seed_demo_data.py

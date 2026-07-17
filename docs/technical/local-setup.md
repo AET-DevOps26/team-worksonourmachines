@@ -36,12 +36,13 @@ Started with `make up`, stopped with `make down`. The local runtime is rendered 
 
 Each service mounts host source code. Runtime dependencies are either baked into the image at build time or stored in a Compose volume, not in your home directory node_modules (except where tooling also installs on the host, see below).
 
-- **client-web** binds `./artifacts/client-web` to `/app` and uses named volumes for `/app/node_modules`, React Router cache, and Vite cache. On start, `docker/entrypoint.sh` runs `pnpm install --frozen-lockfile`, then the dev server. The container does not use host `node_modules`. `make init` installs `artifacts/client-web/node_modules` on the host for IDE support only. The service waits for Redis, and for `keycloak-config-cli` to finish before starting.
+- **client-web** binds `./artifacts/client-web` to `/app` and uses named volumes for `/app/node_modules`, React Router cache, and Vite cache. On start, `docker/entrypoint.sh` runs `pnpm install --frozen-lockfile`, then the dev server. The container does not use host `node_modules`. `make init` installs `artifacts/client-web/node_modules` on the host for IDE support only. The service waits for Redis, the Spring servers, and for `demo-seed` to finish before starting.
 - **ai** binds `./artifacts/ai` to `/app`. Python packages are installed in the image when the image is built. Uvicorn runs with reload on file changes.
 - **ollama** uses the upstream image. Model data persists in the `ollama_data` volume. The local `ai` service depends on it.
 - **postgres** uses the upstream Postgres image. Database files persist in the `postgres_data` volume. Initialization scripts under `artifacts/postgres/init/` run only when this volume is first created.
 - **keycloak** uses the upstream Keycloak image in development mode and stores state in Postgres. It is not published to the host; reach it through the gateway at `https://auth.tutormatch.localhost`.
 - **keycloak-config-cli** applies the committed realm config from `artifacts/keycloak/import/` after Keycloak is healthy (see Local Keycloak below).
+- **demo-seed** resolves Keycloak users by email and upserts shared demo DB rows from `artifacts/demo-seed/` (same files Helm uses).
 - **redis** stores BFF session data and short-lived OIDC login transactions. The web app connects at `redis://redis:6379`.
 - **api-ui** serves the generated OpenAPI specs via Scalar. It mounts `api/specs/` read-only; restart is not required after `make api-generate`, only a browser refresh.
 - **gateway** runs Caddy and is the only service that publishes ports `80` and `443`. It terminates TLS and routes traffic to `client-web`, `keycloak`, and `api-ui`.
@@ -117,16 +118,19 @@ Configuration lives under `artifacts/gateway/`. Both Caddyfiles route `{$APP_HOS
 
 Keycloak is available at <https://auth.tutormatch.localhost>. The admin console uses the development credentials `admin` / `admin` unless overridden through `KEYCLOAK_ADMIN` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-The committed realm config is `artifacts/keycloak/import/tutormatch-realm.json`. It defines:
+The committed realm config is `artifacts/keycloak/import/tutormatch-realm.json`. Compose mounts it directly; Kubernetes copies the same file into the Helm chart via `make -C infrastructure sync-keycloak-realm` before upgrade. It defines:
 
 - realm: `tutormatch`
 - roles: `student`, `tutor`, `admin`
 - client scope: `roles` (adds a `realm_roles` claim to access tokens)
 - client: `client-web` for the React Router backend-for-frontend
 - client: `tutormatch-dev-cli` for local token checks (disabled by default; set `KEYCLOAK_DEV_CLI_ENABLED=true` in `.env` and re-run config-cli)
-- users: 10 dummy users with password `Tutormatch123!`
+- client: `scalar-dev` for Scalar API UI auth (enabled in local Compose by default; disabled on Azure/Helm)
+- users: 30 dummy users with password `Tutormatch123!` (see Demo users below). Keycloak assigns internal IDs (`sub`); they are not fixed in the realm JSON.
 
-After Keycloak is healthy, the one-shot `keycloak-config-cli` container (`adorsys/keycloak-config-cli:latest`) applies that file via the Admin API. The `client-web` redirect URIs use `$(APP_HOSTNAME)` substitution, so local dev and nip.io share one config file.
+After Keycloak is healthy, the one-shot `keycloak-config-cli` container (`adorsys/keycloak-config-cli:latest`) applies that file via the Admin API. Variable substitution (`$(APP_HOSTNAME)`, client secrets, `KEYCLOAK_DEV_CLI_ENABLED`, `KEYCLOAK_SCALAR_DEV_ENABLED`) is handled by config-cli, so Compose and Helm share one JSON and only differ in the env vars passed to the importer.
+
+Then the shared `demo-seed` job (`artifacts/demo-seed/`) resolves those users by email and upserts student / tutor / chat demo rows using the live Keycloak IDs. It is idempotent and remaps stored user ids when Keycloak recreates accounts. Compose and Helm both use the same `demo-data.json` + `seed_demo_data.py`.
 
 **Does it overwrite existing data?** It syncs resources **defined in the JSON** to match the file — for example updating `client-web` redirect URIs when `APP_HOSTNAME` changes. It does **not** wipe the whole database. With our defaults (`IMPORT_MANAGED=partial`, `IMPORT_REMOTESTATE_ENABLED=true`):
 
@@ -136,10 +140,10 @@ After Keycloak is healthy, the one-shot `keycloak-config-cli` container (`adorsy
 
 Manual changes in the Keycloak admin UI to resources **outside** the JSON (for example an extra test client you added by hand) are kept. Manual edits to resources **in** the JSON (roles, users, `client-web` settings) are overwritten on the next config-cli run to match Git.
 
-Re-run config after changing `APP_HOSTNAME` or the realm file:
+Re-run config + demo seed after changing `APP_HOSTNAME` or the realm / demo-seed files:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate keycloak-config-cli
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate keycloak-config-cli demo-seed
 ```
 
 To reset Keycloak entirely, remove Compose volumes with `make deep-clean`.
@@ -154,7 +158,27 @@ Authentication on <https://tutormatch.localhost> uses a backend-for-frontend flo
 
 Protected routes use `protectedLoader` / `protectedAction`; unauthenticated requests redirect to `/login?redirectTo=...` and return to the original page after sign-in. Sign out via `/auth/logout`.
 
-Use one of the imported dummy users, for example `lukas.student@example.com` / `Tutormatch123!`.
+### Demo users and seed data
+
+All dummy users share the password `Tutormatch123!`. Application demo rows are **not** keyed to fixed Keycloak UUIDs in Flyway. After `keycloak-config-cli`, `demo-seed` looks up each email in Keycloak and writes profiles / applications / a sample chat using the live `sub`.
+
+| Email | Role |
+| ----- | ---- |
+| `lukas.student@example.com` | student |
+| `maria.student@example.com` | student |
+| `jonas.student@example.com` | student |
+| `emma.student@example.com` | student |
+| `noah.student@example.com` | student |
+| `anna.tutor@example.com` | tutor |
+| `max.tutor@example.com` | tutor |
+| `lea.tutor@example.com` | tutor |
+| `omar.tutor@example.com` | tutor |
+| `sofia.richter@example.com` … `marco.bianchi@example.com` | tutor (Discover tutors) |
+| `admin.tutormatch@example.com` | admin |
+
+Flyway still seeds the marketplace **catalogue** (modules/topics). User-keyed demo content (student profiles, tutors, applications, sample chat) lives in [`artifacts/demo-seed/`](../../artifacts/demo-seed/) and is applied by the `demo-seed` oneshot after Keycloak import.
+
+Typical demo path: sign in as Lukas → open goals / discover tutors → open the existing chat with Anna. Sign in as Anna or Max to see published tutor profiles. Lea and Omar can log in as tutors but have no seeded marketplace profile yet.
 
 Keycloak's issuer is `https://auth.tutormatch.localhost/realms/tutormatch`, configured through `KEYCLOAK_ISSUER` and `KEYCLOAK_HOSTNAME`. Browser and BFF both use that URL; inside Docker, `auth.${APP_HOSTNAME}` resolves to the Caddy gateway, which proxies to Keycloak. Compose mounts Caddy's local root certificate into `client-web` through `NODE_EXTRA_CA_CERTS` and sets `KEYCLOAK_LOGIN_FEATURE=v1` on Keycloak.
 
