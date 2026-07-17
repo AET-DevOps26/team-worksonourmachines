@@ -212,7 +212,7 @@ We keep `.env.dist` small on purpose. Only put variables there that someone need
 | -------- | ---- | -------------- |
 | `.env.dist` copied to `.env` | Optional local or deployment overrides; local Compose has hardcoded development defaults | `KEYCLOAK_DEV_CLI_ENABLED`, optional `LLM_API_KEY`, Azure deployment secrets |
 | `docker-compose.yml`         | Shared image-first service topology, with no build directives or source bind mounts    | `CLIENT_WEB_IMAGE`, `AI_IMAGE`, shared service names and dependencies |
-| `docker-compose.dev.yml`     | Local build directives, source bind mounts, local URLs, and development defaults       | `APP_HOSTNAME`, local Keycloak values, Ollama defaults, server-mock URLs |
+| `docker-compose.dev.yml`     | Local build directives, source bind mounts, local URLs, and development defaults       | `APP_HOSTNAME`, local Keycloak values, Ollama defaults, URLs |
 | `docker-compose.azure.yml`   | Azure VM production overrides and required production values                           | `APP_HOSTNAME`, `APP_BASE_URL`, `KEYCLOAK_ISSUER`, `POSTGRES_PASSWORD`, `CLIENT_WEB_IMAGE`, `AI_IMAGE` |
 | `.env` optional overrides | Override variables referenced as `${VAR:-default}` in compose without editing compose | e.g. `LLM_MODEL=llama3.2:latest` |
 

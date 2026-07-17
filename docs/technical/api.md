@@ -8,7 +8,7 @@ For day-to-day commands and scripts, see [api/README.md](../../api/README.md). F
 
 | Path | Role |
 |------|------|
-| `api/*.tsp` | TypeSpec source (edit here) |
+| `api/main.tsp`, `services/`, `shared/` | TypeSpec source (edit here) |
 | `api/specs/` | Generated OpenAPI YAML (do not edit) |
 | `artifacts/api-ui/` | Scalar API reference UI (Docker + config) |
 
@@ -20,9 +20,7 @@ For day-to-day commands and scripts, see [api/README.md](../../api/README.md). F
 
 ## API reference UI
 
-[Scalar](https://github.com/scalar/scalar) serves the generated specs read-only. Locally it is available at **https://api.tutormatch.localhost** (via the Caddy gateway). In Kubernetes it is exposed at `api.<ingress host>`.
+[Scalar](https://github.com/scalar/scalar) serves the generated specs. Locally it is available at **https://api.tutormatch.localhost** (via the Caddy gateway). In Kubernetes it is exposed at `api.<ingress host>`.
 
-- **Dev:** `docker-compose.yml` mounts `api/specs/` into the `api-ui` container — refresh the browser after regenerating specs.
-- **Prod:** the `api-ui` image bakes in `api/specs/` at build time; CI rebuilds the image when specs change.
-
-Configuration lives in `artifacts/api-ui/scalar.config.json`. Test and client buttons are hidden; this UI is documentation only, not a live API client against running services.
+- **Dev:** `docker-compose.yml` mounts `api/specs/` into the `api-ui` container — refresh the browser after regenerating specs. Local Scalar config is `artifacts/api-ui/scalar.dev.config.json` (test/client buttons and Keycloak auth enabled).
+- **Prod:** the `api-ui` image bakes in `api/specs/` at build time; CI rebuilds the image when specs change. Production config is `artifacts/api-ui/scalar.config.json` (test and client buttons hidden).

@@ -63,8 +63,6 @@ app/
 | `components/ui/` | Shared presentational components without business logic. |
 | `lib/` | Utilities used on the client or from both sides (not `.server`-only). Must not import from `routes/` or `components/`. |
 
-`components/` and `lib/` are scaffolded but mostly empty until features land.
-
 ## Import rules
 
 These are enforced by dependency-cruiser (`pnpm run lint:deps`). Rule behaviour is covered by tests in `test-dependency-cruiser/` (`pnpm run lint:deps:test`).
@@ -95,6 +93,7 @@ The BFF authenticates users with Keycloak over OIDC. Session data and tokens liv
 |-------|------|
 | `/login` | Sign-in page |
 | `/auth/login` | Starts the OIDC flow |
+| `/auth/register` | Starts the Keycloak registration flow |
 | `/auth/callback` | Handles the Keycloak redirect |
 | `/auth/logout` | Ends the session |
 
@@ -113,6 +112,10 @@ For local sign-in, realm config, and environment variables, see [local-setup.md]
 | `pnpm run lint:deps` | dependency-cruiser layer rules |
 | `pnpm run lint:deps:test` | dependency-cruiser rule tests |
 | `pnpm run lint:unused` | knip dead code |
+| `pnpm run lint:types` | React Router typegen + `tsc --noEmit` |
 | `pnpm run format` | Biome formatter |
+| `pnpm run test` | Unit tests + dependency-cruiser rule tests |
+| `pnpm run test:unit` | Vitest unit tests only |
+| `pnpm run test:watch` | Vitest in watch mode |
 
-From the repo root, `make lint` and `make format` run the respective npm scripts inside the tooling container.
+From the repo root, `make lint`, `make format`, and `make test` run the respective npm scripts inside the tooling container.
