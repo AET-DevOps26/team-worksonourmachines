@@ -8,6 +8,7 @@ import {
     type SharedMarketplaceWeekday,
 } from '~/.server/api/server-marketplace/generated';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { getModule, listModules, listTutors } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
 import { contentMaxWidth } from '~/components/shell';
@@ -87,8 +88,8 @@ export const loader = protectedLoader(async ({ request }) => {
 
     const [tutorsResult, modulesResult] = await Promise.all([listTutors(tutorParams), listModules({ pageSize: 100 })]);
 
-    if (isErr(tutorsResult)) throw tutorsResult.error;
-    if (isErr(modulesResult)) throw modulesResult.error;
+    if (isErr(tutorsResult)) throwRouteError(tutorsResult.error);
+    if (isErr(modulesResult)) throwRouteError(modulesResult.error);
 
     const selectedModule = moduleId ? modulesResult.value.items.find((m) => m.id === moduleId) : undefined;
     let moduleTopics: { id: string; name: string }[] = [];

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Form, Link, useActionData, useLoaderData, useNavigation } from 'react-router';
 import type { SharedCommunicationChatMessage } from '~/.server/api/server-communication/generated';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { getConversation, listMessages, sendMessage } from '~/.server/service/communication';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { PageContainer } from '~/components/shell';
@@ -14,8 +15,8 @@ import { cn } from '~/lib/ui/utils';
 export const loader = protectedLoader(async ({ params, session }) => {
     const id = params.id ?? '';
     const [convResult, messagesResult] = await Promise.all([getConversation(id), listMessages(id, 1, 100)]);
-    if (isErr(convResult)) throw convResult.error;
-    if (isErr(messagesResult)) throw messagesResult.error;
+    if (isErr(convResult)) throwRouteError(convResult.error);
+    if (isErr(messagesResult)) throwRouteError(messagesResult.error);
     return {
         conversation: convResult.value,
         currentUserId: session.user.sub,
@@ -52,6 +53,7 @@ export default function ChatThreadRoute() {
         (initialMessages as SharedCommunicationChatMessage[]).map(normalise),
     );
     const [inputValue, setInputValue] = useState('');
+    const [liveUpdatesUnavailable, setLiveUpdatesUnavailable] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
     const seenIds = useRef(new Set(initialMessages.map((m) => m.id)));
     const stompClient = useRef<InstanceType<typeof Client> | null>(null);
@@ -70,6 +72,7 @@ export default function ChatThreadRoute() {
         let cancelled = false;
         stompClient.current?.deactivate();
         stompClient.current = null;
+        setLiveUpdatesUnavailable(false);
 
         const wsUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/stomp`;
 
@@ -79,11 +82,13 @@ export default function ChatThreadRoute() {
             if (!ticketResponse.ok || cancelled) {
                 if (!cancelled) {
                     console.error('Failed to obtain WebSocket ticket', ticketResponse.status);
+                    setLiveUpdatesUnavailable(true);
                 }
                 return;
             }
             const ticketBody = (await ticketResponse.json()) as { ticket?: string };
             if (cancelled || !ticketBody.ticket) {
+                if (!cancelled) setLiveUpdatesUnavailable(true);
                 return;
             }
 
@@ -91,6 +96,7 @@ export default function ChatThreadRoute() {
                 brokerURL: wsUrl,
                 connectHeaders: { Authorization: `Ticket ${ticketBody.ticket}` },
                 onConnect: () => {
+                    setLiveUpdatesUnavailable(false);
                     client.subscribe(`/user/queue/conversation.${conversation.id}`, (frame) => {
                         try {
                             const msg = JSON.parse(frame.body) as ChatMessage;
@@ -104,9 +110,11 @@ export default function ChatThreadRoute() {
                 },
                 onStompError: (frame) => {
                     console.error('STOMP error', frame.headers['message'], frame.body);
+                    setLiveUpdatesUnavailable(true);
                 },
                 onWebSocketError: (event) => {
                     console.error('WebSocket error', event);
+                    setLiveUpdatesUnavailable(true);
                 },
             });
 
@@ -142,6 +150,13 @@ export default function ChatThreadRoute() {
                     ) : null}
                 </div>
             </Card>
+
+            {liveUpdatesUnavailable ? (
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                    Live updates are temporarily unavailable. You can still send messages; refresh to check for new
+                    ones.
+                </div>
+            ) : null}
 
             <Card className="flex h-96 flex-col gap-3 overflow-y-auto">
                 {messages.map((msg) => (

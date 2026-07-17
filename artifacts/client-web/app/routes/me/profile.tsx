@@ -1,5 +1,6 @@
 import { Link, redirect, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { getStudentProfile, updateStudentProfile } from '~/.server/service/student';
 import {
@@ -20,7 +21,7 @@ export const PROFILE_EDIT_SEARCH = '?edit=1';
 export const loader = protectedLoader(async ({ request, session }) => {
     const profileResult = await getStudentProfile();
     if (isErr(profileResult)) {
-        throw profileResult.error;
+        throwRouteError(profileResult.error);
     }
 
     let profile = profileResult.value;
@@ -34,7 +35,7 @@ export const loader = protectedLoader(async ({ request, session }) => {
             ...(profile.studyFocus ? { studyFocus: profile.studyFocus } : {}),
         });
         if (isErr(updateResult)) {
-            throw updateResult.error;
+            throwRouteError(updateResult.error);
         }
         profile = updateResult.value;
     }

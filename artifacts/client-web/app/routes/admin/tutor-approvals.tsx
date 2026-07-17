@@ -1,5 +1,6 @@
 import { useFetcher, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import {
     approveTutorApplication,
     listAdminTutorApplications,
@@ -13,7 +14,7 @@ import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 
 export const loader = roleProtectedLoader('admin', async () => {
     const result = await listAdminTutorApplications('pending');
-    if (isErr(result)) throw result.error;
+    if (isErr(result)) throwRouteError(result.error);
     return { applications: result.value };
 });
 
@@ -44,7 +45,8 @@ export const action = roleProtectedAction('admin', async ({ request }) => {
 
 export default function AdminTutorApprovalsRoute() {
     const { applications } = useLoaderData<typeof loader>();
-    const fetcher = useFetcher();
+    const fetcher = useFetcher<typeof action>();
+    const actionError = fetcher.data && 'error' in fetcher.data ? fetcher.data.error : null;
 
     return (
         <PageContainer className="flex flex-col gap-6">
@@ -52,6 +54,11 @@ export default function AdminTutorApprovalsRoute() {
                 <CardTitle>Tutor approvals</CardTitle>
                 <CardDescription>Review pending tutor applications and certificates.</CardDescription>
             </Card>
+            {actionError ? (
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                    {actionError}
+                </div>
+            ) : null}
             {applications.length === 0 ? (
                 <Card>
                     <CardDescription>No pending applications.</CardDescription>

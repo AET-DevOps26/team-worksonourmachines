@@ -135,6 +135,11 @@ For the local demo, you need to [enable it explicitely](#observability). For dem
 - username: admin.tutormatch@example.com
 - password: adminpassword123
 
+### Limitations
+
+- In local development it is normal that on first startup a useContext error is present. This is a know React Router issue, which is not specific to this project.
+- Due to Rancher limitations, we could not have rolling updates on deployment as having multiple instances up of the services will break the deployment because of ressource limits.
+
 ## Domains
 
 |  | local | k8 |

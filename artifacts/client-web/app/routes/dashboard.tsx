@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { listConversations } from '~/.server/service/communication';
 import { listMyTutorApplications } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
@@ -24,8 +25,8 @@ export const loader = protectedLoader(async ({ session }) => {
         listConversations(),
         listMyTutorApplications(),
     ]);
-    if (isErr(conversationsResult)) throw conversationsResult.error;
-    if (isErr(applicationsResult)) throw applicationsResult.error;
+    if (isErr(conversationsResult)) throwRouteError(conversationsResult.error);
+    if (isErr(applicationsResult)) throwRouteError(applicationsResult.error);
 
     return {
         applications: applicationsResult.value,

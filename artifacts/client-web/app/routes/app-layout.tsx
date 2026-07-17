@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs } from 'react-router';
 import { Outlet, useLoaderData } from 'react-router';
 import { logger } from '~/.server/lib/logger';
 import { getSessionUser, type SessionUser } from '~/.server/service/session';
+import { RouteErrorPage } from '~/components/errors';
 import { AppShell, type ShellUser } from '~/components/shell';
 
 function toShellUser(user: SessionUser): ShellUser {
@@ -31,6 +32,16 @@ export default function AppLayout() {
     return (
         <AppShell user={user}>
             <Outlet />
+        </AppShell>
+    );
+}
+
+export function ErrorBoundary() {
+    const data = useLoaderData<typeof loader>() as { user: ShellUser | null } | undefined; // manual type assignment as the loader could break and therefore be undefined
+    const user = data?.user ?? null;
+    return (
+        <AppShell user={user}>
+            <RouteErrorPage />
         </AppShell>
     );
 }

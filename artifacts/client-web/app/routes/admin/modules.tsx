@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { listAdminModules } from '~/.server/service/marketplace';
 import { roleProtectedLoader } from '~/.server/service/routeProtection';
 import { PageContainer } from '~/components/shell';
@@ -10,7 +11,7 @@ import { cn } from '~/lib/ui/utils';
 
 export const loader = roleProtectedLoader('admin', async () => {
     const result = await listAdminModules();
-    if (isErr(result)) throw result.error;
+    if (isErr(result)) throwRouteError(result.error);
     return { modules: result.value };
 });
 

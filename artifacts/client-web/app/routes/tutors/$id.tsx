@@ -1,5 +1,6 @@
-import { Form, Link, redirect, useLoaderData, useNavigation } from 'react-router';
+import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { startConversation } from '~/.server/service/communication';
 import { getTutor } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
@@ -12,7 +13,7 @@ import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 export const loader = protectedLoader(async ({ params, session }) => {
     const result = await getTutor(params.id ?? '');
     if (isErr(result)) {
-        throw result.error;
+        throwRouteError(result.error);
     }
     return { isSelf: result.value.userId === session.user.sub, tutor: result.value };
 });
@@ -20,20 +21,21 @@ export const loader = protectedLoader(async ({ params, session }) => {
 export const action = protectedAction(async ({ params, session }) => {
     const tutorResult = await getTutor(params.id ?? '');
     if (isErr(tutorResult)) {
-        throw tutorResult.error;
+        return { error: 'Could not open this conversation. Please try again.' };
     }
     if (tutorResult.value.userId === session.user.sub) {
         return null;
     }
     const convResult = await startConversation(tutorResult.value.userId);
     if (isErr(convResult)) {
-        throw convResult.error;
+        return { error: 'Could not open this conversation. Please try again.' };
     }
     throw redirect(`/chat/${convResult.value.id}`);
 });
 
 export default function PublicTutorProfileRoute() {
     const { tutor, isSelf } = useLoaderData<typeof loader>();
+    const actionData = useActionData<typeof action>();
     const navigation = useNavigation();
     const messaging = navigation.state !== 'idle' && navigation.formMethod === 'POST';
 
@@ -63,6 +65,7 @@ export default function PublicTutorProfileRoute() {
                         <Button disabled={messaging} type="submit">
                             {messaging ? 'Opening…' : 'Message tutor'}
                         </Button>
+                        {actionData?.error ? <p className="mt-2 text-sm text-destructive">{actionData.error}</p> : null}
                     </Form>
                 )}
             </Card>

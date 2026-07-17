@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { listModules } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
 import { listMyGoals } from '~/.server/service/student';
@@ -11,8 +12,8 @@ import { cn } from '~/lib/ui/utils';
 
 export const loader = protectedLoader(async () => {
     const [goalsResult, modulesResult] = await Promise.all([listMyGoals(), listModules({ pageSize: 100 })]);
-    if (isErr(goalsResult)) throw goalsResult.error;
-    if (isErr(modulesResult)) throw modulesResult.error;
+    if (isErr(goalsResult)) throwRouteError(goalsResult.error);
+    if (isErr(modulesResult)) throwRouteError(modulesResult.error);
     const moduleCodeById = Object.fromEntries(modulesResult.value.items.map((m) => [m.id, m.code]));
     return { goals: goalsResult.value, moduleCodeById };
 });
