@@ -13,9 +13,12 @@ FROM tooling AS build
 
 ARG SERVER_MODULE
 
-COPY artifacts/server/ ./
+COPY artifacts/server/pom.xml ./
+COPY artifacts/server/common ./common
+COPY artifacts/server/${SERVER_MODULE} ./${SERVER_MODULE}
 
 RUN test -n "${SERVER_MODULE}" \
+  && sed -i "/<module>/!b;/<module>common<\/module>/b;/<module>${SERVER_MODULE}<\/module>/b;d" pom.xml \
   && mvn -q -pl "${SERVER_MODULE}" -am package -DskipTests \
   && jar_file="$(find "${SERVER_MODULE}/target" -maxdepth 1 \
       -name "server-${SERVER_MODULE}-*.jar" \

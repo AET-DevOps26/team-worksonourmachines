@@ -423,6 +423,7 @@ k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, L
 		--kube-context "$(K3D_KUBE_CONTEXT)" \
 		--namespace "$(NAMESPACE)" \
 		--values "$(OBSERVABILITY_DIR)grafana.values.yaml" \
+		--values "$(OBSERVABILITY_DIR)grafana.values.local.yaml" \
 		--set-file 'dashboards.default.spring-boot-observability.json=$(OBSERVABILITY_DASHBOARD)' \
 		--wait \
 		--timeout "$(K3D_TIMEOUT)"

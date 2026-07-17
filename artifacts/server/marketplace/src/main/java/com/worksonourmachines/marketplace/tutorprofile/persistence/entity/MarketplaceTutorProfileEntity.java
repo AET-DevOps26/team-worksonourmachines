@@ -38,7 +38,7 @@ public class MarketplaceTutorProfileEntity {
     private String bio;
 
     @Column(name = "hourly_rate", nullable = false)
-    private Float hourlyRate;
+    private Integer hourlyRate;
 
     @Column(name = "published", nullable = false)
     private Boolean published;
@@ -80,7 +80,7 @@ public class MarketplaceTutorProfileEntity {
             UUID userId,
             String displayName,
             String bio,
-            Float hourlyRate,
+            Integer hourlyRate,
             Boolean published) {
         this.userId = userId;
         this.displayName = displayName;
@@ -120,11 +120,11 @@ public class MarketplaceTutorProfileEntity {
         this.bio = bio;
     }
 
-    public Float getHourlyRate() {
+    public Integer getHourlyRate() {
         return hourlyRate;
     }
 
-    public void setHourlyRate(Float hourlyRate) {
+    public void setHourlyRate(Integer hourlyRate) {
         this.hourlyRate = hourlyRate;
     }
 

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.openapitools.model.SharedMarketplaceLocation;
-import org.openapitools.model.SharedMarketplaceRatingSummary;
 import org.openapitools.model.SharedMarketplaceTutorAvailability;
 import org.openapitools.model.SharedMarketplaceTutorCoverage;
 import org.springframework.lang.Nullable;
@@ -35,15 +34,13 @@ public class SharedMarketplaceTutorDetail {
 
   private String displayName;
 
-  private Float hourlyRate;
+  private Integer hourlyRate;
 
   @Valid
   private List<String> languages = new ArrayList<>();
 
   @Valid
   private List<SharedMarketplaceLocation> locations = new ArrayList<>();
-
-  private SharedMarketplaceRatingSummary ratingSummary;
 
   @Valid
   private List<@Valid SharedMarketplaceTutorCoverage> coverages = new ArrayList<>();
@@ -62,14 +59,13 @@ public class SharedMarketplaceTutorDetail {
   /**
    * Constructor with only required parameters
    */
-  public SharedMarketplaceTutorDetail(String id, String userId, String displayName, Float hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, SharedMarketplaceRatingSummary ratingSummary, List<@Valid SharedMarketplaceTutorCoverage> coverages, String bio, List<@Valid SharedMarketplaceTutorAvailability> availability, Boolean published) {
+  public SharedMarketplaceTutorDetail(String id, String userId, String displayName, Integer hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, List<@Valid SharedMarketplaceTutorCoverage> coverages, String bio, List<@Valid SharedMarketplaceTutorAvailability> availability, Boolean published) {
     this.id = id;
     this.userId = userId;
     this.displayName = displayName;
     this.hourlyRate = hourlyRate;
     this.languages = languages;
     this.locations = locations;
-    this.ratingSummary = ratingSummary;
     this.coverages = coverages;
     this.bio = bio;
     this.availability = availability;
@@ -136,7 +132,7 @@ public class SharedMarketplaceTutorDetail {
     this.displayName = displayName;
   }
 
-  public SharedMarketplaceTutorDetail hourlyRate(Float hourlyRate) {
+  public SharedMarketplaceTutorDetail hourlyRate(Integer hourlyRate) {
     this.hourlyRate = hourlyRate;
     return this;
   }
@@ -147,12 +143,12 @@ public class SharedMarketplaceTutorDetail {
    */
   @NotNull 
   @JsonProperty("hourlyRate")
-  public Float getHourlyRate() {
+  public Integer getHourlyRate() {
     return hourlyRate;
   }
 
   @JsonProperty("hourlyRate")
-  public void setHourlyRate(Float hourlyRate) {
+  public void setHourlyRate(Integer hourlyRate) {
     this.hourlyRate = hourlyRate;
   }
 
@@ -210,26 +206,6 @@ public class SharedMarketplaceTutorDetail {
   @JsonProperty("locations")
   public void setLocations(List<SharedMarketplaceLocation> locations) {
     this.locations = locations;
-  }
-
-  public SharedMarketplaceTutorDetail ratingSummary(SharedMarketplaceRatingSummary ratingSummary) {
-    this.ratingSummary = ratingSummary;
-    return this;
-  }
-
-  /**
-   * Get ratingSummary
-   * @return ratingSummary
-   */
-  @NotNull @Valid 
-  @JsonProperty("ratingSummary")
-  public SharedMarketplaceRatingSummary getRatingSummary() {
-    return ratingSummary;
-  }
-
-  @JsonProperty("ratingSummary")
-  public void setRatingSummary(SharedMarketplaceRatingSummary ratingSummary) {
-    this.ratingSummary = ratingSummary;
   }
 
   public SharedMarketplaceTutorDetail coverages(List<@Valid SharedMarketplaceTutorCoverage> coverages) {
@@ -343,7 +319,6 @@ public class SharedMarketplaceTutorDetail {
         Objects.equals(this.hourlyRate, sharedMarketplaceTutorDetail.hourlyRate) &&
         Objects.equals(this.languages, sharedMarketplaceTutorDetail.languages) &&
         Objects.equals(this.locations, sharedMarketplaceTutorDetail.locations) &&
-        Objects.equals(this.ratingSummary, sharedMarketplaceTutorDetail.ratingSummary) &&
         Objects.equals(this.coverages, sharedMarketplaceTutorDetail.coverages) &&
         Objects.equals(this.bio, sharedMarketplaceTutorDetail.bio) &&
         Objects.equals(this.availability, sharedMarketplaceTutorDetail.availability) &&
@@ -352,7 +327,7 @@ public class SharedMarketplaceTutorDetail {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, userId, displayName, hourlyRate, languages, locations, ratingSummary, coverages, bio, availability, published);
+    return Objects.hash(id, userId, displayName, hourlyRate, languages, locations, coverages, bio, availability, published);
   }
 
   @Override
@@ -365,7 +340,6 @@ public class SharedMarketplaceTutorDetail {
     sb.append("    hourlyRate: ").append(toIndentedString(hourlyRate)).append("\n");
     sb.append("    languages: ").append(toIndentedString(languages)).append("\n");
     sb.append("    locations: ").append(toIndentedString(locations)).append("\n");
-    sb.append("    ratingSummary: ").append(toIndentedString(ratingSummary)).append("\n");
     sb.append("    coverages: ").append(toIndentedString(coverages)).append("\n");
     sb.append("    bio: ").append(toIndentedString(bio)).append("\n");
     sb.append("    availability: ").append(toIndentedString(availability)).append("\n");

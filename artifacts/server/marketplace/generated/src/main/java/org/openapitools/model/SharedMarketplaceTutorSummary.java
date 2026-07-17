@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.openapitools.model.SharedMarketplaceLocation;
-import org.openapitools.model.SharedMarketplaceRatingSummary;
 import org.openapitools.model.SharedMarketplaceTutorCoverage;
 import org.springframework.lang.Nullable;
 import java.time.OffsetDateTime;
@@ -34,15 +33,13 @@ public class SharedMarketplaceTutorSummary {
 
   private String displayName;
 
-  private Float hourlyRate;
+  private Integer hourlyRate;
 
   @Valid
   private List<String> languages = new ArrayList<>();
 
   @Valid
   private List<SharedMarketplaceLocation> locations = new ArrayList<>();
-
-  private SharedMarketplaceRatingSummary ratingSummary;
 
   @Valid
   private List<@Valid SharedMarketplaceTutorCoverage> coverages = new ArrayList<>();
@@ -54,14 +51,13 @@ public class SharedMarketplaceTutorSummary {
   /**
    * Constructor with only required parameters
    */
-  public SharedMarketplaceTutorSummary(String id, String userId, String displayName, Float hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, SharedMarketplaceRatingSummary ratingSummary, List<@Valid SharedMarketplaceTutorCoverage> coverages) {
+  public SharedMarketplaceTutorSummary(String id, String userId, String displayName, Integer hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, List<@Valid SharedMarketplaceTutorCoverage> coverages) {
     this.id = id;
     this.userId = userId;
     this.displayName = displayName;
     this.hourlyRate = hourlyRate;
     this.languages = languages;
     this.locations = locations;
-    this.ratingSummary = ratingSummary;
     this.coverages = coverages;
   }
 
@@ -125,7 +121,7 @@ public class SharedMarketplaceTutorSummary {
     this.displayName = displayName;
   }
 
-  public SharedMarketplaceTutorSummary hourlyRate(Float hourlyRate) {
+  public SharedMarketplaceTutorSummary hourlyRate(Integer hourlyRate) {
     this.hourlyRate = hourlyRate;
     return this;
   }
@@ -136,12 +132,12 @@ public class SharedMarketplaceTutorSummary {
    */
   @NotNull 
   @JsonProperty("hourlyRate")
-  public Float getHourlyRate() {
+  public Integer getHourlyRate() {
     return hourlyRate;
   }
 
   @JsonProperty("hourlyRate")
-  public void setHourlyRate(Float hourlyRate) {
+  public void setHourlyRate(Integer hourlyRate) {
     this.hourlyRate = hourlyRate;
   }
 
@@ -201,26 +197,6 @@ public class SharedMarketplaceTutorSummary {
     this.locations = locations;
   }
 
-  public SharedMarketplaceTutorSummary ratingSummary(SharedMarketplaceRatingSummary ratingSummary) {
-    this.ratingSummary = ratingSummary;
-    return this;
-  }
-
-  /**
-   * Get ratingSummary
-   * @return ratingSummary
-   */
-  @NotNull @Valid 
-  @JsonProperty("ratingSummary")
-  public SharedMarketplaceRatingSummary getRatingSummary() {
-    return ratingSummary;
-  }
-
-  @JsonProperty("ratingSummary")
-  public void setRatingSummary(SharedMarketplaceRatingSummary ratingSummary) {
-    this.ratingSummary = ratingSummary;
-  }
-
   public SharedMarketplaceTutorSummary coverages(List<@Valid SharedMarketplaceTutorCoverage> coverages) {
     this.coverages = coverages;
     return this;
@@ -264,13 +240,12 @@ public class SharedMarketplaceTutorSummary {
         Objects.equals(this.hourlyRate, sharedMarketplaceTutorSummary.hourlyRate) &&
         Objects.equals(this.languages, sharedMarketplaceTutorSummary.languages) &&
         Objects.equals(this.locations, sharedMarketplaceTutorSummary.locations) &&
-        Objects.equals(this.ratingSummary, sharedMarketplaceTutorSummary.ratingSummary) &&
         Objects.equals(this.coverages, sharedMarketplaceTutorSummary.coverages);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, userId, displayName, hourlyRate, languages, locations, ratingSummary, coverages);
+    return Objects.hash(id, userId, displayName, hourlyRate, languages, locations, coverages);
   }
 
   @Override
@@ -283,7 +258,6 @@ public class SharedMarketplaceTutorSummary {
     sb.append("    hourlyRate: ").append(toIndentedString(hourlyRate)).append("\n");
     sb.append("    languages: ").append(toIndentedString(languages)).append("\n");
     sb.append("    locations: ").append(toIndentedString(locations)).append("\n");
-    sb.append("    ratingSummary: ").append(toIndentedString(ratingSummary)).append("\n");
     sb.append("    coverages: ").append(toIndentedString(coverages)).append("\n");
     sb.append("}");
     return sb.toString();

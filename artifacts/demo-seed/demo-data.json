@@ -57,7 +57,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0001",
       "displayName": "Anna Muller",
       "bio": "CS student with strong background in probability and foundations.",
-      "hourlyRate": 25.0,
+      "hourlyRate": 25,
       "published": true,
       "languages": [
         "German",
@@ -91,7 +91,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0002",
       "displayName": "Max Hoffmann",
       "bio": "Tutor for discrete structures and linear algebra.",
-      "hourlyRate": 20.0,
+      "hourlyRate": 20,
       "published": true,
       "languages": [
         "German"
@@ -112,7 +112,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0003",
       "displayName": "Sofia Richter",
       "bio": "Patient DWT tutor who focuses on exam-style probability proofs.",
-      "hourlyRate": 22.0,
+      "hourlyRate": 22,
       "published": true,
       "languages": [
         "German",
@@ -140,7 +140,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0004",
       "displayName": "Ben Krause",
       "bio": "Explains discrete structures with lots of worked graph examples.",
-      "hourlyRate": 18.0,
+      "hourlyRate": 18,
       "published": true,
       "languages": [
         "German"
@@ -166,7 +166,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0005",
       "displayName": "Clara Nguyen",
       "bio": "Linear algebra specialist; matrices, bases, and eigenvalues demystified.",
-      "hourlyRate": 28.0,
+      "hourlyRate": 28,
       "published": true,
       "languages": [
         "English",
@@ -189,7 +189,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0006",
       "displayName": "Felix Brandt",
       "bio": "Foundations-first tutor for logic, automata, and formal reasoning.",
-      "hourlyRate": 19.0,
+      "hourlyRate": 19,
       "published": true,
       "languages": [
         "German",
@@ -216,7 +216,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0007",
       "displayName": "Nina Petrov",
       "bio": "Bilingual tutor pairing probability intuition with careful notation.",
-      "hourlyRate": 26.0,
+      "hourlyRate": 26,
       "published": true,
       "languages": [
         "English",
@@ -239,7 +239,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0008",
       "displayName": "Jonas Meier",
       "bio": "Practical DS help with combinatorics drills and past homework sets.",
-      "hourlyRate": 17.0,
+      "hourlyRate": 17,
       "published": true,
       "languages": [
         "German"
@@ -260,7 +260,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0009",
       "displayName": "Amira Hassan",
       "bio": "Calm online sessions for linear algebra and discrete math catch-up.",
-      "hourlyRate": 24.0,
+      "hourlyRate": 24,
       "published": true,
       "languages": [
         "English",
@@ -287,7 +287,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0010",
       "displayName": "Timo Vogel",
       "bio": "Garching-based tutor for GDB proofs and exam warm-ups.",
-      "hourlyRate": 21.0,
+      "hourlyRate": 21,
       "published": true,
       "languages": [
         "German"
@@ -309,7 +309,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0011",
       "displayName": "Elena Rossi",
       "bio": "Structured DWT lessons with weekly mini-quizzes.",
-      "hourlyRate": 27.0,
+      "hourlyRate": 27,
       "published": true,
       "languages": [
         "English",
@@ -337,7 +337,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0012",
       "displayName": "Paul Schwarz",
       "bio": "Budget-friendly LA tutor for engineers who need the essentials.",
-      "hourlyRate": 15.0,
+      "hourlyRate": 15,
       "published": true,
       "languages": [
         "German"
@@ -359,7 +359,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0013",
       "displayName": "Mira Koch",
       "bio": "Combines GDB and DWT for students bridging foundations into probability.",
-      "hourlyRate": 23.0,
+      "hourlyRate": 23,
       "published": true,
       "languages": [
         "German",
@@ -387,7 +387,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0014",
       "displayName": "Lucas Berg",
       "bio": "Graph theory enthusiast; visual explanations for Diskrete Strukturen.",
-      "hourlyRate": 20.0,
+      "hourlyRate": 20,
       "published": true,
       "languages": [
         "German",
@@ -409,7 +409,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0015",
       "displayName": "Hana Kim",
       "bio": "Clear English-first tutoring for linear algebra and problem sets.",
-      "hourlyRate": 29.0,
+      "hourlyRate": 29,
       "published": true,
       "languages": [
         "English"
@@ -435,7 +435,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0016",
       "displayName": "David Wolf",
       "bio": "Evening sessions focused on automata and formal language exercises.",
-      "hourlyRate": 18.0,
+      "hourlyRate": 18,
       "published": true,
       "languages": [
         "German"
@@ -461,7 +461,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0017",
       "displayName": "Sara Ali",
       "bio": "Helps students build intuition for random variables and limit theorems.",
-      "hourlyRate": 25.0,
+      "hourlyRate": 25,
       "published": true,
       "languages": [
         "English",
@@ -489,7 +489,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0018",
       "displayName": "Erik Lange",
       "bio": "Broad CS foundations tutor with flexible weekday afternoons.",
-      "hourlyRate": 16.0,
+      "hourlyRate": 16,
       "published": true,
       "languages": [
         "German",
@@ -521,7 +521,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0019",
       "displayName": "Yara Stein",
       "bio": "Exam-oriented DWT and LA package for last-minute preparation.",
-      "hourlyRate": 30.0,
+      "hourlyRate": 30,
       "published": true,
       "languages": [
         "German",
@@ -545,7 +545,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0020",
       "displayName": "Noah Fischer",
       "bio": "Friendly beginner-friendly discrete math support.",
-      "hourlyRate": 14.0,
+      "hourlyRate": 14,
       "published": true,
       "languages": [
         "German"
@@ -566,7 +566,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0021",
       "displayName": "Lena Hoff",
       "bio": "Campus tutor around Ottobrunn for LA recitations and homework clubs.",
-      "hourlyRate": 22.0,
+      "hourlyRate": 22,
       "published": true,
       "languages": [
         "German",
@@ -593,7 +593,7 @@
       "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0022",
       "displayName": "Marco Bianchi",
       "bio": "Italian-German bilingual tutor covering foundations and discrete structures.",
-      "hourlyRate": 21.0,
+      "hourlyRate": 21,
       "published": true,
       "languages": [
         "German",

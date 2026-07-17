@@ -10,7 +10,6 @@ docs/SharedMarketplaceApproveApplicationResponse.md
 docs/SharedMarketplaceLocation.md
 docs/SharedMarketplaceModuleDetail.md
 docs/SharedMarketplaceModuleListItem.md
-docs/SharedMarketplaceRatingSummary.md
 docs/SharedMarketplaceRejectApplicationRequest.md
 docs/SharedMarketplaceSubmitTutorApplicationRequest.md
 docs/SharedMarketplaceTopic.md
@@ -37,7 +36,6 @@ models/SharedMarketplaceApproveApplicationResponse.ts
 models/SharedMarketplaceLocation.ts
 models/SharedMarketplaceModuleDetail.ts
 models/SharedMarketplaceModuleListItem.ts
-models/SharedMarketplaceRatingSummary.ts
 models/SharedMarketplaceRejectApplicationRequest.ts
 models/SharedMarketplaceSubmitTutorApplicationRequest.ts
 models/SharedMarketplaceTopic.ts

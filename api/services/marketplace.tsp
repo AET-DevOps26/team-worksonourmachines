@@ -36,7 +36,6 @@ namespace Shared.Marketplace {
   }
 
   enum TutorSort {
-    rating,
     rate_asc,
     rate_desc,
     name,
@@ -46,11 +45,6 @@ namespace Shared.Marketplace {
     weekday: Weekday;
     available: boolean;
     note?: string;
-  }
-
-  model RatingSummary {
-    average: float32;
-    count: int32;
   }
 
   model Topic {
@@ -86,10 +80,9 @@ namespace Shared.Marketplace {
     id: string;
     userId: string;
     displayName: string;
-    hourlyRate: float32;
+    hourlyRate: int32;
     languages: string[];
     locations: Location[];
-    ratingSummary: RatingSummary;
     coverages: TutorCoverage[];
   }
 
@@ -104,7 +97,7 @@ namespace Shared.Marketplace {
     bio: string;
     languages: string[];
     locations: Location[];
-    hourlyRate: float32;
+    hourlyRate: int32;
     availability: TutorAvailability[];
     published?: boolean = false;
   }
@@ -217,9 +210,8 @@ namespace Marketplace {
     @query topicId?: string,
     @query languages?: string[],
     @query locations?: Location[],
-    @query minRate?: float32,
-    @query maxRate?: float32,
-    @query minRating?: float32,
+    @query minRate?: int32,
+    @query maxRate?: int32,
     @query weekdays?: Weekday[],
     @query sort?: TutorSort,
   ): TutorPage | UnauthorizedError;

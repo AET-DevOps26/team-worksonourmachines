@@ -148,7 +148,6 @@ TUTORS = [
         "hourlyRate": 25,
         "languages": ["German", "English"],
         "locations": ["garching"],
-        "ratingSummary": {"average": 4.8, "count": 20},
         "availability": [{"weekday": "monday", "available": True}],
         "coverages": [{"moduleCode": "LA"}],
     }
@@ -400,7 +399,6 @@ TUTOR_DE = {
     "hourlyRate": 20,
     "languages": ["German"],
     "locations": ["garching"],
-    "ratingSummary": {"average": 4.5, "count": 5},
     "availability": [],
     "coverages": [],
 }
@@ -411,7 +409,6 @@ TUTOR_EN = {
     "hourlyRate": 30,
     "languages": ["English"],
     "locations": ["online"],
-    "ratingSummary": {"average": 4.9, "count": 10},
     "availability": [],
     "coverages": [],
 }
@@ -422,7 +419,6 @@ TUTOR_BOTH = {
     "hourlyRate": 25,
     "languages": ["German", "English"],
     "locations": ["munich", "online"],
-    "ratingSummary": {"average": 4.7, "count": 8},
     "availability": [],
     "coverages": [],
 }

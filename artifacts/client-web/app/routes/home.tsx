@@ -13,7 +13,7 @@ const valuePillars = [
     },
     {
         description:
-            'Compare tutors with ratings, topic coverage, and availability so you know who fits your module and goals.',
+            'Compare tutors by topic coverage, availability, and hourly rate so you know who fits your module and goals.',
         title: 'Trust before you connect',
     },
     {

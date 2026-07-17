@@ -35,7 +35,6 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
     tutors_lines = []
     for tutor in tutors:
         rate = tutor.get("hourlyRate", "?")
-        rating = tutor.get("ratingSummary", {})
         avail = [
             a.get("weekday")
             for a in tutor.get("availability", [])
@@ -46,9 +45,7 @@ def build_prompt(student: dict, goal: dict, module: dict, tutors: list) -> str:
             f"- id={tutor.get('id', 'unknown')}"
             f" | name={tutor.get('displayName', 'unknown')}"
             f" | RATE=€{rate}/h  ← use this exact integer for hourlyRate"
-            f" | rating: {rating.get('average', '?')}"
-            f" ({rating.get('count', '?')} sessions)\n"
-            f"  Languages: {', '.join(tutor.get('languages', []))}\n"
+            f"\n  Languages: {', '.join(tutor.get('languages', []))}\n"
             f"  Locations: {', '.join(tutor.get('locations', []))}\n"
             f"  Available on: {', '.join(avail) or 'not specified'}\n"
             f"  Covers modules: {', '.join(coverages) or 'not specified'}"
