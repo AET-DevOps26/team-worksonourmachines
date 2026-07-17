@@ -53,23 +53,6 @@ services:
     volumes:
       - ./artifacts/api-ui/scalar.dev.config.json:/config/scalar.config.json:ro,Z
 
-#  server-mock:
-#    image: tutormatch/server-mock:dev
-#    build:
-#      context: .
-#      dockerfile: artifacts/server-mock/docker/Dockerfile
-#    volumes:
-#      - ./artifacts/server-mock:/app:Z
-#      - server-mock-node-modules:/app/node_modules
-#    environment:
-#      PORT: "3000"
-#      KEYCLOAK_ISSUER: ${KEYCLOAK_INTERNAL_ISSUER:-http://keycloak:8080/realms/tutormatch}
-#      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
-#      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
-#    depends_on:
-#      keycloak-config-cli:
-#        condition: service_completed_successfully
-
   server-communication:
     <<: *server-base
     environment:
@@ -123,7 +106,6 @@ services:
       - client-web-node-modules:/app/node_modules
       - client-web-react-router-cache:/app/.react-router
       - client-web-vite-cache:/app/.vite
-      - caddy_data:/caddy-data:ro
     environment:
       CI: "true"
       LOG_FORMAT: json
@@ -138,8 +120,6 @@ services:
       SERVER_MARKETPLACE_API_URL: http://server-marketplace:8082
       SERVER_STUDENT_API_URL: http://server-student:8081
     depends_on:
-#      server-mock:
-#        condition: service_started
       server-communication:
         condition: service_started
       server-marketplace:
@@ -200,7 +180,6 @@ services:
         condition: service_started
 
 volumes:
-#  server-mock-node-modules:
   server-maven-repository:
   client-web-node-modules:
   client-web-react-router-cache:

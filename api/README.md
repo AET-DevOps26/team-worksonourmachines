@@ -1,6 +1,6 @@
 # API
 
-This package holds the [**TypeSpec**](https://typespec.io/) source of truth for all HTTP APIs of this project. The compiler emits OpenAPI 3 documents under `specs/` and [OpenAPI Generator](https://github.com/openapitools/openapi-generator) turns those into TypeScript fetch clients (for the web app) and Spring server stubs (for backend services).
+This package holds the [**TypeSpec**](https://typespec.io/) source of truth for all HTTP APIs of this project. The compiler emits OpenAPI 3 documents under `specs/` and [OpenAPI Generator](https://github.com/openapitools/openapi-generator) turns those into TypeScript fetch clients (web BFF), Spring server stubs (microservices), and a Python FastAPI stub (AI service).
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ From the repo root you can proxy any script:
 
 ```bash
 # e.g. for pnpm run specs:generate
-make api-pnpm run specs:generate
+make api-pnpm ARGS="run specs:generate"
 # additionally, the generate script is available as
 make api-generate
 ```
@@ -40,7 +40,7 @@ make api-generate
 ## Typical Workflow
 
 1. Edit `main.tsp` (and any other `.tsp` files).
-2. Run `pnpm run format` (or `make api-pnpm run format`).
+2. Run `pnpm run format` (or `make api-pnpm ARGS="run format"`).
 3. Run `pnpm run generate` when you need updated OpenAPI files and generated client/server code.
 ## Code Style
 
