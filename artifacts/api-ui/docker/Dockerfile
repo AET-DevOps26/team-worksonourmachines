@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM scalarapi/api-reference:latest
+FROM scalarapi/api-reference:0.5.58
 
 USER root
 

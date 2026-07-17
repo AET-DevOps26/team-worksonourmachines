@@ -1,0 +1,6 @@
+[default.extend-words]
+# Azure subnet naming prefix (snet-*)
+snet = "snet"
+Diskrete = "Diskrete"
+# lorem ipsum
+varius = "varius"

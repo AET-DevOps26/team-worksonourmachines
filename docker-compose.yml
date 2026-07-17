@@ -1,14 +1,11 @@
 name: tutormatch
 
-x-hardening: &hardening
-  cap_drop:
-    - ALL
-  security_opt:
-    - no-new-privileges:true
-
 services:
   gateway:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     image: caddy:2-alpine
     cap_add:
       - NET_BIND_SERVICE
@@ -35,7 +32,10 @@ services:
           - auth.${APP_HOSTNAME:-tutormatch.localhost}
 
   postgres:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     image: postgres:17-alpine
     cap_add:
       - CHOWN
@@ -53,7 +53,10 @@ services:
       retries: 10
 
   keycloak:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     image: quay.io/keycloak/keycloak:26.6.1
     command: ["start"]
     depends_on:
@@ -71,7 +74,10 @@ services:
       start_period: 60s
 
   redis:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     image: redis:7-alpine
     cap_add:
       - SETUID
@@ -83,7 +89,10 @@ services:
       retries: 10
 
   keycloak-config-cli:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     image: adorsys/keycloak-config-cli:latest
     command:
       - "--import.var-substitution.enabled=true"
@@ -105,7 +114,10 @@ services:
     restart: "no"
 
   client-web:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     build:
       context: .
       dockerfile: artifacts/client-web/docker/Dockerfile
@@ -137,8 +149,11 @@ services:
       start_period: 60s
 
   api-ui:
-    <<: *hardening
-    image: scalarapi/api-reference:latest
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    image: scalarapi/api-reference:0.5.58
     environment:
       SPRING_CONFIG_ADDITIONAL_LOCATION: file:/app/server/application.yaml
     cap_add:
@@ -160,7 +175,10 @@ services:
       retries: 5
 
   ai:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     image: ${AI_IMAGE:-tutormatch/ai:dev}
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
