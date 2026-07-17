@@ -8,11 +8,13 @@ type SearchResult = {
     tutors: { id: string; displayName: string; hourlyRate: number }[];
 };
 
+type SearchResponse = SearchResult | { code: string; message: string };
+
 export function HeaderSearch() {
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
     const listboxId = useId();
-    const fetcher = useFetcher<SearchResult>();
+    const fetcher = useFetcher<SearchResponse>();
 
     useEffect(() => {
         const trimmed = query.trim();
@@ -26,8 +28,9 @@ export function HeaderSearch() {
         return () => clearTimeout(timer);
     }, [query, fetcher.load]);
 
-    const modules = fetcher.data?.modules ?? [];
-    const tutors = fetcher.data?.tutors ?? [];
+    const searchError = fetcher.data && 'code' in fetcher.data;
+    const modules = fetcher.data && 'modules' in fetcher.data ? fetcher.data.modules : [];
+    const tutors = fetcher.data && 'tutors' in fetcher.data ? fetcher.data.tutors : [];
     const hasResults = modules.length > 0 || tutors.length > 0;
     const showDropdown = open && query.trim().length >= 2;
 
@@ -54,6 +57,9 @@ export function HeaderSearch() {
                 >
                     {fetcher.state === 'loading' ? (
                         <p className="px-2 py-1 text-sm text-muted-foreground">Searching…</p>
+                    ) : null}
+                    {searchError && fetcher.state !== 'loading' ? (
+                        <p className="px-2 py-1 text-sm text-destructive">Search is temporarily unavailable.</p>
                     ) : null}
                     {modules.length > 0 ? (
                         <div className="mb-2">
@@ -87,7 +93,7 @@ export function HeaderSearch() {
                             ))}
                         </div>
                     ) : null}
-                    {!hasResults && fetcher.state !== 'loading' ? (
+                    {!hasResults && !searchError && fetcher.state !== 'loading' ? (
                         <p className="px-2 py-1 text-sm text-muted-foreground">No results</p>
                     ) : null}
                     <div className="mt-2 border-t border-border pt-2">

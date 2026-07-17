@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { getMyTutorProfile, updateMyTutorProfile } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { PageContainer } from '~/components/shell';
@@ -22,7 +23,7 @@ export const loader = protectedLoader(async ({ session }) => {
     }
 
     const result = await getMyTutorProfile();
-    if (isErr(result)) throw result.error;
+    if (isErr(result)) throwRouteError(result.error);
     if (!result.value.profile) {
         throw redirect('/tutor/apply');
     }

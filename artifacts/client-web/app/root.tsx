@@ -1,4 +1,5 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { RouteErrorPage } from '~/components/errors';
 import './app.css';
 
 const themeScript = `
@@ -33,4 +34,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function Root() {
     return <Outlet />;
+}
+
+export function ErrorBoundary() {
+    return <RouteErrorPage standalone />;
 }

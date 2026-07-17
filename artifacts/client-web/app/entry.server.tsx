@@ -38,15 +38,17 @@ export default async function handleRequest(
 
                 pipe(body);
             },
-            onError(_error: unknown) {
+            onError(error: unknown) {
                 responseStatusCode = 500;
                 // Log streaming rendering errors from inside the shell.  Don't log
                 // errors encountered during initial shell rendering since they'll
                 // reject and get logged in handleDocumentRequest.
                 if (shellRendered) {
+                    console.error('Streaming render failed', error);
                 }
             },
             onShellError(error: unknown) {
+                console.error('Initial server render failed', error);
                 reject(error);
             },
         });

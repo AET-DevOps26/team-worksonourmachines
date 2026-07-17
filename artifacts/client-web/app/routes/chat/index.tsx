@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { listConversations } from '~/.server/service/communication';
 import { protectedLoader } from '~/.server/service/routeProtection';
 import { PageContainer } from '~/components/shell';
@@ -7,7 +8,7 @@ import { Card, CardDescription, CardTitle } from '~/components/ui/card';
 
 export const loader = protectedLoader(async () => {
     const result = await listConversations();
-    if (isErr(result)) throw result.error;
+    if (isErr(result)) throwRouteError(result.error);
     return { conversations: result.value };
 });
 

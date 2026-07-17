@@ -1,5 +1,6 @@
 import { useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { getModule } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
 import { PageContainer } from '~/components/shell';
@@ -10,7 +11,7 @@ export const loader = protectedLoader(async ({ params }) => {
     const code = params.code ?? '';
     const moduleResult = await getModule(code);
     if (isErr(moduleResult)) {
-        throw moduleResult.error;
+        throwRouteError(moduleResult.error);
     }
     return { module: moduleResult.value };
 });

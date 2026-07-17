@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { getMyTutorProfile, listModules, submitTutorApplication } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { PageContainer } from '~/components/shell';
@@ -19,8 +20,8 @@ import { Textarea } from '~/components/ui/textarea';
 
 export const loader = protectedLoader(async () => {
     const [modulesResult, tutorResult] = await Promise.all([listModules({ pageSize: 100 }), getMyTutorProfile()]);
-    if (isErr(modulesResult)) throw modulesResult.error;
-    if (isErr(tutorResult)) throw tutorResult.error;
+    if (isErr(modulesResult)) throwRouteError(modulesResult.error);
+    if (isErr(tutorResult)) throwRouteError(tutorResult.error);
     return {
         hasProfile: tutorResult.value.profile !== null,
         modules: modulesResult.value.items,

@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { listModules } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { createGoal } from '~/.server/service/student';
@@ -18,7 +19,7 @@ const LOCATIONS = ['online', 'garching', 'munich', 'weihenstephan', 'straubing',
 export const loader = protectedLoader(async () => {
     const result = await listModules({ pageSize: 100 });
     if (isErr(result)) {
-        throw result.error;
+        throwRouteError(result.error);
     }
     return { modules: result.value.items };
 });

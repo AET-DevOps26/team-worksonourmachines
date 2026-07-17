@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useFetcher, useLoaderData, useRevalidator } from 'react-router';
 import type { SharedStudentGeneratedPlanSuggestion } from '~/.server/api/server-student/generated';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { generatePlan, getPlan } from '~/.server/service/student';
 import { PageContainer } from '~/components/shell';
@@ -17,7 +18,7 @@ export const loader = protectedLoader(async ({ params }) => {
         if (result.error.type === 'notFound') {
             return { goalId, plan: null };
         }
-        throw result.error;
+        throwRouteError(result.error);
     }
     return { goalId, plan: result.value };
 });
