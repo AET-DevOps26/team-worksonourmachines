@@ -269,9 +269,11 @@ function SuggestionCard({ suggestion }: { suggestion: PlanSuggestion }) {
                     <p className="mb-2 text-sm font-medium">Proposed tutors</p>
                     <div className="flex flex-wrap gap-2">
                         {suggestion.proposedTutors.map((tutor) => (
-                            <Badge key={tutor.id} variant="outline">
-                                {tutor.displayName} · €{tutor.hourlyRate}/h
-                            </Badge>
+                            <Link key={tutor.id} to={`/tutors/${tutor.id}`}>
+                                <Badge className="hover:bg-accent" variant="outline">
+                                    {tutor.displayName} · €{tutor.hourlyRate}/h
+                                </Badge>
+                            </Link>
                         ))}
                     </div>
                 </div>
