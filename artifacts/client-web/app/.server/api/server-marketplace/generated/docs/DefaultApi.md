@@ -696,9 +696,9 @@ async function example() {
     // Array<SharedMarketplaceLocation> (optional)
     locations: ...,
     // number (optional)
-    minRate: 3.4,
+    minRate: 56,
     // number (optional)
-    maxRate: 3.4,
+    maxRate: 56,
     // Array<SharedMarketplaceWeekday> (optional)
     weekdays: ...,
     // SharedMarketplaceTutorSort (optional)

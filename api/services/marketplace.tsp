@@ -210,8 +210,8 @@ namespace Marketplace {
     @query topicId?: string,
     @query languages?: string[],
     @query locations?: Location[],
-    @query minRate?: float32,
-    @query maxRate?: float32,
+    @query minRate?: int32,
+    @query maxRate?: int32,
     @query weekdays?: Weekday[],
     @query sort?: TutorSort,
   ): TutorPage | UnauthorizedError;

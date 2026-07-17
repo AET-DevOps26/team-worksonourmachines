@@ -381,15 +381,15 @@ paths:
           in: query
           required: false
           schema:
-            type: number
-            format: float
+            type: integer
+            format: int32
           explode: false
         - name: maxRate
           in: query
           required: false
           schema:
-            type: number
-            format: float
+            type: integer
+            format: int32
           explode: false
         - name: weekdays
           in: query
