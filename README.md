@@ -36,7 +36,7 @@ An interactive API reference (Scalar UI) is served at the `api` subdomain:
 | GenAI service (Python, FastAPI, LangChain) | Hristina Ivanova |
 | Reverse proxy, API specs, local setup, monorepo tooling | Julian Wilke |
 | Keycloak, observability stack | Amritanshu Sikdar |
-| Documentation | Hristina Ivanova |
+| Documentation, K8s | Hristina Ivanova |
 
 See [problem-statement.md](./docs/problem-statement.md) for the full responsibility breakdown.
 
@@ -89,7 +89,7 @@ make test-ai           # Python pytest suite
 make test-server       # Spring Boot JUnit tests (Maven)
 ```
 
-All tests run automatically in CI on every pull request. See [.github/workflows/code-quality.yml](.github/workflows/code-quality.yml) for the pipeline definition.
+All tests run automatically in CI on every commit. See [.github/workflows/code-quality.yml](.github/workflows/code-quality.yml) for the pipeline definition.
 
 ## CI/CD
 
@@ -97,7 +97,7 @@ The project uses GitHub Actions with two workflows:
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `code-quality.yml` | Every pull request | Lint, format check, and test all services (client, server, AI) |
+| `code-quality.yml` | Every commit | Lint, format check, and test all services (client, server, AI) |
 | `build-push.yml` | Push to `main` | Build Docker images, push to GHCR, deploy to Rancher Kubernetes |
 
 Images are tagged with the Git commit SHA and referenced by content digest in Helm for reproducible deployments. Secrets (`KUBECONFIG`, `LLM_API_KEY`, database passwords) are stored as GitHub Actions environment secrets.
