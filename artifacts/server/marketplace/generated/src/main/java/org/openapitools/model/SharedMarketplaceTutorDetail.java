@@ -81,7 +81,7 @@ public class SharedMarketplaceTutorDetail {
    * Get id
    * @return id
    */
-  @NotNull
+  @NotNull 
   @JsonProperty("id")
   public String getId() {
     return id;
@@ -101,7 +101,7 @@ public class SharedMarketplaceTutorDetail {
    * Get userId
    * @return userId
    */
-  @NotNull
+  @NotNull 
   @JsonProperty("userId")
   public String getUserId() {
     return userId;
@@ -121,7 +121,7 @@ public class SharedMarketplaceTutorDetail {
    * Get displayName
    * @return displayName
    */
-  @NotNull
+  @NotNull 
   @JsonProperty("displayName")
   public String getDisplayName() {
     return displayName;
@@ -141,7 +141,7 @@ public class SharedMarketplaceTutorDetail {
    * Get hourlyRate
    * @return hourlyRate
    */
-  @NotNull
+  @NotNull 
   @JsonProperty("hourlyRate")
   public Integer getHourlyRate() {
     return hourlyRate;
@@ -169,7 +169,7 @@ public class SharedMarketplaceTutorDetail {
    * Get languages
    * @return languages
    */
-  @NotNull
+  @NotNull 
   @JsonProperty("languages")
   public List<String> getLanguages() {
     return languages;
@@ -197,7 +197,7 @@ public class SharedMarketplaceTutorDetail {
    * Get locations
    * @return locations
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @JsonProperty("locations")
   public List<SharedMarketplaceLocation> getLocations() {
     return locations;
@@ -225,7 +225,7 @@ public class SharedMarketplaceTutorDetail {
    * Get coverages
    * @return coverages
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @JsonProperty("coverages")
   public List<@Valid SharedMarketplaceTutorCoverage> getCoverages() {
     return coverages;
@@ -245,7 +245,7 @@ public class SharedMarketplaceTutorDetail {
    * Get bio
    * @return bio
    */
-  @NotNull
+  @NotNull 
   @JsonProperty("bio")
   public String getBio() {
     return bio;
@@ -273,7 +273,7 @@ public class SharedMarketplaceTutorDetail {
    * Get availability
    * @return availability
    */
-  @NotNull @Valid
+  @NotNull @Valid 
   @JsonProperty("availability")
   public List<@Valid SharedMarketplaceTutorAvailability> getAvailability() {
     return availability;
@@ -293,7 +293,7 @@ public class SharedMarketplaceTutorDetail {
    * Get published
    * @return published
    */
-  @NotNull
+  @NotNull 
   @JsonProperty("published")
   public Boolean getPublished() {
     return published;
@@ -348,7 +348,12 @@ public class SharedMarketplaceTutorDetail {
     return sb.toString();
   }
 
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
   private String toIndentedString(@Nullable Object o) {
     return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
+

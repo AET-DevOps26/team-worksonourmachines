@@ -12,7 +12,6 @@ Name | Type
 `hourlyRate` | number
 `languages` | Array&lt;string&gt;
 `locations` | [Array&lt;SharedMarketplaceLocation&gt;](SharedMarketplaceLocation.md)
-`ratingSummary` | [SharedMarketplaceRatingSummary](SharedMarketplaceRatingSummary.md)
 `coverages` | [Array&lt;SharedMarketplaceTutorCoverage&gt;](SharedMarketplaceTutorCoverage.md)
 
 ## Example
@@ -28,7 +27,6 @@ const example = {
   "hourlyRate": null,
   "languages": null,
   "locations": null,
-  "ratingSummary": null,
   "coverages": null,
 } satisfies SharedMarketplaceTutorSummary
 

@@ -657,7 +657,7 @@ This endpoint does not need any parameter.
 
 ## listTutors
 
-> TutorPage listTutors(page, pageSize, q, moduleId, topicId, languages, locations, minRate, maxRate, minRating, weekdays, sort)
+> TutorPage listTutors(page, pageSize, q, moduleId, topicId, languages, locations, minRate, maxRate, weekdays, sort)
 
 Discover tutors
 
@@ -699,8 +699,6 @@ async function example() {
     minRate: 3.4,
     // number (optional)
     maxRate: 3.4,
-    // number (optional)
-    minRating: 3.4,
     // Array<SharedMarketplaceWeekday> (optional)
     weekdays: ...,
     // SharedMarketplaceTutorSort (optional)
@@ -733,9 +731,8 @@ example().catch(console.error);
 | **locations** | `Array<SharedMarketplaceLocation>` |  | [Optional] |
 | **minRate** | `number` |  | [Optional] [Defaults to `undefined`] |
 | **maxRate** | `number` |  | [Optional] [Defaults to `undefined`] |
-| **minRating** | `number` |  | [Optional] [Defaults to `undefined`] |
 | **weekdays** | `Array<SharedMarketplaceWeekday>` |  | [Optional] |
-| **sort** | `SharedMarketplaceTutorSort` |  | [Optional] [Defaults to `undefined`] [Enum: rating, rate_asc, rate_desc, name] |
+| **sort** | `SharedMarketplaceTutorSort` |  | [Optional] [Defaults to `undefined`] [Enum: rate_asc, rate_desc, name] |
 
 ### Return type
 
