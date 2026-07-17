@@ -60,7 +60,6 @@ class MarketplaceTutorProfileServiceTest {
                 10,
                 50,
                 null,
-                null,
                 SharedMarketplaceTutorSort.RATE_DESC);
 
         assertEquals(1, response.getItems().size());
