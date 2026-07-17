@@ -3,7 +3,6 @@ package com.worksonourmachines.marketplace.tutorprofile.mapper;
 import java.util.List;
 import java.util.UUID;
 
-import org.openapitools.model.SharedMarketplaceRatingSummary;
 import org.openapitools.model.SharedMarketplaceTutorAvailability;
 import org.openapitools.model.SharedMarketplaceTutorCoverage;
 import org.openapitools.model.SharedMarketplaceTutorDetail;
@@ -73,7 +72,6 @@ public class MarketplaceTutorProfileMapper {
                 profile.getHourlyRate(),
                 List.copyOf(profile.getLanguages()),
                 toDtoLocations(profile),
-                ratingSummary(),
                 toDtoCoverages(profile));
     }
 
@@ -85,7 +83,6 @@ public class MarketplaceTutorProfileMapper {
                 profile.getHourlyRate(),
                 List.copyOf(profile.getLanguages()),
                 toDtoLocations(profile),
-                ratingSummary(),
                 toDtoCoverages(profile),
                 profile.getBio(),
                 toDtoAvailability(profile),
@@ -136,9 +133,5 @@ public class MarketplaceTutorProfileMapper {
                 module.getCode(),
                 module.getTitle(),
                 coverage.getProficiencyLevel());
-    }
-
-    private SharedMarketplaceRatingSummary ratingSummary() {
-        return new SharedMarketplaceRatingSummary(4.7f, 12);
     }
 }

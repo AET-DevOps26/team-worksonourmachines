@@ -114,7 +114,6 @@ public class MarketplaceController implements MarketplaceApiV1 {
             @Nullable List<SharedMarketplaceLocation> locations,
             @Nullable Integer minRate,
             @Nullable Integer maxRate,
-            @Nullable Float minRating,
             @Nullable List<SharedMarketplaceWeekday> weekdays,
             @Nullable SharedMarketplaceTutorSort sort) {
         return ResponseEntity.ok(marketplaceTutorProfileService.listTutors(
@@ -127,7 +126,6 @@ public class MarketplaceController implements MarketplaceApiV1 {
                 locations,
                 minRate,
                 maxRate,
-                minRating,
                 weekdays,
                 sort));
     }

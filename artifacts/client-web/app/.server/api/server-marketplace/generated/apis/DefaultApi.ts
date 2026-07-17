@@ -141,7 +141,6 @@ export interface ListTutorsRequest {
     locations?: Array<SharedMarketplaceLocation>;
     minRate?: number;
     maxRate?: number;
-    minRating?: number;
     weekdays?: Array<SharedMarketplaceWeekday>;
     sort?: SharedMarketplaceTutorSort;
 }
@@ -655,10 +654,6 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters['maxRate'] != null) {
             queryParameters['maxRate'] = requestParameters['maxRate'];
-        }
-
-        if (requestParameters['minRating'] != null) {
-            queryParameters['minRating'] = requestParameters['minRating'];
         }
 
         if (requestParameters['weekdays'] != null) {

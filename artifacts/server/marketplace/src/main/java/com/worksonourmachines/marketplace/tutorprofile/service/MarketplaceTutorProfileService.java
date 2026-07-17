@@ -69,7 +69,6 @@ public class MarketplaceTutorProfileService {
             @Nullable List<SharedMarketplaceLocation> locations,
             @Nullable Integer minRate,
             @Nullable Integer maxRate,
-            @Nullable Float minRating,
             @Nullable List<SharedMarketplaceWeekday> weekdays,
             @Nullable SharedMarketplaceTutorSort sort) {
         int resolvedPage = page == null ? 1 : Math.max(1, page);
@@ -84,7 +83,6 @@ public class MarketplaceTutorProfileService {
                         locations,
                         minRate,
                         maxRate,
-                        minRating,
                         weekdays),
                 PageRequest.of(resolvedPage - 1, resolvedPageSize, sort(sort)));
 
@@ -130,7 +128,6 @@ public class MarketplaceTutorProfileService {
             @Nullable List<SharedMarketplaceLocation> locations,
             @Nullable Integer minRate,
             @Nullable Integer maxRate,
-            @Nullable Float minRating,
             @Nullable List<SharedMarketplaceWeekday> weekdays) {
         return (root, query, criteriaBuilder) -> {
             query.distinct(true);
@@ -180,10 +177,6 @@ public class MarketplaceTutorProfileService {
             if (maxRate != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("hourlyRate"), maxRate));
             }
-//          TODO: add rating into TypeSpec & the filtering logic here
-//            if (minRating != null && 4.7f < minRating) {
-//                return criteriaBuilder.conjunction();
-//            }
 
             if (weekdays != null && !weekdays.isEmpty()) {
                 var availability = root.join("availability");

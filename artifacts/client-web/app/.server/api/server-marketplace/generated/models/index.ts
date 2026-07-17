@@ -10,7 +10,6 @@ export * from './SharedMarketplaceApproveApplicationResponse';
 export * from './SharedMarketplaceLocation';
 export * from './SharedMarketplaceModuleDetail';
 export * from './SharedMarketplaceModuleListItem';
-export * from './SharedMarketplaceRatingSummary';
 export * from './SharedMarketplaceRejectApplicationRequest';
 export * from './SharedMarketplaceSubmitTutorApplicationRequest';
 export * from './SharedMarketplaceTopic';

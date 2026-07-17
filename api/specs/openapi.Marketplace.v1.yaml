@@ -391,13 +391,6 @@ paths:
             type: number
             format: float
           explode: false
-        - name: minRating
-          in: query
-          required: false
-          schema:
-            type: number
-            format: float
-          explode: false
         - name: weekdays
           in: query
           required: false
@@ -673,18 +666,6 @@ components:
           type: string
         difficultyHint:
           type: string
-    Shared.Marketplace.RatingSummary:
-      type: object
-      required:
-        - average
-        - count
-      properties:
-        average:
-          type: number
-          format: float
-        count:
-          type: integer
-          format: int32
     Shared.Marketplace.RejectApplicationRequest:
       type: object
       properties:
@@ -805,7 +786,6 @@ components:
         - hourlyRate
         - languages
         - locations
-        - ratingSummary
         - coverages
         - bio
         - availability
@@ -828,8 +808,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Shared.Marketplace.Location'
-        ratingSummary:
-          $ref: '#/components/schemas/Shared.Marketplace.RatingSummary'
         coverages:
           type: array
           items:
@@ -904,7 +882,6 @@ components:
     Shared.Marketplace.TutorSort:
       type: string
       enum:
-        - rating
         - rate_asc
         - rate_desc
         - name
@@ -917,7 +894,6 @@ components:
         - hourlyRate
         - languages
         - locations
-        - ratingSummary
         - coverages
       properties:
         id:
@@ -937,8 +913,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Shared.Marketplace.Location'
-        ratingSummary:
-          $ref: '#/components/schemas/Shared.Marketplace.RatingSummary'
         coverages:
           type: array
           items:

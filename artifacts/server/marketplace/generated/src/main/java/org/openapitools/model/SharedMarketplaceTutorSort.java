@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.22.0")
 public enum SharedMarketplaceTutorSort {
   
-  RATING("rating"),
   
   RATE_ASC("rate_asc"),
   

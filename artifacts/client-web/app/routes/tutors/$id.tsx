@@ -43,10 +43,7 @@ export default function PublicTutorProfileRoute() {
         <PageContainer className="flex flex-col gap-6">
             <Card>
                 <CardTitle>{tutor.displayName}</CardTitle>
-                <CardDescription className="mt-1">
-                    €{tutor.hourlyRate}/h · ★ {tutor.ratingSummary.average.toFixed(1)} ({tutor.ratingSummary.count}{' '}
-                    reviews)
-                </CardDescription>
+                <CardDescription className="mt-1">€{tutor.hourlyRate}/h</CardDescription>
                 <p className="mt-4 text-sm whitespace-pre-wrap text-foreground">{tutor.bio}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                     {tutor.languages.map((l) => (

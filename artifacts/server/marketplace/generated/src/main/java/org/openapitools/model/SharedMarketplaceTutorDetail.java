@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.openapitools.model.SharedMarketplaceLocation;
-import org.openapitools.model.SharedMarketplaceRatingSummary;
 import org.openapitools.model.SharedMarketplaceTutorAvailability;
 import org.openapitools.model.SharedMarketplaceTutorCoverage;
 import org.springframework.lang.Nullable;
@@ -43,8 +42,6 @@ public class SharedMarketplaceTutorDetail {
   @Valid
   private List<SharedMarketplaceLocation> locations = new ArrayList<>();
 
-  private SharedMarketplaceRatingSummary ratingSummary;
-
   @Valid
   private List<@Valid SharedMarketplaceTutorCoverage> coverages = new ArrayList<>();
 
@@ -62,14 +59,13 @@ public class SharedMarketplaceTutorDetail {
   /**
    * Constructor with only required parameters
    */
-  public SharedMarketplaceTutorDetail(String id, String userId, String displayName, Integer hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, SharedMarketplaceRatingSummary ratingSummary, List<@Valid SharedMarketplaceTutorCoverage> coverages, String bio, List<@Valid SharedMarketplaceTutorAvailability> availability, Boolean published) {
+  public SharedMarketplaceTutorDetail(String id, String userId, String displayName, Integer hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, List<@Valid SharedMarketplaceTutorCoverage> coverages, String bio, List<@Valid SharedMarketplaceTutorAvailability> availability, Boolean published) {
     this.id = id;
     this.userId = userId;
     this.displayName = displayName;
     this.hourlyRate = hourlyRate;
     this.languages = languages;
     this.locations = locations;
-    this.ratingSummary = ratingSummary;
     this.coverages = coverages;
     this.bio = bio;
     this.availability = availability;
@@ -85,7 +81,7 @@ public class SharedMarketplaceTutorDetail {
    * Get id
    * @return id
    */
-  @NotNull 
+  @NotNull
   @JsonProperty("id")
   public String getId() {
     return id;
@@ -105,7 +101,7 @@ public class SharedMarketplaceTutorDetail {
    * Get userId
    * @return userId
    */
-  @NotNull 
+  @NotNull
   @JsonProperty("userId")
   public String getUserId() {
     return userId;
@@ -125,7 +121,7 @@ public class SharedMarketplaceTutorDetail {
    * Get displayName
    * @return displayName
    */
-  @NotNull 
+  @NotNull
   @JsonProperty("displayName")
   public String getDisplayName() {
     return displayName;
@@ -145,7 +141,7 @@ public class SharedMarketplaceTutorDetail {
    * Get hourlyRate
    * @return hourlyRate
    */
-  @NotNull 
+  @NotNull
   @JsonProperty("hourlyRate")
   public Integer getHourlyRate() {
     return hourlyRate;
@@ -173,7 +169,7 @@ public class SharedMarketplaceTutorDetail {
    * Get languages
    * @return languages
    */
-  @NotNull 
+  @NotNull
   @JsonProperty("languages")
   public List<String> getLanguages() {
     return languages;
@@ -201,7 +197,7 @@ public class SharedMarketplaceTutorDetail {
    * Get locations
    * @return locations
    */
-  @NotNull @Valid 
+  @NotNull @Valid
   @JsonProperty("locations")
   public List<SharedMarketplaceLocation> getLocations() {
     return locations;
@@ -210,26 +206,6 @@ public class SharedMarketplaceTutorDetail {
   @JsonProperty("locations")
   public void setLocations(List<SharedMarketplaceLocation> locations) {
     this.locations = locations;
-  }
-
-  public SharedMarketplaceTutorDetail ratingSummary(SharedMarketplaceRatingSummary ratingSummary) {
-    this.ratingSummary = ratingSummary;
-    return this;
-  }
-
-  /**
-   * Get ratingSummary
-   * @return ratingSummary
-   */
-  @NotNull @Valid 
-  @JsonProperty("ratingSummary")
-  public SharedMarketplaceRatingSummary getRatingSummary() {
-    return ratingSummary;
-  }
-
-  @JsonProperty("ratingSummary")
-  public void setRatingSummary(SharedMarketplaceRatingSummary ratingSummary) {
-    this.ratingSummary = ratingSummary;
   }
 
   public SharedMarketplaceTutorDetail coverages(List<@Valid SharedMarketplaceTutorCoverage> coverages) {
@@ -249,7 +225,7 @@ public class SharedMarketplaceTutorDetail {
    * Get coverages
    * @return coverages
    */
-  @NotNull @Valid 
+  @NotNull @Valid
   @JsonProperty("coverages")
   public List<@Valid SharedMarketplaceTutorCoverage> getCoverages() {
     return coverages;
@@ -269,7 +245,7 @@ public class SharedMarketplaceTutorDetail {
    * Get bio
    * @return bio
    */
-  @NotNull 
+  @NotNull
   @JsonProperty("bio")
   public String getBio() {
     return bio;
@@ -297,7 +273,7 @@ public class SharedMarketplaceTutorDetail {
    * Get availability
    * @return availability
    */
-  @NotNull @Valid 
+  @NotNull @Valid
   @JsonProperty("availability")
   public List<@Valid SharedMarketplaceTutorAvailability> getAvailability() {
     return availability;
@@ -317,7 +293,7 @@ public class SharedMarketplaceTutorDetail {
    * Get published
    * @return published
    */
-  @NotNull 
+  @NotNull
   @JsonProperty("published")
   public Boolean getPublished() {
     return published;
@@ -343,7 +319,6 @@ public class SharedMarketplaceTutorDetail {
         Objects.equals(this.hourlyRate, sharedMarketplaceTutorDetail.hourlyRate) &&
         Objects.equals(this.languages, sharedMarketplaceTutorDetail.languages) &&
         Objects.equals(this.locations, sharedMarketplaceTutorDetail.locations) &&
-        Objects.equals(this.ratingSummary, sharedMarketplaceTutorDetail.ratingSummary) &&
         Objects.equals(this.coverages, sharedMarketplaceTutorDetail.coverages) &&
         Objects.equals(this.bio, sharedMarketplaceTutorDetail.bio) &&
         Objects.equals(this.availability, sharedMarketplaceTutorDetail.availability) &&
@@ -352,7 +327,7 @@ public class SharedMarketplaceTutorDetail {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, userId, displayName, hourlyRate, languages, locations, ratingSummary, coverages, bio, availability, published);
+    return Objects.hash(id, userId, displayName, hourlyRate, languages, locations, coverages, bio, availability, published);
   }
 
   @Override
@@ -365,7 +340,6 @@ public class SharedMarketplaceTutorDetail {
     sb.append("    hourlyRate: ").append(toIndentedString(hourlyRate)).append("\n");
     sb.append("    languages: ").append(toIndentedString(languages)).append("\n");
     sb.append("    locations: ").append(toIndentedString(locations)).append("\n");
-    sb.append("    ratingSummary: ").append(toIndentedString(ratingSummary)).append("\n");
     sb.append("    coverages: ").append(toIndentedString(coverages)).append("\n");
     sb.append("    bio: ").append(toIndentedString(bio)).append("\n");
     sb.append("    availability: ").append(toIndentedString(availability)).append("\n");
@@ -374,12 +348,7 @@ public class SharedMarketplaceTutorDetail {
     return sb.toString();
   }
 
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
   private String toIndentedString(@Nullable Object o) {
     return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
-
