@@ -99,6 +99,8 @@ The BFF authenticates users with Keycloak over OIDC. Session data and tokens liv
 
 Protected routes use `protectedLoader` and `protectedAction` from `app/.server/service/routeProtection.ts`. Outbound API clients attach the Keycloak access token as a `Bearer` header via `app/.server/lib/requestAuth.ts`.
 
+Chat WebSocket auth uses a short-lived ticket from `POST /v1/conversations/ws-ticket` (stored in Redis, 60s TTL). The chat page loads first; the browser then fetches `/chat/ws-ticket` and STOMP `CONNECT` sends `Authorization: Ticket <…>`.
+
 For local sign-in, realm config, and environment variables, see [local-setup.md](./local-setup.md#local-keycloak).
 
 ## Tooling

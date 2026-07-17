@@ -29,9 +29,10 @@
     llm_base_url: https://logos.aet.cit.tum.de
     llm_model: openai/gpt-oss-120b
     llm_api_key: "{{ lookup('env', 'LLM_API_KEY') | default('', true) }}"
-    server_communication_api_url: tbd
-    server_marketplace_api_url: tbd
-    server_student_api_url: tbd
+    server_communication_api_url: http://server-communication:8083
+    server_marketplace_api_url: http://server-marketplace:8082
+    server_student_api_url: http://server-student:8081
+    server_student_client_secret: "{{ lookup('env', 'SERVER_STUDENT_CLIENT_SECRET') | default('server-student-dev-secret', true) }}"
     ghcr_username: "{{ lookup('env', 'GHCR_USERNAME') | default('', true) }}"
     ghcr_token: "{{ lookup('env', 'GHCR_TOKEN') | default('', true) }}"
 
@@ -114,6 +115,9 @@
           KEYCLOAK_ISSUER={{ keycloak_issuer }}
           CLIENT_WEB_IMAGE={{ image_prefix }}/client-web:{{ image_tag }}
           AI_IMAGE={{ image_prefix }}/ai:{{ image_tag }}
+          SERVER_COMMUNICATION_IMAGE={{ image_prefix }}/server-communication:{{ image_tag }}
+          SERVER_MARKETPLACE_IMAGE={{ image_prefix }}/server-marketplace:{{ image_tag }}
+          SERVER_STUDENT_IMAGE={{ image_prefix }}/server-student:{{ image_tag }}
           POSTGRES_DB={{ postgres_db }}
           POSTGRES_USER={{ postgres_user }}
           POSTGRES_PASSWORD={{ postgres_password }}
@@ -124,6 +128,7 @@
           KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}
           KEYCLOAK_CLIENT_ID={{ keycloak_client_id }}
           KEYCLOAK_CLIENT_SECRET={{ keycloak_client_secret }}
+          SERVER_STUDENT_CLIENT_SECRET={{ server_student_client_secret }}
           LLM_PROVIDER={{ llm_provider }}
           LLM_BASE_URL={{ llm_base_url }}
           LLM_MODEL={{ llm_model }}

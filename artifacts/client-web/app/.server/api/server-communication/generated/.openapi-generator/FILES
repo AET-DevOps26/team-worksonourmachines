@@ -8,6 +8,7 @@ docs/SharedCommunicationConversationPartner.md
 docs/SharedCommunicationConversationSummary.md
 docs/SharedCommunicationSendMessageRequest.md
 docs/SharedCommunicationStartConversationRequest.md
+docs/SharedCommunicationWsTicket.md
 docs/SharedErrorsErrorBody.md
 index.ts
 models/MessagePage.ts
@@ -17,6 +18,7 @@ models/SharedCommunicationConversationPartner.ts
 models/SharedCommunicationConversationSummary.ts
 models/SharedCommunicationSendMessageRequest.ts
 models/SharedCommunicationStartConversationRequest.ts
+models/SharedCommunicationWsTicket.ts
 models/SharedErrorsErrorBody.ts
 models/index.ts
 runtime.ts

@@ -1,4 +1,4 @@
-import { Form, Link, redirect, useLoaderData } from 'react-router';
+import { Form, Link, redirect, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
 import { startConversation } from '~/.server/service/communication';
 import { getTutor } from '~/.server/service/marketplace';
@@ -34,6 +34,8 @@ export const action = protectedAction(async ({ params, session }) => {
 
 export default function PublicTutorProfileRoute() {
     const { tutor, isSelf } = useLoaderData<typeof loader>();
+    const navigation = useNavigation();
+    const messaging = navigation.state !== 'idle' && navigation.formMethod === 'POST';
 
     return (
         <PageContainer className="flex flex-col gap-6">
@@ -58,7 +60,9 @@ export default function PublicTutorProfileRoute() {
                 </div>
                 {!isSelf && (
                     <Form className="mt-6" method="post">
-                        <Button type="submit">Message tutor</Button>
+                        <Button disabled={messaging} type="submit">
+                            {messaging ? 'Opening…' : 'Message tutor'}
+                        </Button>
                     </Form>
                 )}
             </Card>

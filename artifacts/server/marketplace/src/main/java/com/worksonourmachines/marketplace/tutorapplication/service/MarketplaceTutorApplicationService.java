@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.worksonourmachines.marketplace.keycloak.KeycloakTutorRoleClient;
 import com.worksonourmachines.marketplace.module.persistence.entity.MarketplaceModuleEntity;
 import com.worksonourmachines.marketplace.module.persistence.repository.MarketplaceModuleRepository;
 import com.worksonourmachines.marketplace.tutorapplication.mapper.MarketplaceTutorApplicationMapper;
@@ -39,6 +40,7 @@ public class MarketplaceTutorApplicationService {
     private final MarketplaceTutorApplicationMapper marketplaceTutorApplicationMapper;
     private final MarketplaceTutorProfileRepository marketplaceTutorProfileRepository;
     private final MarketplaceTutorProfileMapper marketplaceTutorProfileMapper;
+    private final KeycloakTutorRoleClient keycloakTutorRoleClient;
 
     public MarketplaceTutorApplicationService(
             AuthenticatedUser authenticatedUser,
@@ -46,13 +48,15 @@ public class MarketplaceTutorApplicationService {
             MarketplaceTutorApplicationRepository marketplaceTutorApplicationRepository,
             MarketplaceTutorApplicationMapper marketplaceTutorApplicationMapper,
             MarketplaceTutorProfileRepository marketplaceTutorProfileRepository,
-            MarketplaceTutorProfileMapper marketplaceTutorProfileMapper) {
+            MarketplaceTutorProfileMapper marketplaceTutorProfileMapper,
+            KeycloakTutorRoleClient keycloakTutorRoleClient) {
         this.authenticatedUser = authenticatedUser;
         this.marketplaceModuleRepository = marketplaceModuleRepository;
         this.marketplaceTutorApplicationRepository = marketplaceTutorApplicationRepository;
         this.marketplaceTutorApplicationMapper = marketplaceTutorApplicationMapper;
         this.marketplaceTutorProfileRepository = marketplaceTutorProfileRepository;
         this.marketplaceTutorProfileMapper = marketplaceTutorProfileMapper;
+        this.keycloakTutorRoleClient = keycloakTutorRoleClient;
     }
 
     @Transactional(readOnly = true)
@@ -117,11 +121,16 @@ public class MarketplaceTutorApplicationService {
                 application.getUserId(),
                 MarketplaceTutorApplicationStatus.APPROVED);
 
+        if (isFirstApproval) {
+            keycloakTutorRoleClient.assignTutorRole(application.getUserId());
+        }
+
         application.setStatus(MarketplaceTutorApplicationStatus.APPROVED);
         application.setRejectionReason(null);
         marketplaceTutorProfileRepository.findByUserId(application.getUserId())
                 .ifPresent(profile -> {
                     profile.addCoverage(application.getModule(), "advanced");
+                    profile.setPublished(true);
                     marketplaceTutorProfileRepository.save(profile);
                 });
 

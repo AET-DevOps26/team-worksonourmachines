@@ -52,7 +52,7 @@ export default function LoginRoute() {
             <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
                 <div
                     className={cn(
-                        'mx-auto grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center px-6',
+                        'mx-auto grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center',
                         contentMaxWidth.wide,
                     )}
                 >

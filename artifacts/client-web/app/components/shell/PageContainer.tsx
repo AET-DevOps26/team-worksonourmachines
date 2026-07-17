@@ -2,10 +2,9 @@ import type { ReactNode } from 'react';
 
 import { cn } from '~/lib/ui/utils';
 
-/** Page content widths. Wide matches the site header/footer. */
 export const contentMaxWidth = {
-    narrow: 'max-w-3xl',
-    wide: 'max-w-6xl',
+    narrow: 'max-w-3xl px-6',
+    wide: 'max-w-6xl px-6',
 } as const;
 
 type PageContainerProps = {

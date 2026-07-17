@@ -55,6 +55,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Shared.Communication.StartConversationRequest'
+  /v1/conversations/ws-ticket:
+    post:
+      operationId: createWsTicket
+      summary: Create WebSocket ticket
+      description: Issues a short-lived ticket (Redis TTL) for authenticating a STOMP WebSocket CONNECT.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Communication.WsTicket'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shared.Errors.ErrorBody'
   /v1/conversations/{id}:
     get:
       operationId: getConversation
@@ -291,6 +310,17 @@ components:
       properties:
         participantUserId:
           type: string
+    Shared.Communication.WsTicket:
+      type: object
+      required:
+        - ticket
+        - expiresInSeconds
+      properties:
+        ticket:
+          type: string
+        expiresInSeconds:
+          type: integer
+          format: int32
     Shared.Errors.ErrorBody:
       type: object
       required:

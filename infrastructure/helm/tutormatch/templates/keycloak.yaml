@@ -109,6 +109,21 @@ data:
           "standardFlowEnabled": false,
           "directAccessGrantsEnabled": false,
           "serviceAccountsEnabled": true
+        },
+        {
+          "clientId": "server-marketplace-admin",
+          "name": "TUtorMatch Marketplace Admin API",
+          "description": "Service account for marketplace backend to assign realm roles via Admin API.",
+          "enabled": true,
+          "protocol": "openid-connect",
+          "publicClient": false,
+          "clientAuthenticatorType": "client-secret",
+          "secret": {{ .Values.keycloak.serverMarketplaceAdminSecret | quote }},
+          "standardFlowEnabled": false,
+          "implicitFlowEnabled": false,
+          "directAccessGrantsEnabled": false,
+          "serviceAccountsEnabled": true,
+          "authorizationServicesEnabled": false
         }
       ],
       "users": [
@@ -203,6 +218,15 @@ data:
           "enabled": true,
           "serviceAccountClientId": "server-ai",
           "realmRoles": ["service"]
+        },
+        {
+          "username": "service-account-server-marketplace-admin",
+          "enabled": true,
+          "serviceAccountClientId": "server-marketplace-admin",
+          "realmRoles": [],
+          "clientRoles": {
+            "realm-management": ["manage-users", "view-users", "query-users", "view-realm"]
+          }
         }
       ]
     }

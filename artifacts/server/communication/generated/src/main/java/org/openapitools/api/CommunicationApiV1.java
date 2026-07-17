@@ -12,6 +12,7 @@ import org.openapitools.model.SharedCommunicationConversationDetail;
 import org.openapitools.model.SharedCommunicationConversationSummary;
 import org.openapitools.model.SharedCommunicationSendMessageRequest;
 import org.openapitools.model.SharedCommunicationStartConversationRequest;
+import org.openapitools.model.SharedCommunicationWsTicket;
 import org.openapitools.model.SharedErrorsErrorBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +29,24 @@ import jakarta.annotation.Generated;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.22.0")
 @Validated
 public interface CommunicationApiV1 {
+
+    String PATH_CREATE_WS_TICKET = "/v1/conversations/ws-ticket";
+    /**
+     * POST /v1/conversations/ws-ticket : Create WebSocket ticket
+     * Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+     *
+     * @return The request has succeeded. (status code 200)
+     *         or Access is unauthorized. (status code 401)
+     */
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = CommunicationApiV1.PATH_CREATE_WS_TICKET,
+        produces = { "application/json" }
+    )
+    ResponseEntity<SharedCommunicationWsTicket> createWsTicket(
+        
+    );
+
 
     String PATH_GET_CONVERSATION = "/v1/conversations/{id}";
     /**

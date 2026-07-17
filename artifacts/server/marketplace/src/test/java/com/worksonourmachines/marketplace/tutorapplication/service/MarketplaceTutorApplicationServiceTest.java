@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.worksonourmachines.marketplace.keycloak.KeycloakTutorRoleClient;
 import com.worksonourmachines.marketplace.module.persistence.entity.MarketplaceModuleEntity;
 import com.worksonourmachines.marketplace.module.persistence.repository.MarketplaceModuleRepository;
 import com.worksonourmachines.marketplace.tutorapplication.mapper.MarketplaceTutorApplicationMapper;
@@ -48,13 +50,15 @@ class MarketplaceTutorApplicationServiceTest {
             MarketplaceTutorApplicationRepository.class);
     private final MarketplaceTutorProfileRepository profileRepository = org.mockito.Mockito.mock(
             MarketplaceTutorProfileRepository.class);
+    private final KeycloakTutorRoleClient keycloakTutorRoleClient = org.mockito.Mockito.mock(KeycloakTutorRoleClient.class);
     private final MarketplaceTutorApplicationService service = new MarketplaceTutorApplicationService(
             authenticatedUser,
             moduleRepository,
             repository,
             new MarketplaceTutorApplicationMapper(),
             profileRepository,
-            new MarketplaceTutorProfileMapper());
+            new MarketplaceTutorProfileMapper(),
+            keycloakTutorRoleClient);
 
     @Test
     void submitsTutorApplication() {
@@ -195,6 +199,8 @@ class MarketplaceTutorApplicationServiceTest {
         assertEquals(MarketplaceTutorApplicationStatus.APPROVED, application.getStatus());
         assertNull(application.getRejectionReason());
         assertEquals(1, profile.getCoverages().size());
+        assertTrue(profile.getPublished());
+        verify(keycloakTutorRoleClient).assignTutorRole(application.getUserId());
         verify(repository).save(application);
         verify(profileRepository).save(profile);
     }
@@ -216,6 +222,31 @@ class MarketplaceTutorApplicationServiceTest {
 
         assertFalse(response.getIsFirstApproval());
         assertEquals(SharedMarketplaceApplicationStatus.APPROVED, response.getApplication().getStatus());
+        verify(keycloakTutorRoleClient, never()).assignTutorRole(any());
+    }
+
+    @Test
+    void failsApprovalWhenKeycloakRoleAssignmentFails() {
+        UUID applicationId = UUID.fromString("11111111-1111-1111-1111-111111111301");
+        MarketplaceTutorApplicationEntity application = application(
+                applicationId,
+                MarketplaceTutorApplicationStatus.PENDING);
+        when(repository.findWithModuleById(applicationId)).thenReturn(Optional.of(application));
+        when(repository.existsByUserIdAndStatus(
+                application.getUserId(),
+                MarketplaceTutorApplicationStatus.APPROVED)).thenReturn(false);
+        org.mockito.Mockito.doThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to assign tutor role."))
+                .when(keycloakTutorRoleClient)
+                .assignTutorRole(application.getUserId());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.approveTutorApplication(applicationId.toString()));
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
+        assertEquals(MarketplaceTutorApplicationStatus.PENDING, application.getStatus());
+        verify(repository, never()).save(any());
+        verify(profileRepository, never()).save(any());
     }
 
     @Test

@@ -141,6 +141,7 @@ rancher-check-deploy-env:
 	@: "$${LLM_API_KEY:?Set LLM_API_KEY}"
 	@: "$${AI_CLIENT_SECRET:?Set AI_CLIENT_SECRET}"
 	@: "$${SERVER_STUDENT_SECRET:?Set SERVER_STUDENT_SECRET}"
+	@: "$${SERVER_MARKETPLACE_ADMIN_SECRET:?Set SERVER_MARKETPLACE_ADMIN_SECRET}"
 	@: "$${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
 	@: "$${KEYCLOAK_DB_PASSWORD:?Set KEYCLOAK_DB_PASSWORD}"
 	@: "$${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD}"
@@ -208,6 +209,7 @@ rancher-helm-upgrade: rancher-check-deploy-env rancher-check-image-digests
 		--set-string ai.llmApiKey="$${LLM_API_KEY}" \
 		--set-string ai.aiClientSecret="$${AI_CLIENT_SECRET}" \
 		--set-string keycloak.serverStudentSecret="$${SERVER_STUDENT_SECRET}" \
+		--set-string keycloak.serverMarketplaceAdminSecret="$${SERVER_MARKETPLACE_ADMIN_SECRET}" \
 		--set-string postgres.password="$${POSTGRES_PASSWORD}" \
 		--set-string postgres.keycloakPassword="$${KEYCLOAK_DB_PASSWORD}" \
 		--set-string keycloak.adminPassword="$${KEYCLOAK_ADMIN_PASSWORD}" \
@@ -351,10 +353,10 @@ k3d-local-deploy: \
 k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, Loki, Promtail) to local k3d
 	@test -f "$(OBSERVABILITY_ENV)" || { echo "Missing $(OBSERVABILITY_ENV) — copy .env.dist to .env and fill in values" >&2; exit 1; }
 	@set -a; . "$(OBSERVABILITY_ENV)"; set +a; \
-	: "$${GRAFANA_SMTP_USER:?Set GRAFANA_SMTP_USER}" && \
-	: "$${GRAFANA_SMTP_PASSWORD:?Set GRAFANA_SMTP_PASSWORD}" && \
-	: "$${GRAFANA_ADMIN_USER:?Set GRAFANA_ADMIN_USER}" && \
-	: "$${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD}" && \
+	GRAFANA_SMTP_USER="$${GRAFANA_SMTP_USER:-noreply@localhost}"; \
+	GRAFANA_SMTP_PASSWORD="$${GRAFANA_SMTP_PASSWORD:-changeme}"; \
+	GRAFANA_ADMIN_USER="$${GRAFANA_ADMIN_USER:-admin}"; \
+	GRAFANA_ADMIN_PASSWORD="$${GRAFANA_ADMIN_PASSWORD:-admin}"; \
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update && \
 	helm repo add grafana https://grafana.github.io/helm-charts --force-update && \
 	helm repo update prometheus-community grafana && \

@@ -74,9 +74,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function HomeRoute() {
     return (
-        <div className="-mx-6 flex flex-col">
+        <div className="flex flex-col">
             <section className="border-b border-border bg-muted/30">
-                <div className={cn('mx-auto flex w-full flex-col gap-8 px-6 py-16 md:py-24', contentMaxWidth.wide)}>
+                <div className={cn('mx-auto flex w-full flex-col gap-8 py-16 md:py-24', contentMaxWidth.wide)}>
                     <div className="flex max-w-3xl flex-col gap-4">
                         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                             Personal tutoring for your courses
@@ -109,7 +109,7 @@ export default function HomeRoute() {
             </section>
 
             <section className="border-b border-border">
-                <div className={cn('mx-auto grid w-full gap-8 px-6 py-16 md:grid-cols-3', contentMaxWidth.wide)}>
+                <div className={cn('mx-auto grid w-full gap-8 py-16 md:grid-cols-3', contentMaxWidth.wide)}>
                     {valuePillars.map((pillar) => (
                         <div className="flex flex-col gap-2" key={pillar.title}>
                             <h2 className="text-base font-semibold text-foreground">{pillar.title}</h2>
@@ -121,7 +121,7 @@ export default function HomeRoute() {
 
             {/* biome-ignore lint/correctness/useUniqueElementIds: stable in-page anchor linked from public nav */}
             <section className="border-b border-border" id="how-it-works">
-                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
+                <div className={cn('mx-auto w-full py-16', contentMaxWidth.wide)}>
                     <div className="mb-10 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">How it works</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -150,7 +150,7 @@ export default function HomeRoute() {
             </section>
 
             <section className="border-b border-border bg-muted/20">
-                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
+                <div className={cn('mx-auto w-full py-16', contentMaxWidth.wide)}>
                     <div className="mb-8 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">
                             Course modules we know well
@@ -167,7 +167,7 @@ export default function HomeRoute() {
             </section>
 
             <section className="border-b border-border">
-                <div className={cn('mx-auto w-full px-6 py-16', contentMaxWidth.wide)}>
+                <div className={cn('mx-auto w-full py-16', contentMaxWidth.wide)}>
                     <div className="mb-8 flex max-w-2xl flex-col gap-2">
                         <h2 className="text-2xl font-semibold tracking-tight text-foreground">For students</h2>
                         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -191,7 +191,7 @@ export default function HomeRoute() {
             <section className="border-b border-border bg-muted/20">
                 <div
                     className={cn(
-                        'mx-auto flex w-full flex-col gap-4 px-6 py-16 md:flex-row md:items-center md:justify-between',
+                        'mx-auto flex w-full flex-col gap-4 py-16 md:flex-row md:items-center md:justify-between',
                         contentMaxWidth.wide,
                     )}
                 >
@@ -211,7 +211,7 @@ export default function HomeRoute() {
             <section>
                 <div
                     className={cn(
-                        'mx-auto flex w-full flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between',
+                        'mx-auto flex w-full flex-col items-start gap-6 py-16 md:flex-row md:items-center md:justify-between',
                         contentMaxWidth.wide,
                     )}
                 >
