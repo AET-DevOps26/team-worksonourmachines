@@ -17,7 +17,6 @@ export const loader = protectedLoader(async ({ params, session }) => {
     if (isErr(convResult)) throw convResult.error;
     if (isErr(messagesResult)) throw messagesResult.error;
     return {
-        accessToken: session.accessToken,
         conversation: convResult.value,
         currentUserId: session.user.sub,
         messages: messagesResult.value.items,
@@ -44,7 +43,7 @@ function normalise(m: SharedCommunicationChatMessage): ChatMessage {
 }
 
 export default function ChatThreadRoute() {
-    const { accessToken, conversation, currentUserId, messages: initialMessages } = useLoaderData<typeof loader>();
+    const { conversation, currentUserId, messages: initialMessages } = useLoaderData<typeof loader>();
     const actionData = useActionData() as { error?: string } | undefined;
     const navigation = useNavigation();
     const partner = conversation.partner;
@@ -68,41 +67,62 @@ export default function ChatThreadRoute() {
     }, [messages]);
 
     useEffect(() => {
-        // Deactivate any previous client (handles Strict Mode double-invoke)
+        let cancelled = false;
         stompClient.current?.deactivate();
+        stompClient.current = null;
 
         const wsUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/stomp`;
 
-        const client = new Client({
-            brokerURL: wsUrl,
-            connectHeaders: { Authorization: `Bearer ${accessToken}` },
-            onConnect: () => {
-                client.subscribe(`/user/queue/conversation.${conversation.id}`, (frame) => {
-                    try {
-                        const msg = JSON.parse(frame.body) as ChatMessage;
-                        if (seenIds.current.has(msg.id)) return;
-                        seenIds.current.add(msg.id);
-                        setMessages((prev) => [...prev, msg]);
-                    } catch {
-                        // ignore malformed frames
-                    }
-                });
-            },
-            onStompError: (frame) => {
-                console.error('STOMP error', frame.headers['message'], frame.body);
-            },
-            onWebSocketError: (event) => {
-                console.error('WebSocket error', event);
-            },
-        });
+        void (async () => {
+            // Fetch ticket after navigation so opening a chat is not blocked on ticket minting.
+            const ticketResponse = await fetch('/chat/ws-ticket', { credentials: 'same-origin' });
+            if (!ticketResponse.ok || cancelled) {
+                if (!cancelled) {
+                    console.error('Failed to obtain WebSocket ticket', ticketResponse.status);
+                }
+                return;
+            }
+            const ticketBody = (await ticketResponse.json()) as { ticket?: string };
+            if (cancelled || !ticketBody.ticket) {
+                return;
+            }
 
-        stompClient.current = client;
-        client.activate();
+            const client = new Client({
+                brokerURL: wsUrl,
+                connectHeaders: { Authorization: `Ticket ${ticketBody.ticket}` },
+                onConnect: () => {
+                    client.subscribe(`/user/queue/conversation.${conversation.id}`, (frame) => {
+                        try {
+                            const msg = JSON.parse(frame.body) as ChatMessage;
+                            if (seenIds.current.has(msg.id)) return;
+                            seenIds.current.add(msg.id);
+                            setMessages((prev) => [...prev, msg]);
+                        } catch {
+                            // ignore malformed frames
+                        }
+                    });
+                },
+                onStompError: (frame) => {
+                    console.error('STOMP error', frame.headers['message'], frame.body);
+                },
+                onWebSocketError: (event) => {
+                    console.error('WebSocket error', event);
+                },
+            });
+
+            if (cancelled) {
+                return;
+            }
+            stompClient.current = client;
+            client.activate();
+        })();
 
         return () => {
-            client.deactivate();
+            cancelled = true;
+            stompClient.current?.deactivate();
+            stompClient.current = null;
         };
-    }, [accessToken, conversation.id]);
+    }, [conversation.id]);
 
     return (
         <PageContainer className="flex flex-col gap-4">

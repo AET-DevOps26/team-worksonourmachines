@@ -75,7 +75,8 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./package.json
 
-RUN groupadd -r appuser && useradd -r -g appuser appuser \
+RUN groupadd --gid 10001 appuser \
+	&& useradd --uid 10001 --gid 10001 --create-home --shell /usr/sbin/nologin appuser \
 	&& chown -R appuser:appuser /app
 
 USER appuser

@@ -2,6 +2,8 @@ KUBERNETES_MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
 KUBERNETES_DIR := $(dir $(KUBERNETES_MAKEFILE))
 KUBERNETES_REPO_ROOT := $(abspath $(KUBERNETES_DIR)/..)
 KUBERNETES_CHART := $(KUBERNETES_DIR)helm/tutormatch
+KEYCLOAK_REALM_SRC := $(KUBERNETES_REPO_ROOT)/artifacts/keycloak/import/tutormatch-realm.json
+KEYCLOAK_REALM_CHART_FILE := $(KUBERNETES_CHART)/files/tutormatch-realm.json
 OBSERVABILITY_DIR := $(KUBERNETES_DIR)helm/observability/
 OBSERVABILITY_DASHBOARD := $(KUBERNETES_REPO_ROOT)/artifacts/observability/grafana/dashboards/spring-boot-observability.json
 OBSERVABILITY_ENV ?= $(KUBERNETES_REPO_ROOT)/.env
@@ -25,6 +27,25 @@ K3D_AUTH_URL ?= https://auth.tutormatch.127.0.0.1.nip.io
 K3D_API_URL ?= https://api.tutormatch.127.0.0.1.nip.io
 
 .NOTPARALLEL: rancher-publish-images rancher-prod-deploy k3d-images-import k3d-deploy
+
+.PHONY: sync-keycloak-realm
+sync-keycloak-realm: ## Copy the shared Keycloak realm JSON into the Helm chart files/
+	@mkdir -p "$(KUBERNETES_CHART)/files"
+	@cp "$(KEYCLOAK_REALM_SRC)" "$(KEYCLOAK_REALM_CHART_FILE)"
+	@echo "Synced $(KEYCLOAK_REALM_SRC) -> $(KEYCLOAK_REALM_CHART_FILE)"
+
+DEMO_SEED_SRC := $(KUBERNETES_REPO_ROOT)/artifacts/demo-seed
+DEMO_SEED_CHART_DIR := $(KUBERNETES_CHART)/files/demo-seed
+
+.PHONY: sync-demo-seed
+sync-demo-seed: ## Copy shared demo-seed config/script into the Helm chart files/
+	@mkdir -p "$(DEMO_SEED_CHART_DIR)"
+	@cp "$(DEMO_SEED_SRC)/demo-data.json" "$(DEMO_SEED_CHART_DIR)/demo-data.json"
+	@cp "$(DEMO_SEED_SRC)/seed_demo_data.py" "$(DEMO_SEED_CHART_DIR)/seed_demo_data.py"
+	@echo "Synced $(DEMO_SEED_SRC) -> $(DEMO_SEED_CHART_DIR)"
+
+.PHONY: sync-helm-files
+sync-helm-files: sync-keycloak-realm sync-demo-seed ## Sync all shared artifact files into the Helm chart
 
 .PHONY: kubernetes-help
 kubernetes-help: ## Show Kubernetes build and deployment targets
@@ -141,6 +162,7 @@ rancher-check-deploy-env:
 	@: "$${LLM_API_KEY:?Set LLM_API_KEY}"
 	@: "$${AI_CLIENT_SECRET:?Set AI_CLIENT_SECRET}"
 	@: "$${SERVER_STUDENT_SECRET:?Set SERVER_STUDENT_SECRET}"
+	@: "$${SERVER_MARKETPLACE_ADMIN_SECRET:?Set SERVER_MARKETPLACE_ADMIN_SECRET}"
 	@: "$${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
 	@: "$${KEYCLOAK_DB_PASSWORD:?Set KEYCLOAK_DB_PASSWORD}"
 	@: "$${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD}"
@@ -191,7 +213,7 @@ rancher-release-unlock:
 	esac
 
 .PHONY: rancher-helm-upgrade
-rancher-helm-upgrade: rancher-check-deploy-env rancher-check-image-digests
+rancher-helm-upgrade: sync-helm-files rancher-check-deploy-env rancher-check-image-digests
 	@set -a; . "$(RANCHER_DIGEST_FILE)"; set +a; \
 	helm upgrade --install "$(RELEASE_NAME)" "$(KUBERNETES_CHART)" \
 		--kube-context "$(RANCHER_KUBE_CONTEXT)" \
@@ -208,6 +230,7 @@ rancher-helm-upgrade: rancher-check-deploy-env rancher-check-image-digests
 		--set-string ai.llmApiKey="$${LLM_API_KEY}" \
 		--set-string ai.aiClientSecret="$${AI_CLIENT_SECRET}" \
 		--set-string keycloak.serverStudentSecret="$${SERVER_STUDENT_SECRET}" \
+		--set-string keycloak.serverMarketplaceAdminSecret="$${SERVER_MARKETPLACE_ADMIN_SECRET}" \
 		--set-string postgres.password="$${POSTGRES_PASSWORD}" \
 		--set-string postgres.keycloakPassword="$${KEYCLOAK_DB_PASSWORD}" \
 		--set-string keycloak.adminPassword="$${KEYCLOAK_ADMIN_PASSWORD}" \
@@ -306,7 +329,7 @@ k3d-images-import: ## Import all local images into k3d sequentially
 	@k3d image import "$(IMAGE_PREFIX)/server-student:$(K3D_IMAGE_TAG)" --cluster "$(K3D_CLUSTER)"
 
 .PHONY: k3d-helm-upgrade
-k3d-helm-upgrade: ## Install or upgrade TutorMatch in local k3d
+k3d-helm-upgrade: sync-helm-files ## Install or upgrade TutorMatch in local k3d
 	@ingress_ip="$$(kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace ingress-nginx \
 		get service ingress-nginx-controller --output jsonpath='{.spec.clusterIP}')"; \
 	helm upgrade --install "$(RELEASE_NAME)" "$(KUBERNETES_CHART)" \
@@ -351,10 +374,10 @@ k3d-local-deploy: \
 k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, Loki, Promtail) to local k3d
 	@test -f "$(OBSERVABILITY_ENV)" || { echo "Missing $(OBSERVABILITY_ENV) — copy .env.dist to .env and fill in values" >&2; exit 1; }
 	@set -a; . "$(OBSERVABILITY_ENV)"; set +a; \
-	: "$${GRAFANA_SMTP_USER:?Set GRAFANA_SMTP_USER}" && \
-	: "$${GRAFANA_SMTP_PASSWORD:?Set GRAFANA_SMTP_PASSWORD}" && \
-	: "$${GRAFANA_ADMIN_USER:?Set GRAFANA_ADMIN_USER}" && \
-	: "$${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD}" && \
+	GRAFANA_SMTP_USER="$${GRAFANA_SMTP_USER:-noreply@localhost}"; \
+	GRAFANA_SMTP_PASSWORD="$${GRAFANA_SMTP_PASSWORD:-changeme}"; \
+	GRAFANA_ADMIN_USER="$${GRAFANA_ADMIN_USER:-admin}"; \
+	GRAFANA_ADMIN_PASSWORD="$${GRAFANA_ADMIN_PASSWORD:-admin}"; \
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update && \
 	helm repo add grafana https://grafana.github.io/helm-charts --force-update && \
 	helm repo update prometheus-community grafana && \

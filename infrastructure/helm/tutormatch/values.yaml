@@ -21,6 +21,7 @@ clientWeb:
   serverCommunicationApiUrl: http://server-communication:8083
   serverMarketplaceApiUrl: http://server-marketplace:8082
   serverStudentApiUrl: http://server-student:8081
+  port: 3000
 
 serverCommunication:
   imageDigest: ""
@@ -72,3 +73,4 @@ keycloak:
   adminPassword: admin  # Override in production
   clientWebSecret: client-web-secret  # Override in production
   serverStudentSecret: server-student-dev-secret  # Override via SERVER_STUDENT_SECRET GitHub Actions secret
+  serverMarketplaceAdminSecret: server-marketplace-admin-secret  # Override via SERVER_MARKETPLACE_ADMIN_SECRET GitHub Actions secret

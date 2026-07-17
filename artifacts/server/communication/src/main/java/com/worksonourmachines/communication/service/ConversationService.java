@@ -9,6 +9,7 @@ import com.worksonourmachines.communication.persistence.repository.ConversationR
 import com.worksonourmachines.communication.persistence.repository.MessageRepository;
 import com.worksonourmachines.server.common.security.AuthenticatedUser;
 import org.openapitools.model.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -31,6 +32,7 @@ public class ConversationService {
     private final StringRedisTemplate redis;
     private final ObjectMapper objectMapper;
     private final KeycloakUserClient keycloakUserClient;
+    private final ConversationCreateHelper conversationCreateHelper;
 
     public ConversationService(
             AuthenticatedUser authenticatedUser,
@@ -38,16 +40,18 @@ public class ConversationService {
             MessageRepository messageRepository,
             StringRedisTemplate redis,
             ObjectMapper objectMapper,
-            KeycloakUserClient keycloakUserClient) {
+            KeycloakUserClient keycloakUserClient,
+            ConversationCreateHelper conversationCreateHelper) {
         this.authenticatedUser = authenticatedUser;
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
         this.redis = redis;
         this.objectMapper = objectMapper;
         this.keycloakUserClient = keycloakUserClient;
+        this.conversationCreateHelper = conversationCreateHelper;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SharedCommunicationConversationDetail startConversation(
             SharedCommunicationStartConversationRequest request) {
         UUID me = authenticatedUser.id();
@@ -57,27 +61,33 @@ public class ConversationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot start a conversation with yourself.");
         }
 
-        ConversationEntity entity = conversationRepository
+        return conversationRepository
                 .findByParticipants(me, partner)
-                .orElseGet(() -> {
-                    String myName = authenticatedUser.getUsername();
-                    String partnerName = keycloakUserClient.getDisplayName(partner);
-                    OffsetDateTime now = OffsetDateTime.now();
-                    return conversationRepository.save(new ConversationEntity(
-                            UUID.randomUUID(),
-                            me,
-                            partner,
-                            myName,
-                            partnerName,
-                            null,
-                            null,
-                            now,
-                            now));
-                });
-
-        return toDetail(entity, me);
+                .map(entity -> toDetail(entity, me))
+                .orElseGet(() -> createConversationAvoidingRace(me, partner));
     }
 
+    private SharedCommunicationConversationDetail createConversationAvoidingRace(UUID me, UUID partner) {
+        String myName = authenticatedUser.getUsername();
+        String partnerName = keycloakUserClient.getDisplayName(partner);
+        // Canonical order so the unique index is unambiguous regardless of who clicks first.
+        UUID participantA = me.compareTo(partner) <= 0 ? me : partner;
+        UUID participantB = me.compareTo(partner) <= 0 ? partner : me;
+        String nameA = participantA.equals(me) ? myName : partnerName;
+        String nameB = participantB.equals(me) ? myName : partnerName;
+
+        try {
+            ConversationEntity created = conversationCreateHelper.insert(
+                    participantA, participantB, nameA, nameB);
+            return toDetail(created, me);
+        } catch (DataIntegrityViolationException ignored) {
+            ConversationEntity existing = conversationRepository
+                    .findByParticipants(me, partner)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.CONFLICT, "Conversation already exists; please retry."));
+            return toDetail(existing, me);
+        }
+    }
     @Transactional
     public List<SharedCommunicationConversationSummary> listConversations() {
         UUID me = authenticatedUser.id();

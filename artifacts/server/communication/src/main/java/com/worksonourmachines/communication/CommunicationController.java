@@ -1,6 +1,7 @@
 package com.worksonourmachines.communication;
 
 import com.worksonourmachines.communication.service.ConversationService;
+import com.worksonourmachines.communication.websocket.WsTicketService;
 import org.openapitools.api.CommunicationApiV1;
 import org.openapitools.model.*;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,16 @@ import java.util.UUID;
 public class CommunicationController implements CommunicationApiV1 {
 
     private final ConversationService conversationService;
+    private final WsTicketService wsTicketService;
 
-    public CommunicationController(ConversationService conversationService) {
+    public CommunicationController(ConversationService conversationService, WsTicketService wsTicketService) {
         this.conversationService = conversationService;
+        this.wsTicketService = wsTicketService;
+    }
+
+    @Override
+    public ResponseEntity<SharedCommunicationWsTicket> createWsTicket() {
+        return ResponseEntity.ok(wsTicketService.issue());
     }
 
     @Override

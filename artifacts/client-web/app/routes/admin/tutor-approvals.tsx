@@ -66,7 +66,9 @@ export default function AdminTutorApprovalsRoute() {
                             <Badge variant="warning">{app.status}</Badge>
                         </div>
                         <CardDescription className="mt-2">Certificate: {app.certificateRef}</CardDescription>
-                        <CardDescription>Submitted {new Date(app.submittedAt).toLocaleDateString()}</CardDescription>
+                        <CardDescription suppressHydrationWarning>
+                            Submitted {new Date(app.submittedAt).toLocaleDateString()}
+                        </CardDescription>
                         <div className="mt-4 flex flex-wrap gap-2">
                             <fetcher.Form method="post">
                                 <input name="applicationId" type="hidden" value={app.id} />

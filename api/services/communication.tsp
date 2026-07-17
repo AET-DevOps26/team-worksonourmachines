@@ -44,6 +44,11 @@ namespace Shared.Communication {
   model SendMessageRequest {
     content: string;
   }
+
+  model WsTicket {
+    ticket: string;
+    expiresInSeconds: int32;
+  }
 }
 
 enum CommunicationVersions {
@@ -103,4 +108,10 @@ namespace Communication {
     | NotFoundError
     | BadRequestError
     | UnauthorizedError;
+
+  @summary("Create WebSocket ticket")
+  @doc("Issues a short-lived ticket (Redis TTL) for authenticating a STOMP WebSocket CONNECT.")
+  @post
+  @route("/conversations/ws-ticket")
+  op createWsTicket(): WsTicket | UnauthorizedError;
 }

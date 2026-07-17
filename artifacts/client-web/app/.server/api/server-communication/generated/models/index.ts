@@ -8,4 +8,5 @@ export * from './SharedCommunicationConversationPartner';
 export * from './SharedCommunicationConversationSummary';
 export * from './SharedCommunicationSendMessageRequest';
 export * from './SharedCommunicationStartConversationRequest';
+export * from './SharedCommunicationWsTicket';
 export * from './SharedErrorsErrorBody';

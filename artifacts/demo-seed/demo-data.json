@@ -1,0 +1,1121 @@
+{
+  "students": [
+    {
+      "email": "lukas.student@example.com",
+      "displayName": "Lukas Weber",
+      "bio": "Switched majors, looking for DWT help.",
+      "memorization": 3,
+      "formalReasoning": 4,
+      "conceptualUnderstanding": 3,
+      "problemSolving": 2,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "learningGoal": {
+        "id": "99999999-9999-9999-9999-999999999001",
+        "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+        "description": "Pass DWT with a solid understanding of probability spaces and random variables.",
+        "targetDate": "2026-07-31T00:00:00Z",
+        "selfAssessedLevel": 2,
+        "budgetEur": 200,
+        "locations": [
+          "GARCHING",
+          "ONLINE"
+        ]
+      }
+    },
+    {
+      "email": "maria.student@example.com",
+      "displayName": "Maria Schneider",
+      "bio": "Maria is a motivated student who wants to strengthen her conceptual understanding and problem-solving abilities.",
+      "memorization": 4,
+      "formalReasoning": 3,
+      "conceptualUnderstanding": 5,
+      "problemSolving": 4,
+      "languages": [
+        "German",
+        "English"
+      ]
+    },
+    {
+      "email": "jonas.student@example.com",
+      "displayName": "Jonas Fischer",
+      "bio": "Jonas is a student focused on developing better reasoning skills and becoming more confident with complex topics.",
+      "memorization": 3,
+      "formalReasoning": 5,
+      "conceptualUnderstanding": 3,
+      "problemSolving": 4,
+      "languages": [
+        "German"
+      ]
+    }
+  ],
+  "tutors": [
+    {
+      "email": "anna.tutor@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0001",
+      "displayName": "Anna Muller",
+      "bio": "CS student with strong background in probability and foundations.",
+      "hourlyRate": 25.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "GARCHING",
+        "MUNICH",
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "MONDAY",
+          "note": "18:00-21:00",
+          "available": true
+        },
+        {
+          "weekday": "WEDNESDAY",
+          "note": "16:00-20:00",
+          "available": true
+        },
+        {
+          "weekday": "FRIDAY",
+          "note": "Flexible afternoons",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "max.tutor@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0002",
+      "displayName": "Max Hoffmann",
+      "bio": "Tutor for discrete structures and linear algebra.",
+      "hourlyRate": 20.0,
+      "published": true,
+      "languages": [
+        "German"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "TUESDAY",
+          "note": "17:00-22:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "sofia.richter@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0003",
+      "displayName": "Sofia Richter",
+      "bio": "Patient DWT tutor who focuses on exam-style probability proofs.",
+      "hourlyRate": 22.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "GARCHING",
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "MONDAY",
+          "note": "17:00-20:00",
+          "available": true
+        },
+        {
+          "weekday": "THURSDAY",
+          "note": "18:00-21:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "ben.krause@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0004",
+      "displayName": "Ben Krause",
+      "bio": "Explains discrete structures with lots of worked graph examples.",
+      "hourlyRate": 18.0,
+      "published": true,
+      "languages": [
+        "German"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "TUESDAY",
+          "note": "16:00-19:00",
+          "available": true
+        },
+        {
+          "weekday": "SUNDAY",
+          "note": "10:00-13:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "clara.nguyen@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0005",
+      "displayName": "Clara Nguyen",
+      "bio": "Linear algebra specialist; matrices, bases, and eigenvalues demystified.",
+      "hourlyRate": 28.0,
+      "published": true,
+      "languages": [
+        "English",
+        "German"
+      ],
+      "locations": [
+        "MUNICH",
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "WEDNESDAY",
+          "note": "17:00-21:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "felix.brandt@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0006",
+      "displayName": "Felix Brandt",
+      "bio": "Foundations-first tutor for logic, automata, and formal reasoning.",
+      "hourlyRate": 19.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "GARCHING"
+      ],
+      "availability": [
+        {
+          "weekday": "MONDAY",
+          "note": "12:00-15:00",
+          "available": true
+        },
+        {
+          "weekday": "FRIDAY",
+          "note": "14:00-18:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "nina.petrov@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0007",
+      "displayName": "Nina Petrov",
+      "bio": "Bilingual tutor pairing probability intuition with careful notation.",
+      "hourlyRate": 26.0,
+      "published": true,
+      "languages": [
+        "English",
+        "German"
+      ],
+      "locations": [
+        "ONLINE",
+        "MUNICH"
+      ],
+      "availability": [
+        {
+          "weekday": "SATURDAY",
+          "note": "11:00-16:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "jonas.meier@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0008",
+      "displayName": "Jonas Meier",
+      "bio": "Practical DS help with combinatorics drills and past homework sets.",
+      "hourlyRate": 17.0,
+      "published": true,
+      "languages": [
+        "German"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "THURSDAY",
+          "note": "19:00-22:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "amira.hassan@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0009",
+      "displayName": "Amira Hassan",
+      "bio": "Calm online sessions for linear algebra and discrete math catch-up.",
+      "hourlyRate": 24.0,
+      "published": true,
+      "languages": [
+        "English",
+        "German"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "TUESDAY",
+          "note": "18:00-21:00",
+          "available": true
+        },
+        {
+          "weekday": "FRIDAY",
+          "note": "17:00-20:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "timo.vogel@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0010",
+      "displayName": "Timo Vogel",
+      "bio": "Garching-based tutor for GDB proofs and exam warm-ups.",
+      "hourlyRate": 21.0,
+      "published": true,
+      "languages": [
+        "German"
+      ],
+      "locations": [
+        "GARCHING",
+        "MUNICH"
+      ],
+      "availability": [
+        {
+          "weekday": "WEDNESDAY",
+          "note": "15:00-19:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "elena.rossi@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0011",
+      "displayName": "Elena Rossi",
+      "bio": "Structured DWT lessons with weekly mini-quizzes.",
+      "hourlyRate": 27.0,
+      "published": true,
+      "languages": [
+        "English",
+        "German"
+      ],
+      "locations": [
+        "MUNICH",
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "MONDAY",
+          "note": "19:00-22:00",
+          "available": true
+        },
+        {
+          "weekday": "WEDNESDAY",
+          "note": "19:00-22:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "paul.schwarz@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0012",
+      "displayName": "Paul Schwarz",
+      "bio": "Budget-friendly LA tutor for engineers who need the essentials.",
+      "hourlyRate": 15.0,
+      "published": true,
+      "languages": [
+        "German"
+      ],
+      "locations": [
+        "ONLINE",
+        "STRAUBING"
+      ],
+      "availability": [
+        {
+          "weekday": "SUNDAY",
+          "note": "14:00-18:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "mira.koch@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0013",
+      "displayName": "Mira Koch",
+      "bio": "Combines GDB and DWT for students bridging foundations into probability.",
+      "hourlyRate": 23.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "GARCHING",
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "TUESDAY",
+          "note": "17:00-20:00",
+          "available": true
+        },
+        {
+          "weekday": "SATURDAY",
+          "note": "09:00-12:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "lucas.berg@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0014",
+      "displayName": "Lucas Berg",
+      "bio": "Graph theory enthusiast; visual explanations for Diskrete Strukturen.",
+      "hourlyRate": 20.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "THURSDAY",
+          "note": "16:00-20:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "hana.kim@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0015",
+      "displayName": "Hana Kim",
+      "bio": "Clear English-first tutoring for linear algebra and problem sets.",
+      "hourlyRate": 29.0,
+      "published": true,
+      "languages": [
+        "English"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "MONDAY",
+          "note": "08:00-11:00",
+          "available": true
+        },
+        {
+          "weekday": "FRIDAY",
+          "note": "08:00-11:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "david.wolf@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0016",
+      "displayName": "David Wolf",
+      "bio": "Evening sessions focused on automata and formal language exercises.",
+      "hourlyRate": 18.0,
+      "published": true,
+      "languages": [
+        "German"
+      ],
+      "locations": [
+        "MUNICH"
+      ],
+      "availability": [
+        {
+          "weekday": "TUESDAY",
+          "note": "20:00-22:00",
+          "available": true
+        },
+        {
+          "weekday": "THURSDAY",
+          "note": "20:00-22:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "sara.ali@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0017",
+      "displayName": "Sara Ali",
+      "bio": "Helps students build intuition for random variables and limit theorems.",
+      "hourlyRate": 25.0,
+      "published": true,
+      "languages": [
+        "English",
+        "German"
+      ],
+      "locations": [
+        "ONLINE",
+        "GARCHING"
+      ],
+      "availability": [
+        {
+          "weekday": "WEDNESDAY",
+          "note": "18:00-21:00",
+          "available": true
+        },
+        {
+          "weekday": "SUNDAY",
+          "note": "16:00-19:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "erik.lange@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0018",
+      "displayName": "Erik Lange",
+      "bio": "Broad CS foundations tutor with flexible weekday afternoons.",
+      "hourlyRate": 16.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "MONDAY",
+          "note": "14:00-17:00",
+          "available": true
+        },
+        {
+          "weekday": "WEDNESDAY",
+          "note": "14:00-17:00",
+          "available": true
+        },
+        {
+          "weekday": "FRIDAY",
+          "note": "14:00-17:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "yara.stein@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0019",
+      "displayName": "Yara Stein",
+      "bio": "Exam-oriented DWT and LA package for last-minute preparation.",
+      "hourlyRate": 30.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "MUNICH",
+        "GARCHING",
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "SATURDAY",
+          "note": "10:00-18:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "noah.fischer@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0020",
+      "displayName": "Noah Fischer",
+      "bio": "Friendly beginner-friendly discrete math support.",
+      "hourlyRate": 14.0,
+      "published": true,
+      "languages": [
+        "German"
+      ],
+      "locations": [
+        "ONLINE"
+      ],
+      "availability": [
+        {
+          "weekday": "FRIDAY",
+          "note": "16:00-19:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "lena.hoff@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0021",
+      "displayName": "Lena Hoff",
+      "bio": "Campus tutor around Ottobrunn for LA recitations and homework clubs.",
+      "hourlyRate": 22.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "MUNICH"
+      ],
+      "availability": [
+        {
+          "weekday": "TUESDAY",
+          "note": "15:00-18:00",
+          "available": true
+        },
+        {
+          "weekday": "THURSDAY",
+          "note": "15:00-18:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "email": "marco.bianchi@example.com",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0022",
+      "displayName": "Marco Bianchi",
+      "bio": "Italian-German bilingual tutor covering foundations and discrete structures.",
+      "hourlyRate": 21.0,
+      "published": true,
+      "languages": [
+        "German",
+        "English"
+      ],
+      "locations": [
+        "ONLINE",
+        "STRAUBING"
+      ],
+      "availability": [
+        {
+          "weekday": "WEDNESDAY",
+          "note": "19:00-22:00",
+          "available": true
+        },
+        {
+          "weekday": "SATURDAY",
+          "note": "13:00-16:00",
+          "available": true
+        }
+      ]
+    }
+  ],
+  "applications": [
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0001",
+      "email": "anna.tutor@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "status": "APPROVED",
+      "certificateRef": "cert://anna-dwt.pdf",
+      "submittedAt": "2025-09-01T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0002",
+      "email": "anna.tutor@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://anna-gdb.pdf",
+      "submittedAt": "2025-09-15T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0003",
+      "email": "max.tutor@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://max-ds.pdf",
+      "submittedAt": "2025-10-01T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0004",
+      "email": "sofia.richter@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "status": "APPROVED",
+      "certificateRef": "cert://sofia.richter-dwt.pdf",
+      "submittedAt": "2025-09-01T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0005",
+      "email": "ben.krause@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://ben.krause-ds.pdf",
+      "submittedAt": "2025-10-02T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0006",
+      "email": "clara.nguyen@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://clara.nguyen-la.pdf",
+      "submittedAt": "2025-11-03T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0007",
+      "email": "clara.nguyen@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://clara.nguyen-ds.pdf",
+      "submittedAt": "2025-12-04T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0008",
+      "email": "felix.brandt@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://felix.brandt-gdb.pdf",
+      "submittedAt": "2025-09-05T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0009",
+      "email": "nina.petrov@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "status": "APPROVED",
+      "certificateRef": "cert://nina.petrov-dwt.pdf",
+      "submittedAt": "2025-10-06T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0010",
+      "email": "nina.petrov@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://nina.petrov-la.pdf",
+      "submittedAt": "2025-11-07T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0011",
+      "email": "jonas.meier@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://jonas.meier-ds.pdf",
+      "submittedAt": "2025-12-08T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0012",
+      "email": "amira.hassan@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://amira.hassan-la.pdf",
+      "submittedAt": "2025-09-09T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0013",
+      "email": "amira.hassan@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://amira.hassan-ds.pdf",
+      "submittedAt": "2025-10-10T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0014",
+      "email": "timo.vogel@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://timo.vogel-gdb.pdf",
+      "submittedAt": "2025-11-11T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0015",
+      "email": "timo.vogel@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://timo.vogel-ds.pdf",
+      "submittedAt": "2025-12-12T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0016",
+      "email": "elena.rossi@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "status": "APPROVED",
+      "certificateRef": "cert://elena.rossi-dwt.pdf",
+      "submittedAt": "2025-09-13T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0017",
+      "email": "paul.schwarz@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://paul.schwarz-la.pdf",
+      "submittedAt": "2025-10-14T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0018",
+      "email": "mira.koch@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://mira.koch-gdb.pdf",
+      "submittedAt": "2025-11-15T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0019",
+      "email": "mira.koch@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "status": "APPROVED",
+      "certificateRef": "cert://mira.koch-dwt.pdf",
+      "submittedAt": "2025-12-16T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0020",
+      "email": "lucas.berg@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://lucas.berg-ds.pdf",
+      "submittedAt": "2025-09-17T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0021",
+      "email": "lucas.berg@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://lucas.berg-la.pdf",
+      "submittedAt": "2025-10-18T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0022",
+      "email": "hana.kim@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://hana.kim-la.pdf",
+      "submittedAt": "2025-11-19T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0023",
+      "email": "david.wolf@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://david.wolf-gdb.pdf",
+      "submittedAt": "2025-12-20T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0024",
+      "email": "sara.ali@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "status": "APPROVED",
+      "certificateRef": "cert://sara.ali-dwt.pdf",
+      "submittedAt": "2025-09-21T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0025",
+      "email": "erik.lange@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://erik.lange-gdb.pdf",
+      "submittedAt": "2025-10-22T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0026",
+      "email": "erik.lange@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://erik.lange-ds.pdf",
+      "submittedAt": "2025-11-23T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0027",
+      "email": "erik.lange@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://erik.lange-la.pdf",
+      "submittedAt": "2025-12-24T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0028",
+      "email": "yara.stein@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "status": "APPROVED",
+      "certificateRef": "cert://yara.stein-dwt.pdf",
+      "submittedAt": "2025-09-25T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0029",
+      "email": "yara.stein@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://yara.stein-la.pdf",
+      "submittedAt": "2025-10-26T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0030",
+      "email": "noah.fischer@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://noah.fischer-ds.pdf",
+      "submittedAt": "2025-11-27T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0031",
+      "email": "noah.fischer@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://noah.fischer-gdb.pdf",
+      "submittedAt": "2025-12-01T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0032",
+      "email": "lena.hoff@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "status": "APPROVED",
+      "certificateRef": "cert://lena.hoff-la.pdf",
+      "submittedAt": "2025-09-02T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0033",
+      "email": "marco.bianchi@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "status": "APPROVED",
+      "certificateRef": "cert://marco.bianchi-gdb.pdf",
+      "submittedAt": "2025-10-03T10:00:00Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddd0034",
+      "email": "marco.bianchi@example.com",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "status": "APPROVED",
+      "certificateRef": "cert://marco.bianchi-ds.pdf",
+      "submittedAt": "2025-11-04T10:00:00Z"
+    }
+  ],
+  "coverages": [
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0001",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0001",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0002",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0001",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0003",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0002",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0004",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0003",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0005",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0004",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0006",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0005",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0007",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0005",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0008",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0006",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0009",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0007",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0010",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0007",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0011",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0008",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0012",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0009",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0013",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0009",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0014",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0010",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0015",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0010",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0016",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0011",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0017",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0012",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0018",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0013",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0019",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0013",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0020",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0014",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0021",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0014",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0022",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0015",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0023",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0016",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0024",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0017",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0025",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0018",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0026",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0018",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0027",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0018",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0028",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0019",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0001",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0029",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0019",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "expert"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0030",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0020",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0031",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0020",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "intermediate"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0032",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0021",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0004",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0033",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0022",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0002",
+      "proficiencyLevel": "advanced"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeee0034",
+      "profileId": "cccccccc-cccc-cccc-cccc-cccccccc0022",
+      "moduleId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0003",
+      "proficiencyLevel": "advanced"
+    }
+  ],
+  "conversation": {
+    "id": "ffffffff-ffff-ffff-ffff-ffffffffff01",
+    "studentEmail": "lukas.student@example.com",
+    "tutorEmail": "anna.tutor@example.com",
+    "studentDisplayName": "Lukas Weber",
+    "tutorDisplayName": "Anna Muller",
+    "messages": [
+      {
+        "id": "ffffffff-ffff-ffff-ffff-ffffffffff11",
+        "senderEmail": "lukas.student@example.com",
+        "content": "Hi Anna, could we go over probability spaces this week?",
+        "sentAt": "2026-07-15T10:00:00Z"
+      },
+      {
+        "id": "ffffffff-ffff-ffff-ffff-ffffffffff12",
+        "senderEmail": "anna.tutor@example.com",
+        "content": "Sure \u2014 Thursday 18:00 in Garching works for me.",
+        "sentAt": "2026-07-15T10:05:00Z"
+      }
+    ]
+  }
+}

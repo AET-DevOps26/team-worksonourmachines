@@ -36,6 +36,7 @@ prometheus.{$APP_HOSTNAME} {
 	reverse_proxy prometheus:9090
 }
 
+# only used for Scalar (api-ui)
 api.{$APP_HOSTNAME} {
 	tls internal
 

@@ -122,8 +122,8 @@ export default function DiscoverRoute() {
     const minRatingId = useId();
 
     return (
-        <div className="-mx-6 flex flex-col">
-            <section className="border-b border-border px-6 py-6">
+        <div className="flex flex-col">
+            <section className="border-b border-border py-6">
                 <div className={cn('mx-auto', contentMaxWidth.wide)}>
                     <h1 className="text-2xl font-semibold tracking-tight text-foreground">Discover tutors</h1>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -133,7 +133,7 @@ export default function DiscoverRoute() {
             </section>
 
             <form method="get">
-                <section className="sticky top-14 z-30 border-b border-border bg-background/95 px-6 py-3 backdrop-blur">
+                <section className="sticky top-14 z-30 border-b border-border bg-background/95 py-3 backdrop-blur">
                     <div className={cn('mx-auto flex flex-wrap items-end gap-3', contentMaxWidth.wide)}>
                         <div className="min-w-[200px] flex-1">
                             <Label className="sr-only" htmlFor={qId}>
@@ -162,7 +162,7 @@ export default function DiscoverRoute() {
                     </div>
                 </section>
 
-                <section className="px-6 py-6">
+                <section className="py-6">
                     <div className={cn('mx-auto flex gap-8', contentMaxWidth.wide)}>
                         <aside className="hidden w-56 shrink-0 lg:block">
                             <div className="sticky top-[7.75rem] flex flex-col gap-5">

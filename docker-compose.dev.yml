@@ -46,29 +46,31 @@ services:
     environment:
       APP_HOSTNAME: tutormatch.localhost
       KEYCLOAK_DEV_CLI_ENABLED: ${KEYCLOAK_DEV_CLI_ENABLED:-false}
+      KEYCLOAK_SCALAR_DEV_ENABLED: ${KEYCLOAK_SCALAR_DEV_ENABLED:-true}
+      KEYCLOAK_CLIENT_WEB_SECRET: ${KEYCLOAK_CLIENT_WEB_SECRET:-client-web-dev-secret}
+      KEYCLOAK_SERVER_STUDENT_SECRET: ${KEYCLOAK_SERVER_STUDENT_SECRET:-server-student-dev-secret}
+      KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET: ${KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET:-server-marketplace-admin-secret}
+      AI_CLIENT_SECRET: ${AI_CLIENT_SECRET:-server-ai-dev-secret}
       KEYCLOAK_PASSWORD: admin
       KEYCLOAK_USER: admin
+
+  demo-seed:
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      STUDENT_DB: student
+      STUDENT_USER: student
+      STUDENT_PASSWORD: student
+      MARKETPLACE_DB: marketplace
+      MARKETPLACE_USER: marketplace
+      MARKETPLACE_PASSWORD: marketplace
+      COMMUNICATION_DB: communication
+      COMMUNICATION_USER: communication
+      COMMUNICATION_PASSWORD: communication
 
   api-ui:
     volumes:
       - ./artifacts/api-ui/scalar.dev.config.json:/config/scalar.config.json:ro,Z
-
-#  server-mock:
-#    image: tutormatch/server-mock:dev
-#    build:
-#      context: .
-#      dockerfile: artifacts/server-mock/docker/Dockerfile
-#    volumes:
-#      - ./artifacts/server-mock:/app:Z
-#      - server-mock-node-modules:/app/node_modules
-#    environment:
-#      PORT: "3000"
-#      KEYCLOAK_ISSUER: ${KEYCLOAK_INTERNAL_ISSUER:-http://keycloak:8080/realms/tutormatch}
-#      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
-#      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
-#    depends_on:
-#      keycloak-config-cli:
-#        condition: service_completed_successfully
 
   server-communication:
     <<: *server-base
@@ -94,6 +96,10 @@ services:
       PORT: "8082"
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://auth.tutormatch.localhost/realms/tutormatch}
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI:-http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs}
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://keycloak:8080}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-tutormatch}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
     command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
     ports:
       - 127.0.0.1:8082:8082
@@ -123,7 +129,6 @@ services:
       - client-web-node-modules:/app/node_modules
       - client-web-react-router-cache:/app/.react-router
       - client-web-vite-cache:/app/.vite
-      - caddy_data:/caddy-data:ro
     environment:
       CI: "true"
       LOG_FORMAT: json
@@ -138,8 +143,6 @@ services:
       SERVER_MARKETPLACE_API_URL: http://server-marketplace:8082
       SERVER_STUDENT_API_URL: http://server-student:8081
     depends_on:
-#      server-mock:
-#        condition: service_started
       server-communication:
         condition: service_started
       server-marketplace:
@@ -200,7 +203,6 @@ services:
         condition: service_started
 
 volumes:
-#  server-mock-node-modules:
   server-maven-repository:
   client-web-node-modules:
   client-web-react-router-cache:

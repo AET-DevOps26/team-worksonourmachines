@@ -80,7 +80,7 @@ export default function DashboardRoute() {
                             <Card className="transition-colors hover:border-primary/40">
                                 <CardTitle className="text-base">{conv.partner.displayName}</CardTitle>
                                 <CardDescription className="mt-1 line-clamp-1">{conv.lastMessage}</CardDescription>
-                                <p className="mt-2 text-xs text-muted-foreground">
+                                <p className="mt-2 text-xs text-muted-foreground" suppressHydrationWarning>
                                     {new Date(conv.updatedAt).toLocaleString()}
                                 </p>
                             </Card>
@@ -117,7 +117,7 @@ export default function DashboardRoute() {
                                 </CardTitle>
                                 <Badge variant={statusVariant(app.status)}>{app.status}</Badge>
                             </div>
-                            <CardDescription className="mt-2">
+                            <CardDescription className="mt-2" suppressHydrationWarning>
                                 Submitted {new Date(app.submittedAt).toLocaleDateString()}
                             </CardDescription>
                             {app.rejectionReason ? (

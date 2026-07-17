@@ -17,11 +17,13 @@ No VPN is needed to reach the live environment. The Logos AI provider requires T
 ```
 Internet
   └─► Ingress (nginx + cert-manager / Let's Encrypt)
-        ├─► client-web  :3000   — React Router BFF
-        └─► keycloak    :8080   — Auth server
+        ├─► /stomp → server-communication :8083  — STOMP chat WebSocket
+        ├─► / → client-web  :3000   — React Router BFF
+        └─► auth.* → keycloak    :8080   — Auth server
               └─► postgres :5432
 client-web
   └─► redis     :6379   — Session store
+  └─► server-communication :8083  — chat HTTP + tickets (Redis)
   └─► ai        :8000   — FastAPI + LangChain
         └─► Logos / Ollama / LM Studio (external)
 ```
@@ -35,21 +37,25 @@ The chart lives at `infrastructure/helm/tutormatch/`. It has no sub-chart depend
 ```text
 infrastructure/
 ├── Makefile             # k3d and Rancher orchestration targets
-└── helm/tutormatch/
-    ├── Chart.yaml
-    ├── values.yaml          # Defaults used in production (Rancher)
-    ├── values.local.yaml    # Local k3d overrides
-    └── templates/
-        ├── ai.yaml
-        ├── api-ui.yaml
-        ├── client-web.yaml
-        ├── keycloak.yaml
-        ├── postgres.yaml
-        ├── redis.yaml
-        ├── secret.yaml
-        └── servers.yaml
+└── helm/
+    ├── tutormatch/
+    │   ├── Chart.yaml
+    │   ├── values.yaml          # Defaults used in production (Rancher)
+    │   ├── values.local.yaml    # Local k3d overrides
+    │   ├── files/               # `tutormatch-realm.json` copied here before helm upgrade
+    │   └── templates/
+    │       ├── ai.yaml
+    │       ├── api-ui.yaml
+    │       ├── client-web.yaml
+    │       ├── keycloak.yaml
+    │       ├── postgres.yaml
+    │       ├── redis.yaml
+    │       ├── secret.yaml
+    │       └── servers.yaml
+    └── observability/           # Prometheus, Grafana, Loki, Alloy values/RBAC
 ```
 
+Keycloak realm config is not duplicated in the chart. The single source of truth is [`artifacts/keycloak/import/tutormatch-realm.json`](../../artifacts/keycloak/import/tutormatch-realm.json) (same file Compose uses). Demo user data is likewise shared from [`artifacts/demo-seed/`](../../artifacts/demo-seed/). `make -C infrastructure sync-helm-files` copies both into `helm/tutormatch/files/` before `rancher-helm-upgrade` / `k3d-helm-upgrade`. Host and client secrets are substituted at import time by keycloak-config-cli from Job env / Secrets (`APP_HOSTNAME`, `KEYCLOAK_*`, `AI_CLIENT_SECRET`). A post-install `demo-seed` Job (hook-weight 20) then upserts demo DB rows using live Keycloak IDs.
 ### Key values
 
 | Value | Default (`values.yaml`) | Description |
@@ -93,6 +99,9 @@ The production GitHub environment must define these secrets:
 | `KEYCLOAK_DB_PASSWORD` | Keycloak database user |
 | `KEYCLOAK_ADMIN_PASSWORD` | Keycloak administration and config import |
 | `KEYCLOAK_CLIENT_WEB_SECRET` | Confidential OIDC client |
+| `AI_CLIENT_SECRET` | AI service account client |
+| `SERVER_STUDENT_SECRET` | Student service account client |
+| `SERVER_MARKETPLACE_ADMIN_SECRET` | Marketplace Admin API client (tutor role assignment) |
 
 `IMAGE_TAG` and `RANCHER_DIGEST_FILE` are managed automatically by CI. For an existing persistent database, the three database/administration credentials must initially match the values already stored by PostgreSQL and Keycloak. Changing Kubernetes Secrets alone does not rotate persisted credentials.
 
@@ -104,6 +113,9 @@ To deploy from your local machine, download the `rancher-image-digests` artifact
 IMAGE_TAG=<git-sha> \
 RANCHER_DIGEST_FILE=/path/to/rancher-image-digests.env \
 LLM_API_KEY=<your-logos-api-key> \
+AI_CLIENT_SECRET=<ai-client-secret> \
+SERVER_STUDENT_SECRET=<student-client-secret> \
+SERVER_MARKETPLACE_ADMIN_SECRET=<marketplace-admin-client-secret> \
 POSTGRES_PASSWORD=<current-postgres-password> \
 KEYCLOAK_DB_PASSWORD=<current-keycloak-db-password> \
 KEYCLOAK_ADMIN_PASSWORD=<current-keycloak-admin-password> \
@@ -135,16 +147,18 @@ Docker must be running.
 
 ### Deploy the complete local stack
 
+Ensure the repo-root `.env` exists (from `.env.dist`).
+
 Start Ollama on the host if AI calls are part of the test. The Makefile defaults the in-cluster AI URL to `http://host.k3d.internal:11434`.
 
 ```bash
 ollama serve
 ```
 
-Then one command creates the cluster, installs ingress-nginx, builds and imports all images sequentially, deploys the chart, waits for every Deployment, and runs endpoint smoke tests:
+Then one command creates the cluster, installs ingress-nginx, builds and imports all images sequentially, deploys the chart, waits for every Deployment, installs observability (Prometheus, Grafana, Loki, Alloy), and runs endpoint smoke tests:
 
 ```bash
-make -C infrastructure k3d-deploy
+make -C infrastructure k3d-local-deploy
 ```
 
 The dynamic ingress ClusterIP is passed directly to Helm; `values.local.yaml` no longer needs to be edited whenever the cluster is recreated.
@@ -158,13 +172,14 @@ make -C infrastructure k3d-images-build
 make -C infrastructure k3d-images-import
 make -C infrastructure k3d-helm-upgrade
 make -C infrastructure k3d-rollout-status
+make -C infrastructure k3d-observability-install
 make -C infrastructure k3d-smoke-test
 ```
 
 To use a different host-side LLM endpoint:
 
 ```bash
-make -C infrastructure k3d-deploy K3D_LLM_BASE_URL=http://host.k3d.internal:1234
+make -C infrastructure k3d-local-deploy K3D_LLM_BASE_URL=http://host.k3d.internal:1234
 ```
 
 ### Open the app
@@ -175,13 +190,16 @@ nginx uses HTTPS with its default self-signed certificate — accept the browser
 |---|---|
 | <https://tutormatch.127.0.0.1.nip.io> | App |
 | <https://auth.tutormatch.127.0.0.1.nip.io> | Keycloak |
+| <https://api.tutormatch.127.0.0.1.nip.io> | API UI |
 
 ### Tear down
 
 ```bash
+make -C infrastructure k3d-observability-uninstall
 make -C infrastructure k3d-cluster-delete
 ```
 
+`k3d-cluster-delete` removes the whole cluster (including observability). Use `k3d-observability-uninstall` alone when you only want to remove Prometheus / Grafana / Loki / Alloy.
 ## Secrets
 
 In K8s, secrets are created by `templates/secret.yaml` from Helm values. Never commit real secret values to `values.yaml`.

@@ -6,4 +6,5 @@ src/main/java/org/openapitools/model/SharedCommunicationConversationPartner.java
 src/main/java/org/openapitools/model/SharedCommunicationConversationSummary.java
 src/main/java/org/openapitools/model/SharedCommunicationSendMessageRequest.java
 src/main/java/org/openapitools/model/SharedCommunicationStartConversationRequest.java
+src/main/java/org/openapitools/model/SharedCommunicationWsTicket.java
 src/main/java/org/openapitools/model/SharedErrorsErrorBody.java

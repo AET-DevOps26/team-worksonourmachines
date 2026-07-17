@@ -5,207 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   tutormatch-realm.json: |
-    {
-      "realm": "tutormatch",
-      "displayName": "TUtorMatch",
-      "enabled": true,
-      "registrationAllowed": false,
-      "loginWithEmailAllowed": true,
-      "duplicateEmailsAllowed": false,
-      "resetPasswordAllowed": true,
-      "clientScopes": [
-        {
-          "name": "roles",
-          "description": "OpenID Connect scope for realm roles",
-          "protocol": "openid-connect",
-          "attributes": {
-            "include.in.token.scope": "true",
-            "display.on.consent.screen": "true",
-            "consent.screen.text": "${rolesScopeConsentText}"
-          },
-          "protocolMappers": [
-            {
-              "name": "realm roles",
-              "protocol": "openid-connect",
-              "protocolMapper": "oidc-usermodel-realm-role-mapper",
-              "consentRequired": false,
-              "config": {
-                "claim.name": "realm_roles",
-                "jsonType.label": "String",
-                "multivalued": "true",
-                "userinfo.token.claim": "true",
-                "id.token.claim": "false",
-                "access.token.claim": "true"
-              }
-            }
-          ]
-        }
-      ],
-      "roles": {
-        "realm": [
-          { "name": "student", "description": "Learner role for TUtorMatch students." },
-          { "name": "tutor",   "description": "Teaching role for TUtorMatch tutors." },
-          { "name": "admin",   "description": "Administrative role for local TUtorMatch development." },
-          { "name": "service", "description": "Internal service-to-service role, assigned to service accounts." }
-        ]
-      },
-      "groups": [
-        { "name": "students", "realmRoles": ["student"] },
-        { "name": "tutors",   "realmRoles": ["tutor"] },
-        { "name": "admins",   "realmRoles": ["admin"] }
-      ],
-      "clients": [
-        {
-          "clientId": "client-web",
-          "name": "TUtorMatch React Router BFF",
-          "enabled": true,
-          "protocol": "openid-connect",
-          "publicClient": false,
-          "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.keycloak.clientWebSecret }}",
-          "standardFlowEnabled": true,
-          "implicitFlowEnabled": false,
-          "directAccessGrantsEnabled": false,
-          "serviceAccountsEnabled": false,
-          "redirectUris": ["https://{{ .Values.ingress.host }}/*"],
-          "webOrigins": ["https://{{ .Values.ingress.host }}"],
-          "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "basic", "email"],
-          "attributes": {
-            "pkce.code.challenge.method": "S256",
-            "post.logout.redirect.uris": "https://{{ .Values.ingress.host }}/*"
-          }
-        },
-        {
-          "clientId": "tutormatch-dev-cli",
-          "name": "TUtorMatch Dev CLI",
-          "enabled": false,
-          "protocol": "openid-connect",
-          "publicClient": true,
-          "standardFlowEnabled": false,
-          "implicitFlowEnabled": false,
-          "directAccessGrantsEnabled": true,
-          "serviceAccountsEnabled": false
-        },
-        {
-          "clientId": "server-student",
-          "name": "TUtorMatch Student Service",
-          "enabled": true,
-          "protocol": "openid-connect",
-          "publicClient": false,
-          "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.keycloak.serverStudentSecret }}",
-          "standardFlowEnabled": false,
-          "directAccessGrantsEnabled": false,
-          "serviceAccountsEnabled": true
-        },
-        {
-          "clientId": "server-ai",
-          "name": "TUtorMatch AI Service",
-          "enabled": true,
-          "protocol": "openid-connect",
-          "publicClient": false,
-          "clientAuthenticatorType": "client-secret",
-          "secret": {{ .Values.ai.aiClientSecret | quote }},
-          "standardFlowEnabled": false,
-          "directAccessGrantsEnabled": false,
-          "serviceAccountsEnabled": true
-        }
-      ],
-      "users": [
-        {
-          "username": "admin.tutormatch@example.com",
-          "email": "admin.tutormatch@example.com",
-          "firstName": "Admin", "lastName": "User",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/admins"], "realmRoles": ["admin"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "lukas.student@example.com",
-          "email": "lukas.student@example.com",
-          "firstName": "Lukas", "lastName": "Weber",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/students"], "realmRoles": ["student"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "maria.student@example.com",
-          "email": "maria.student@example.com",
-          "firstName": "Maria", "lastName": "Schneider",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/students"], "realmRoles": ["student"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "jonas.student@example.com",
-          "email": "jonas.student@example.com",
-          "firstName": "Jonas", "lastName": "Fischer",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/students"], "realmRoles": ["student"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "emma.student@example.com",
-          "email": "emma.student@example.com",
-          "firstName": "Emma", "lastName": "Bauer",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/students"], "realmRoles": ["student"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "noah.student@example.com",
-          "email": "noah.student@example.com",
-          "firstName": "Noah", "lastName": "Klein",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/students"], "realmRoles": ["student"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "anna.tutor@example.com",
-          "email": "anna.tutor@example.com",
-          "firstName": "Anna", "lastName": "Muller",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/tutors"], "realmRoles": ["tutor"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "max.tutor@example.com",
-          "email": "max.tutor@example.com",
-          "firstName": "Max", "lastName": "Hoffmann",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/tutors"], "realmRoles": ["tutor"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "lea.tutor@example.com",
-          "email": "lea.tutor@example.com",
-          "firstName": "Lea", "lastName": "Wagner",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/tutors"], "realmRoles": ["tutor"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "omar.tutor@example.com",
-          "email": "omar.tutor@example.com",
-          "firstName": "Omar", "lastName": "Yilmaz",
-          "enabled": true, "emailVerified": true,
-          "groups": ["/tutors"], "realmRoles": ["tutor"],
-          "credentials": [{ "type": "password", "value": "Tutormatch123!", "temporary": false }]
-        },
-        {
-          "username": "service-account-server-student",
-          "enabled": true,
-          "serviceAccountClientId": "server-student",
-          "realmRoles": ["service"]
-        },
-        {
-          "username": "service-account-server-ai",
-          "enabled": true,
-          "serviceAccountClientId": "server-ai",
-          "realmRoles": ["service"]
-        }
-      ]
-    }
+{{ include "tutormatch.keycloakRealmJson" . | nindent 4 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -299,14 +99,17 @@ metadata:
     helm.sh/hook-weight: "10"
     helm.sh/hook-delete-policy: before-hook-creation
 spec:
-  backoffLimit: 3
-  activeDeadlineSeconds: 600
+  backoffLimit: 5
+  activeDeadlineSeconds: 900
   template:
     spec:
       restartPolicy: OnFailure
       containers:
         - name: keycloak-config-cli
           image: adorsys/keycloak-config-cli:latest
+          args:
+            - "--import.var-substitution.enabled=true"
+            - "--import.var-substitution.script-evaluation-enabled=true"
           env:
             - name: KEYCLOAK_URL
               value: http://keycloak:8080
@@ -327,13 +130,39 @@ spec:
             - name: IMPORT_REMOTESTATE_ENABLED
               value: "true"
             - name: IMPORT_VARSUBSTITUTION_ENABLED
+              value: "true"
+            - name: APP_HOSTNAME
+              value: {{ .Values.ingress.host | quote }}
+            - name: KEYCLOAK_DEV_CLI_ENABLED
               value: "false"
+            - name: KEYCLOAK_SCALAR_DEV_ENABLED
+              value: "false"
+            - name: KEYCLOAK_CLIENT_WEB_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_CLIENT_WEB_SECRET
+            - name: KEYCLOAK_SERVER_STUDENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_SERVER_STUDENT_SECRET
+            - name: KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secrets
+                  key: KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET
+            - name: AI_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ai-secrets
+                  key: AI_CLIENT_SECRET
             - name: JAVA_OPTS
               value: "-Duser.home=/tmp"
             - name: KEYCLOAK_AVAILABILITYCHECK_ENABLED
               value: "true"
             - name: KEYCLOAK_AVAILABILITYCHECK_TIMEOUT
-              value: 60s
+              value: 300s
           volumeMounts:
             - name: realm-config
               mountPath: /config
@@ -342,8 +171,8 @@ spec:
               cpu: 100m
               memory: 256Mi
             limits:
-              cpu: 100m
-              memory: 512Mi
+              cpu: 500m
+              memory: 768Mi
       volumes:
         - name: realm-config
           configMap:

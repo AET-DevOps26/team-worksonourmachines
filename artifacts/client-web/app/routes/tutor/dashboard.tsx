@@ -80,7 +80,9 @@ export default function TutorDashboardRoute() {
                                 <Badge variant={statusVariant(app.status)}>{app.status}</Badge>
                             </div>
                             <CardDescription className="mt-2">
-                                Submitted {new Date(app.submittedAt).toLocaleDateString()}
+                                <span suppressHydrationWarning>
+                                    Submitted {new Date(app.submittedAt).toLocaleDateString()}
+                                </span>
                             </CardDescription>
                             {app.rejectionReason ? (
                                 <p className="mt-2 text-sm text-destructive">Reason: {app.rejectionReason}</p>
