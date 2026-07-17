@@ -4,4 +4,7 @@ ingress:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
   hosts:
     - grafana.tutormatch.127.0.0.1.nip.io
-  tls: []
+  tls:
+    - hosts:
+        - grafana.tutormatch.127.0.0.1.nip.io
+      secretName: grafana-local-tls
