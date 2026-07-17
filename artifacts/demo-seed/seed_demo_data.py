@@ -505,36 +505,56 @@ def seed_communication(conn, data: dict[str, Any], ids: dict[str, str]) -> None:
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO communication.conversations (
-                id, participant_a_id, participant_b_id,
-                participant_a_display_name, participant_b_display_name,
-                participant_a_tutor_id, participant_b_tutor_id,
-                created_at, updated_at
-            ) VALUES (
-                %s::uuid, %s::uuid, %s::uuid, %s, %s,
-                %s, %s,
-                '2026-07-15T10:00:00Z'::timestamptz,
-                '2026-07-15T10:05:00Z'::timestamptz
-            )
-            ON CONFLICT (id) DO UPDATE SET
-                participant_a_id = EXCLUDED.participant_a_id,
-                participant_b_id = EXCLUDED.participant_b_id,
-                participant_a_display_name = EXCLUDED.participant_a_display_name,
-                participant_b_display_name = EXCLUDED.participant_b_display_name,
-                participant_a_tutor_id = EXCLUDED.participant_a_tutor_id,
-                participant_b_tutor_id = EXCLUDED.participant_b_tutor_id,
-                updated_at = EXCLUDED.updated_at
+            SELECT id
+            FROM communication.conversations
+            WHERE participant_a_id = %s::uuid
+              AND participant_b_id = %s::uuid
+            LIMIT 1
             """,
-            (
-                conversation["id"],
-                participant_a,
-                participant_b,
-                name_a,
-                name_b,
-                tutor_id_on_a,
-                tutor_id_on_b,
-            ),
+            (participant_a, participant_b),
         )
+        existing_conversation = cur.fetchone()
+        conversation_id = (
+            existing_conversation[0] if existing_conversation else conversation["id"]
+        )
+
+        if existing_conversation:
+            log(
+                f"conversation already exists for participants; reusing id {conversation_id}"
+            )
+        else:
+            cur.execute(
+                """
+                INSERT INTO communication.conversations (
+                    id, participant_a_id, participant_b_id,
+                    participant_a_display_name, participant_b_display_name,
+                    participant_a_tutor_id, participant_b_tutor_id,
+                    created_at, updated_at
+                ) VALUES (
+                    %s::uuid, %s::uuid, %s::uuid, %s, %s,
+                    %s, %s,
+                    '2026-07-15T10:00:00Z'::timestamptz,
+                    '2026-07-15T10:05:00Z'::timestamptz
+                )
+                ON CONFLICT (id) DO UPDATE SET
+                    participant_a_id = EXCLUDED.participant_a_id,
+                    participant_b_id = EXCLUDED.participant_b_id,
+                    participant_a_display_name = EXCLUDED.participant_a_display_name,
+                    participant_b_display_name = EXCLUDED.participant_b_display_name,
+                    participant_a_tutor_id = EXCLUDED.participant_a_tutor_id,
+                    participant_b_tutor_id = EXCLUDED.participant_b_tutor_id,
+                    updated_at = EXCLUDED.updated_at
+                """,
+                (
+                    conversation_id,
+                    participant_a,
+                    participant_b,
+                    name_a,
+                    name_b,
+                    tutor_id_on_a,
+                    tutor_id_on_b,
+                ),
+            )
 
         for message in conversation.get("messages", []):
             cur.execute(
@@ -552,7 +572,7 @@ def seed_communication(conn, data: dict[str, Any], ids: dict[str, str]) -> None:
                 """,
                 (
                     message["id"],
-                    conversation["id"],
+                    conversation_id,
                     ids[message["senderEmail"]],
                     message["content"],
                     message["sentAt"],

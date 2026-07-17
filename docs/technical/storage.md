@@ -173,7 +173,7 @@ One row per approved tutor (keyed by Keycloak user ID).
 | `user_id`      | `uuid`         | NOT NULL, UNIQUE        |
 | `display_name` | `varchar(255)` | NOT NULL                |
 | `bio`          | `text`         | NOT NULL                |
-| `hourly_rate`  | `real`         | NOT NULL                |
+| `hourly_rate`  | `integer`          | NOT NULL                |
 | `published`    | `boolean`      | NOT NULL, DEFAULT false |
 
 Index: `idx_tutor_profiles_published_display_name` on `(published, display_name)` for listing queries.
