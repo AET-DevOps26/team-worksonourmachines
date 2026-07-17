@@ -818,8 +818,8 @@ components:
         displayName:
           type: string
         hourlyRate:
-          type: number
-          format: float
+          type: integer
+          format: int32
         languages:
           type: array
           items:
@@ -892,8 +892,8 @@ components:
           items:
             $ref: '#/components/schemas/Shared.Marketplace.Location'
         hourlyRate:
-          type: number
-          format: float
+          type: integer
+          format: int32
         availability:
           type: array
           items:
@@ -927,8 +927,8 @@ components:
         displayName:
           type: string
         hourlyRate:
-          type: number
-          format: float
+          type: integer
+          format: int32
         languages:
           type: array
           items:

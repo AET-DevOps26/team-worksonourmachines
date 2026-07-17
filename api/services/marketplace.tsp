@@ -86,7 +86,7 @@ namespace Shared.Marketplace {
     id: string;
     userId: string;
     displayName: string;
-    hourlyRate: float32;
+    hourlyRate: int32;
     languages: string[];
     locations: Location[];
     ratingSummary: RatingSummary;
@@ -104,7 +104,7 @@ namespace Shared.Marketplace {
     bio: string;
     languages: string[];
     locations: Location[];
-    hourlyRate: float32;
+    hourlyRate: int32;
     availability: TutorAvailability[];
     published?: boolean = false;
   }

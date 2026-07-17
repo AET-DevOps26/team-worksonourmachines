@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS marketplace.tutor_profiles (
     user_id uuid NOT NULL UNIQUE,
     display_name varchar(255) NOT NULL,
     bio text NOT NULL,
-    hourly_rate real NOT NULL,
+    hourly_rate integer NOT NULL,
     published boolean NOT NULL DEFAULT false
 );
 

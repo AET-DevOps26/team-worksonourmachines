@@ -112,8 +112,8 @@ public class MarketplaceController implements MarketplaceApiV1 {
             @Nullable String topicId,
             @Nullable List<String> languages,
             @Nullable List<SharedMarketplaceLocation> locations,
-            @Nullable Float minRate,
-            @Nullable Float maxRate,
+            @Nullable Integer minRate,
+            @Nullable Integer maxRate,
             @Nullable Float minRating,
             @Nullable List<SharedMarketplaceWeekday> weekdays,
             @Nullable SharedMarketplaceTutorSort sort) {

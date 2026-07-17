@@ -35,7 +35,7 @@ public class SharedMarketplaceTutorDetail {
 
   private String displayName;
 
-  private Float hourlyRate;
+  private Integer hourlyRate;
 
   @Valid
   private List<String> languages = new ArrayList<>();
@@ -62,7 +62,7 @@ public class SharedMarketplaceTutorDetail {
   /**
    * Constructor with only required parameters
    */
-  public SharedMarketplaceTutorDetail(String id, String userId, String displayName, Float hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, SharedMarketplaceRatingSummary ratingSummary, List<@Valid SharedMarketplaceTutorCoverage> coverages, String bio, List<@Valid SharedMarketplaceTutorAvailability> availability, Boolean published) {
+  public SharedMarketplaceTutorDetail(String id, String userId, String displayName, Integer hourlyRate, List<String> languages, List<SharedMarketplaceLocation> locations, SharedMarketplaceRatingSummary ratingSummary, List<@Valid SharedMarketplaceTutorCoverage> coverages, String bio, List<@Valid SharedMarketplaceTutorAvailability> availability, Boolean published) {
     this.id = id;
     this.userId = userId;
     this.displayName = displayName;
@@ -136,7 +136,7 @@ public class SharedMarketplaceTutorDetail {
     this.displayName = displayName;
   }
 
-  public SharedMarketplaceTutorDetail hourlyRate(Float hourlyRate) {
+  public SharedMarketplaceTutorDetail hourlyRate(Integer hourlyRate) {
     this.hourlyRate = hourlyRate;
     return this;
   }
@@ -147,12 +147,12 @@ public class SharedMarketplaceTutorDetail {
    */
   @NotNull 
   @JsonProperty("hourlyRate")
-  public Float getHourlyRate() {
+  public Integer getHourlyRate() {
     return hourlyRate;
   }
 
   @JsonProperty("hourlyRate")
-  public void setHourlyRate(Float hourlyRate) {
+  public void setHourlyRate(Integer hourlyRate) {
     this.hourlyRate = hourlyRate;
   }
 

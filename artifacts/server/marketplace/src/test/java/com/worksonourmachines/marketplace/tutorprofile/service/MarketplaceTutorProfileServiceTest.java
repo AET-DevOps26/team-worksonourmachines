@@ -57,8 +57,8 @@ class MarketplaceTutorProfileServiceTest {
                 null,
                 List.of("English"),
                 null,
-                10.0f,
-                50.0f,
+                10,
+                50,
                 null,
                 null,
                 SharedMarketplaceTutorSort.RATE_DESC);
@@ -82,7 +82,7 @@ class MarketplaceTutorProfileServiceTest {
                 UUID.fromString("11111111-1111-1111-1111-111111111101"),
                 "Ada Lovelace",
                 "Tutor bio.",
-                25.0f,
+                25,
                 true);
         ReflectionTestUtils.setField(profile, "id", UUID.fromString("11111111-1111-1111-1111-111111111401"));
         profile.replaceLanguages(List.of("English"));
