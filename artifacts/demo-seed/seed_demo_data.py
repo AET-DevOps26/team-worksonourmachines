@@ -503,61 +503,6 @@ def seed_communication(conn, data: dict[str, Any], ids: dict[str, str]) -> None:
                 )
 
     with conn.cursor() as cur:
-        # Delete any conversation with the same participant pair but a different id
-        # (e.g. created by the app) — the ON CONFLICT (id) clause won't cover it and
-        # the conversations_participants_unique constraint would raise UniqueViolation.
-        cur.execute(
-            """
-            DELETE FROM communication.messages
-            WHERE conversation_id IN (
-                SELECT id FROM communication.conversations
-                WHERE LEAST(participant_a_id, participant_b_id) = LEAST(%s::uuid, %s::uuid)
-                  AND GREATEST(participant_a_id, participant_b_id) = GREATEST(%s::uuid, %s::uuid)
-                  AND id <> %s::uuid
-            )
-            """,
-            (participant_a, participant_b, participant_a, participant_b, conversation["id"]),
-        )
-        cur.execute(
-            """
-            DELETE FROM communication.conversations
-            WHERE LEAST(participant_a_id, participant_b_id) = LEAST(%s::uuid, %s::uuid)
-              AND GREATEST(participant_a_id, participant_b_id) = GREATEST(%s::uuid, %s::uuid)
-              AND id <> %s::uuid
-            """,
-            (participant_a, participant_b, participant_a, participant_b, conversation["id"]),
-        )
-        cur.execute(
-            """
-            INSERT INTO communication.conversations (
-                id, participant_a_id, participant_b_id,
-                participant_a_display_name, participant_b_display_name,
-                participant_a_tutor_id, participant_b_tutor_id,
-                created_at, updated_at
-            ) VALUES (
-                %s::uuid, %s::uuid, %s::uuid, %s, %s,
-                %s, %s,
-                '2026-07-15T10:00:00Z'::timestamptz,
-                '2026-07-15T10:05:00Z'::timestamptz
-            )
-            ON CONFLICT (id) DO UPDATE SET
-                participant_a_id = EXCLUDED.participant_a_id,
-                participant_b_id = EXCLUDED.participant_b_id,
-                participant_a_display_name = EXCLUDED.participant_a_display_name,
-                participant_b_display_name = EXCLUDED.participant_b_display_name,
-                participant_a_tutor_id = EXCLUDED.participant_a_tutor_id,
-                participant_b_tutor_id = EXCLUDED.participant_b_tutor_id,
-                updated_at = EXCLUDED.updated_at
-            """,
-            (
-                conversation["id"],
-                participant_a,
-                participant_b,
-                name_a,
-                name_b,
-                tutor_id_on_a,
-                tutor_id_on_b,
-            ),
         cur.execute(
             """
             SELECT id
@@ -627,7 +572,7 @@ def seed_communication(conn, data: dict[str, Any], ids: dict[str, str]) -> None:
                 """,
                 (
                     message["id"],
-                    conversation["id"],
+                    conversation_id,
                     ids[message["senderEmail"]],
                     message["content"],
                     message["sentAt"],
