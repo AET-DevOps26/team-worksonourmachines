@@ -4,7 +4,7 @@ The AI service is an independent Python microservice (FastAPI + LangChain) that 
 
 ## Module layout
 
-```
+```text
 app/
   main.py           — FastAPI app, router registration, health endpoint
   ai_impl.py        — DefaultApiImpl: plan generation logic, LLM invocation, response mapping
@@ -41,7 +41,7 @@ The `/v1/plan` endpoint is defined in the shared TypeSpec contract (`api/ai.tsp`
 6. **LLM invocation**:
    - For `openai` provider: uses LangChain `with_structured_output()` — the schema is enforced at the API level, no parsing needed.
    - For all other providers (Logos, Ollama, LM Studio): plain text generation, then JSON fence stripping. On parse failure the prompt is retried once with an explicit correction instruction. A second failure returns HTTP 500.
-7. **Response mapping**: `_map_response()` / `_fix_rates()` validates that all tutor IDs in the LLM output exist in the fetched tutor list, corrects any hallucinated IDs to the nearest valid tutor, and recomputes `totalEstimatedCost` from milestone sums.
+7. **Response mapping**: `_map_response()` / `_fix_rates()` validates that all tutor IDs in the LLM output exist in the fetched tutor list, replaces any hallucinated IDs with the first valid tutor (`valid_tutors[0]`), and recomputes `totalEstimatedCost` from milestone sums.
 
 ## Security
 
@@ -91,7 +91,7 @@ Key test coverage in `tests/test_plan.py`:
 
 ## Checking the deployed AI service
 
-The AI service is not exposed through an Ingress — it is internal to the cluster. To hit it directly:
+The AI service is not directly reachable via the main app ingress, but `POST /v1/plan` is publicly accessible through the `api-ui` ingress at `api.<host>/v1/plan` (see [Service networking](./server.md#service-networking)). To hit the service directly for debugging, use port-forward:
 
 ```bash
 kubectl --context stud -n team-worksonourmachines port-forward svc/ai 8000:8000
@@ -100,9 +100,10 @@ kubectl --context stud -n team-worksonourmachines port-forward svc/ai 8000:8000
 Then in another terminal:
 
 ```bash
-curl -X POST http://localhost:8000/v1/chat \
+curl -X POST http://localhost:8000/v1/plan \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "Hello"}'
+  -H "Authorization: Bearer <server-student-token>" \
+  -d '{"learningGoalId":"<goal-id>","studentId":"<student-id>"}'
 ```
 
 The `/health` endpoint is also available:

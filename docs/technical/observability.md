@@ -25,7 +25,7 @@ Without `OBSERVE=1`, Prometheus, Loki, Alloy, and Grafana are not started.
 |---|---|
 | Grafana | https://grafana.tutormatch.localhost |
 
-Demo credentials (local only): `admin.tutormatch@example.com` / `adminpassword123`
+Demo credentials for local Grafana are set in `.env` (see `local-setup.md`).
 
 ## Running in Kubernetes
 
@@ -80,17 +80,11 @@ Alert rules are defined directly in `infrastructure/helm/observability/grafana.v
 | **Folder** | Alerts |
 | **Evaluation interval** | 10 s |
 | **Fires after** | 15 s of `up < 1` |
-| **Condition** | `up{job=~"server-student|server-marketplace|server-communication"} < 1` |
+| **Condition** | `up{job=~"server-student\|server-marketplace\|server-communication"} < 1` |
 | **No-data state** | NoData |
 | **Severity** | critical |
 | **Summary** | `Microservice {{ $labels.job }} is down` |
 
 ### Contact point
 
-Alerts are routed to an email contact point (`Email`) that sends to all three team members. SMTP is configured via a Kubernetes Secret (`grafana-smtp-secret`) — credentials are never stored in the chart values.
-
-| Recipient | Address |
-|---|---|
-| Amritanshu Sikdar | amritanshu.sikdar@gmail.com |
-| Hristina Ivanova | hristina.ivanova1003@gmail.com |
-| Julian Wilke | julian.wilke@tum.de |
+Alerts are routed to an email contact point (`Email`). Recipients are configured in `infrastructure/helm/observability/grafana.values.yaml` under `alerting.contactpoints.yaml`. SMTP credentials are supplied via a Kubernetes Secret (`grafana-smtp-secret`) — never stored in the chart values.

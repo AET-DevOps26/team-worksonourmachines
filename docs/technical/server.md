@@ -81,7 +81,7 @@ Manages student identity data, learning goals, and AI-generated study plans.
 
 **Package layout**
 
-```
+```text
 profile/       — StudentProfile entity, service, controller, mapper
 goal/          — LearningGoal entity, service, mapper
 plan/          — GeneratedPlan entity, service, mapper
@@ -118,7 +118,7 @@ Manages the module catalogue, tutor profiles, and the tutor application workflow
 
 **Package layout**
 
-```
+```text
 module/            — Module + ModuleTopic entity, service, mapper
 tutorprofile/      — TutorProfile entity, service, mapper (availability, coverage, locations)
 tutorapplication/  — TutorApplication entity, service, mapper
@@ -154,7 +154,7 @@ Manages conversations and messages between students and tutors, with real-time d
 
 **Package layout**
 
-```
+```text
 CommunicationController    — REST endpoints (conversations, messages, WS ticket)
 service/                   — ConversationService, ConversationCreateHelper
 persistence/               — ConversationEntity, MessageEntity, repositories
@@ -168,7 +168,7 @@ keycloak/                  — KeycloakUserClient (resolves display names)
 - REST layer provides conversation listing, creation, message history (paginated), and message sending. Sending a message persists it and publishes a `ConversationMessageEvent` to Redis.
 - **WebSocket**: STOMP endpoint at `/stomp`. The in-memory broker uses destination prefix `/queue`; user-specific destinations use prefix `/user`. `StompChannelInterceptor` validates a short-lived ticket token on every CONNECT frame so the WebSocket handshake does not need to carry a Bearer token (browser WebSocket APIs cannot set custom headers).
 - **WS ticket flow**: clients call `POST /v1/ws-ticket` (authenticated via Bearer token) to get a one-time ticket, then connect to `/stomp` with the ticket as a query parameter.
-- **Redis pub/sub**: `ChatMessageListener` subscribes to Redis and pushes arriving `ConversationMessageEvent` payloads to the relevant user's STOMP `/user/queue/messages` destination, enabling live delivery across server restarts or multiple instances.
+- **Redis pub/sub**: `ChatMessageListener` subscribes to Redis and pushes arriving `ConversationMessageEvent` payloads to the relevant user's STOMP `/user/queue/messages` destination, enabling live delivery across concurrently running server instances.
 - `KeycloakUserClient` calls the Keycloak Admin API to resolve display names for conversation participants when creating a conversation.
 
 **Environment variables**

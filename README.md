@@ -12,7 +12,7 @@ The system consists of five self-contained components:
 | **Server** | Spring Boot (Java) — 3 microservices | Student, Marketplace, and Communication services; each owns its own logical Postgres schema |
 | **Database** | PostgreSQL | Single instance, three isolated schemas; schema documented in [storage.md](./docs/technical/storage.md) |
 | **GenAI** | Python — FastAPI + LangChain | Independent AI service; generates study plans; supports cloud (OpenAI/Logos) and local (Ollama/LM Studio) LLMs |
-| **Gateway** | Caddy | Public-facing reverse proxy; only the client and auth are exposed externally |
+| **Gateway** | Caddy | Public-facing reverse proxy; the client app, Keycloak (auth), Grafana, and the API UI (Scalar + backend REST routes) are all publicly accessible |
 
 For a prose description see [system-overview.md](./docs/system-overview.md). UML diagrams (Component, Use Case, Class) are in [docs/uml/](./docs/uml/).
 
@@ -106,7 +106,7 @@ For the full deployment pipeline and required secrets see [k8s-deployment.md](./
 
 ## Observability
 
-The system uses Prometheus for metrics, Loki for logs, Grafana Alloy as the log collector, and Grafana for dashboards and alerts. Prometheus scrapes all three Spring Boot services; tracked metrics include request count, latency (P95/P99), and error rate. An alert fires when any microservice becomes unreachable and notifies all team members by email.
+The system uses Prometheus for metrics, Loki for logs, Grafana Alloy as the log collector, and Grafana for dashboards and alerts. Prometheus scrapes all three Spring Boot services; tracked metrics include request count, latency (P95/P99), and error rate. An alert fires when any microservice becomes unreachable and notifies the configured email contact point.
 
 For full details — stack setup, scrape config, dashboard inventory, and alert rules — see [observability.md](./docs/technical/observability.md).
 
