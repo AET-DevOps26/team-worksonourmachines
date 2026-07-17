@@ -1,0 +1,381 @@
+{
+  "id": "c7d8e9f0-1234-5678-abcd-ef0123456789",
+  "version": "4.1.0",
+  "title": "AI Service Communication Diagram",
+  "type": "CommunicationDiagram",
+  "nodes": [
+    {
+      "id": "n-client",
+      "width": 180,
+      "height": 80,
+      "type": "communicationObjectName",
+      "position": {
+        "x": 330,
+        "y": 735
+      },
+      "data": {
+        "name": "client: Browser",
+        "attributes": [],
+        "methods": []
+      },
+      "measured": {
+        "width": 180,
+        "height": 80
+      }
+    },
+    {
+      "id": "n-student",
+      "width": 240,
+      "height": 80,
+      "type": "communicationObjectName",
+      "position": {
+        "x": 300,
+        "y": 335
+      },
+      "data": {
+        "name": "studentSvc: Student Service",
+        "attributes": [
+          {
+            "id": "a-ss-1",
+            "name": "port = 8081"
+          }
+        ],
+        "methods": []
+      },
+      "measured": {
+        "width": 240,
+        "height": 80
+      }
+    },
+    {
+      "id": "n-keycloak",
+      "width": 200,
+      "height": 100,
+      "type": "communicationObjectName",
+      "position": {
+        "x": 970,
+        "y": -220
+      },
+      "data": {
+        "name": "keycloak: Keycloak",
+        "attributes": [
+          {
+            "id": "a-kc-1",
+            "name": "port = 8080"
+          },
+          {
+            "id": "a-kc-2",
+            "name": "realm = tutormatch"
+          }
+        ],
+        "methods": []
+      },
+      "measured": {
+        "width": 200,
+        "height": 100
+      }
+    },
+    {
+      "id": "n-ai",
+      "width": 200,
+      "height": 80,
+      "type": "communicationObjectName",
+      "position": {
+        "x": 1540,
+        "y": 330
+      },
+      "data": {
+        "name": "aiSvc: AI Service",
+        "attributes": [
+          {
+            "id": "a-ai-1",
+            "name": "port = 8000"
+          }
+        ],
+        "methods": []
+      },
+      "measured": {
+        "width": 200,
+        "height": 80
+      }
+    },
+    {
+      "id": "n-marketplace",
+      "width": 310,
+      "height": 80,
+      "type": "communicationObjectName",
+      "position": {
+        "x": 875,
+        "y": 1105
+      },
+      "data": {
+        "name": "marketplaceSvc: Marketplace Service",
+        "attributes": [
+          {
+            "id": "a-mp-1",
+            "name": "port = 8082"
+          }
+        ],
+        "methods": []
+      },
+      "measured": {
+        "width": 310,
+        "height": 80
+      }
+    },
+    {
+      "id": "n-llm",
+      "width": 200,
+      "height": 80,
+      "type": "communicationObjectName",
+      "position": {
+        "x": 1965,
+        "y": 670
+      },
+      "data": {
+        "name": "llm: Ollama / OpenAI",
+        "attributes": [],
+        "methods": []
+      },
+      "measured": {
+        "width": 200,
+        "height": 80
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-client-student",
+      "source": "n-client",
+      "target": "n-student",
+      "type": "CommunicationLink",
+      "sourceHandle": "top",
+      "targetHandle": "bottom",
+      "data": {
+        "messages": [
+          {
+            "id": "msg-1",
+            "text": "1: POST /v1/students/me/goals/{id}/plan [user JWT]",
+            "direction": "target"
+          },
+          {
+            "id": "msg-14",
+            "text": "14: 200 OK SharedStudentGeneratedPlan",
+            "direction": "source"
+          }
+        ],
+        "points": [],
+        "targetAnchor": {
+          "side": "bottom",
+          "ratio": 0.5
+        },
+        "sourceAnchor": {
+          "side": "top",
+          "ratio": 0.5
+        }
+      }
+    },
+    {
+      "id": "e-student-keycloak",
+      "source": "n-student",
+      "target": "n-keycloak",
+      "type": "CommunicationLink",
+      "sourceHandle": "top",
+      "targetHandle": "bottom",
+      "data": {
+        "messages": [
+          {
+            "id": "msg-2",
+            "text": "2: GET /certs (verify user JWT)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-2r",
+            "text": "2.1: 200 OK public keys",
+            "direction": "source"
+          },
+          {
+            "id": "msg-3",
+            "text": "3: client_credentials (client_id=server-student)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-3r",
+            "text": "3.1: Bearer token [azp=server-student, role=service]",
+            "direction": "source"
+          },
+          {
+            "id": "msg-8",
+            "text": "8: GET /certs (verify AI token, azp=server-ai, role=service)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-8r",
+            "text": "8.1: 200 OK public keys",
+            "direction": "source"
+          },
+          {
+            "id": "msg-9v",
+            "text": "9.1: GET /certs (verify AI token, azp=server-ai, role=service)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-9vr",
+            "text": "9.2: 200 OK public keys (cached)",
+            "direction": "source"
+          }
+        ],
+        "points": []
+      }
+    },
+    {
+      "id": "e-student-ai",
+      "source": "n-student",
+      "target": "n-ai",
+      "type": "CommunicationLink",
+      "sourceHandle": "right",
+      "targetHandle": "left",
+      "data": {
+        "messages": [
+          {
+            "id": "msg-4",
+            "text": "4: POST /v1/plan [service token]",
+            "direction": "target"
+          },
+          {
+            "id": "msg-7",
+            "text": "7: GET /v1/internal/students/{id}/goals/{goalId} [AI token]",
+            "direction": "source"
+          },
+          {
+            "id": "msg-9",
+            "text": "9: GET /v1/internal/students/{id} [AI token]",
+            "direction": "source"
+          },
+          {
+            "id": "msg-13",
+            "text": "13: 200 OK AiGeneratePlanResponse",
+            "direction": "source"
+          }
+        ],
+        "points": []
+      }
+    },
+    {
+      "id": "e-ai-keycloak",
+      "source": "n-ai",
+      "target": "n-keycloak",
+      "type": "CommunicationLink",
+      "sourceHandle": "top",
+      "targetHandle": "bottom",
+      "data": {
+        "messages": [
+          {
+            "id": "msg-5",
+            "text": "5: GET /certs (verify service token, azp=server-student, role=service)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-5r",
+            "text": "5.1: 200 OK public keys",
+            "direction": "source"
+          },
+          {
+            "id": "msg-6",
+            "text": "6: client_credentials (client_id=server-ai)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-6r",
+            "text": "6.1: Bearer token [azp=server-ai, role=service]",
+            "direction": "source"
+          }
+        ],
+        "points": []
+      }
+    },
+    {
+      "id": "e-ai-marketplace",
+      "source": "n-ai",
+      "target": "n-marketplace",
+      "type": "CommunicationLink",
+      "sourceHandle": "bottom",
+      "targetHandle": "right",
+      "data": {
+        "messages": [
+          {
+            "id": "msg-10",
+            "text": "10: GET /v1/modules [AI token]",
+            "direction": "target"
+          },
+          {
+            "id": "msg-11",
+            "text": "11: GET /v1/tutors?moduleId=…&languages=… [AI token]",
+            "direction": "target"
+          }
+        ],
+        "points": [],
+        "targetAnchor": {
+          "side": "right",
+          "ratio": 0.25
+        }
+      }
+    },
+    {
+      "id": "e-marketplace-keycloak",
+      "source": "n-marketplace",
+      "target": "n-keycloak",
+      "type": "CommunicationLink",
+      "sourceHandle": "top",
+      "targetHandle": "bottom",
+      "data": {
+        "messages": [
+          {
+            "id": "msg-10v",
+            "text": "10.1: GET /certs (verify AI token, azp=server-ai, role=service)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-10vr",
+            "text": "10.2: 200 OK public keys (cached)",
+            "direction": "source"
+          },
+          {
+            "id": "msg-11v",
+            "text": "11.1: GET /certs (verify AI token, azp=server-ai, role=service)",
+            "direction": "target"
+          },
+          {
+            "id": "msg-11vr",
+            "text": "11.2: 200 OK public keys (cached)",
+            "direction": "source"
+          }
+        ],
+        "points": [],
+        "sourceAnchor": {
+          "side": "top",
+          "ratio": 0.6451612903225806
+        }
+      }
+    },
+    {
+      "id": "e-ai-llm",
+      "source": "n-ai",
+      "target": "n-llm",
+      "type": "CommunicationLink",
+      "sourceHandle": "right",
+      "targetHandle": "left",
+      "data": {
+        "messages": [
+          {
+            "id": "msg-12",
+            "text": "12: ainvoke(build_prompt(goal, student, modules, tutors))",
+            "direction": "target"
+          }
+        ],
+        "points": []
+      }
+    }
+  ],
+  "assessments": {}
+}
