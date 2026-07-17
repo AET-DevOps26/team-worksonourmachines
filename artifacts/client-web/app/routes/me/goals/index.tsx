@@ -65,7 +65,7 @@ export default function LearningGoalsRoute() {
                                 <CardDescription className="mt-2">
                                     Module: {moduleCodeById[goal.moduleId] ?? goal.moduleId}
                                 </CardDescription>
-                                <p className="mt-1 text-sm text-muted-foreground">
+                                <p className="mt-1 text-sm text-muted-foreground" suppressHydrationWarning>
                                     Target: {new Date(goal.targetDate).toLocaleDateString()}
                                     {goal.budgetEur != null && ` · Budget: €${goal.budgetEur}`}
                                 </p>

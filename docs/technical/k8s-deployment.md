@@ -42,6 +42,7 @@ infrastructure/
     │   ├── Chart.yaml
     │   ├── values.yaml          # Defaults used in production (Rancher)
     │   ├── values.local.yaml    # Local k3d overrides
+    │   ├── files/               # `tutormatch-realm.json` copied here before helm upgrade
     │   └── templates/
     │       ├── ai.yaml
     │       ├── api-ui.yaml
@@ -54,6 +55,7 @@ infrastructure/
     └── observability/           # Prometheus, Grafana, Loki, Alloy values/RBAC
 ```
 
+Keycloak realm config is not duplicated in the chart. The single source of truth is [`artifacts/keycloak/import/tutormatch-realm.json`](../../artifacts/keycloak/import/tutormatch-realm.json) (same file Compose uses). Demo user data is likewise shared from [`artifacts/demo-seed/`](../../artifacts/demo-seed/). `make -C infrastructure sync-helm-files` copies both into `helm/tutormatch/files/` before `rancher-helm-upgrade` / `k3d-helm-upgrade`. Host and client secrets are substituted at import time by keycloak-config-cli from Job env / Secrets (`APP_HOSTNAME`, `KEYCLOAK_*`, `AI_CLIENT_SECRET`). A post-install `demo-seed` Job (hook-weight 20) then upserts demo DB rows using live Keycloak IDs.
 ### Key values
 
 | Value | Default (`values.yaml`) | Description |

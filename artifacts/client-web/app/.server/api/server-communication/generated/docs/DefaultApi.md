@@ -19,7 +19,7 @@ All URIs are relative to *https://communication.example.local*
 
 Create WebSocket ticket
 
-Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+Issues a short-lived ticket (Redis TTL) for authenticating a STOMP WebSocket CONNECT.
 
 ### Example
 

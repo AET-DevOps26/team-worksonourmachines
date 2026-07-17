@@ -26,6 +26,10 @@ Makefile.local
 
 # Helm downloaded chart archives (Chart.lock is committed; charts/ dir is not)
 infrastructure/helm/tutormatch/charts/
+# Copied from artifacts/keycloak/import/ by `make -C infrastructure sync-keycloak-realm`
+infrastructure/helm/tutormatch/files/tutormatch-realm.json
+# Copied from artifacts/demo-seed/ by `make -C infrastructure sync-demo-seed`
+infrastructure/helm/tutormatch/files/demo-seed/
 
 
 # Terraform

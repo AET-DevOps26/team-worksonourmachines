@@ -104,6 +104,46 @@ services:
         condition: service_healthy
     restart: "no"
 
+  demo-seed:
+    <<: *hardening
+    image: python:3.12-alpine
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        pip install --no-cache-dir 'psycopg[binary]==3.2.9' >/dev/null
+        python3 /demo-seed/seed_demo_data.py
+    environment:
+      DEMO_DATA_PATH: /demo-seed/demo-data.json
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: tutormatch
+      KEYCLOAK_USER: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      PGHOST: postgres
+      STUDENT_DB: ${STUDENT_DB:-student}
+      STUDENT_USER: ${STUDENT_DB_USER:-student}
+      STUDENT_PASSWORD: ${STUDENT_DB_PASSWORD:-student}
+      MARKETPLACE_DB: ${MARKETPLACE_DB:-marketplace}
+      MARKETPLACE_USER: ${MARKETPLACE_DB_USER:-marketplace}
+      MARKETPLACE_PASSWORD: ${MARKETPLACE_DB_PASSWORD:-marketplace}
+      COMMUNICATION_DB: ${COMMUNICATION_DB:-communication}
+      COMMUNICATION_USER: ${COMMUNICATION_DB_USER:-communication}
+      COMMUNICATION_PASSWORD: ${COMMUNICATION_DB_PASSWORD:-communication}
+    volumes:
+      - ./artifacts/demo-seed:/demo-seed:ro,Z
+    depends_on:
+      keycloak-config-cli:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      server-student:
+        condition: service_started
+      server-marketplace:
+        condition: service_started
+      server-communication:
+        condition: service_started
+    restart: "no"
+
   client-web:
     <<: *hardening
     build:
@@ -117,7 +157,7 @@ services:
       - client-web-vite-cache:/app/.vite
       - caddy_data:/caddy-data:ro
     depends_on:
-      keycloak-config-cli:
+      demo-seed:
         condition: service_completed_successfully
       redis:
         condition: service_healthy

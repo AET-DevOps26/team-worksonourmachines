@@ -2,7 +2,7 @@
 
 PostgreSQL is the single relational store for the platform. One shared Postgres instance runs three isolated schemas — `student`, `marketplace`, and `communication` — each owned by a dedicated database user with no cross-schema privileges. Schema isolation is enforced at the database level; services connect with credentials scoped to their own schema only.
 
-Tables are managed by [Flyway](https://flywaydb.org/) migrations co-located with each service under `artifacts/server/<service>/src/main/resources/db/migration/`. The init script that creates the databases and users lives at `artifacts/postgres/init/db-init.sh`.
+Tables are managed by [Flyway](https://flywaydb.org/) migrations co-located with each service under `artifacts/server/<service>/src/main/resources/db/migration/`. The init script that creates the databases and users lives at `artifacts/postgres/init/db-init.sh`. Flyway seeds the marketplace catalogue (modules/topics). User-keyed demo rows (profiles, tutors, chat) are applied at runtime by [`artifacts/demo-seed/`](../../artifacts/demo-seed/) after Keycloak import, using live Keycloak user IDs resolved by email.
 
 ## Databases and users
 
@@ -25,7 +25,7 @@ Stores student identity data, learning goals, and AI-generated study plans.
 
 ### `student.student_profiles`
 
-One row per student (keyed by the Keycloak user ID).
+One row per student (keyed by the Keycloak user ID / JWT `sub`).
 
 | Column                   | Type           | Constraints                     | Notes                                       |
 |--------------------------|----------------|---------------------------------|---------------------------------------------|

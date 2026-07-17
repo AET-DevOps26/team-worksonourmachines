@@ -33,7 +33,7 @@ public interface CommunicationApiV1 {
     String PATH_CREATE_WS_TICKET = "/v1/conversations/ws-ticket";
     /**
      * POST /v1/conversations/ws-ticket : Create WebSocket ticket
-     * Issues a short-lived, single-use ticket for authenticating a STOMP WebSocket CONNECT.
+     * Issues a short-lived ticket (Redis TTL) for authenticating a STOMP WebSocket CONNECT.
      *
      * @return The request has succeeded. (status code 200)
      *         or Access is unauthorized. (status code 401)
