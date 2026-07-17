@@ -123,6 +123,9 @@ def connect_ready(dbname: str, user: str, password: str, schema: str):
                 if cur.fetchone():
                     return conn
             conn.close()
+            last_exc = RuntimeError(f"schema {schema!r} not found yet")
+            log(f"waiting for {dbname}/{schema} ({attempt}/90): {last_exc}")
+            time.sleep(2)
         except Exception as exc:  # noqa: BLE001 - retry until DBs exist
             last_exc = exc
             log(f"waiting for {dbname}/{schema} ({attempt}/90): {exc}")
