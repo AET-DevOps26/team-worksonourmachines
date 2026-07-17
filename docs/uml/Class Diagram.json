@@ -10,8 +10,8 @@
       "height": 850,
       "type": "package",
       "position": {
-        "x": -1010,
-        "y": -280
+        "x": -1345,
+        "y": -295
       },
       "data": {
         "name": "Marketplace Service"
@@ -44,8 +44,8 @@
       "height": 790,
       "type": "package",
       "position": {
-        "x": 1030,
-        "y": -230
+        "x": 1180,
+        "y": -255
       },
       "data": {
         "name": "Communication Service"
@@ -206,8 +206,8 @@
       "height": 130,
       "type": "class",
       "position": {
-        "x": 370,
-        "y": 660
+        "x": 205,
+        "y": 665
       },
       "parentId": "f66bb3f5-fc94-41bc-b41d-3ee6a399d689",
       "data": {
@@ -231,43 +231,6 @@
       "measured": {
         "width": 250,
         "height": 130
-      }
-    },
-    {
-      "id": "9d798fd1-aa08-4c37-84ef-7f73d4d2fdde",
-      "width": 190,
-      "height": 160,
-      "type": "class",
-      "position": {
-        "x": 30,
-        "y": 630
-      },
-      "parentId": "f66bb3f5-fc94-41bc-b41d-3ee6a399d689",
-      "data": {
-        "name": "Rating",
-        "attributes": [
-          {
-            "id": "c76acd82-6b6c-470c-a1a1-66ff37ac151c",
-            "name": "- ratingId: String"
-          },
-          {
-            "id": "93bd955f-2439-48b6-8518-c64b16fc4801",
-            "name": "- studentId: String"
-          },
-          {
-            "id": "5d2c1bf1-e0a8-4079-a2b1-ed61569afde3",
-            "name": "- score: Integer"
-          },
-          {
-            "id": "4709e817-ddcc-47e0-8e0a-fe4fc461aa0a",
-            "name": "- comment: String"
-          }
-        ],
-        "methods": []
-      },
-      "measured": {
-        "width": 190,
-        "height": 160
       }
     },
     {
@@ -351,11 +314,11 @@
           },
           {
             "id": "c79d093d-ddd2-4ce7-8f03-b9d0a60cb606",
-            "name": "- selfAssessedLevel: Integer"
+            "name": "- selfAssessedLevel: int"
           },
           {
             "id": "988e9a6d-09ca-4534-900a-dada459c475b",
-            "name": "- budgetEur: Integer"
+            "name": "- budgetEur: int"
           },
           {
             "id": "88e85760-15fd-4fe7-9ce0-69d1d3190e39",
@@ -574,8 +537,8 @@
       "height": 190,
       "type": "class",
       "position": {
-        "x": 480,
-        "y": 350
+        "x": 485,
+        "y": 430
       },
       "parentId": "f66bb3f5-fc94-41bc-b41d-3ee6a399d689",
       "data": {
@@ -607,7 +570,7 @@
       },
       "measured": {
         "width": 400,
-        "height": 0
+        "height": 190
       }
     },
     {
@@ -683,23 +646,6 @@
       }
     },
     {
-      "id": "aad4e0e7-47df-41ca-a9aa-6871e4c6cc7e",
-      "source": "9d798fd1-aa08-4c37-84ef-7f73d4d2fdde",
-      "target": "92e3f95f-33c6-43ee-b0b0-db50fd114d82",
-      "type": "ClassBidirectional",
-      "sourceHandle": "top",
-      "targetHandle": "bottom-left",
-      "data": {
-        "sourceRole": "ratings",
-        "targetRole": "tutor",
-        "sourceLabel": "receives",
-        "targetLabel": "for",
-        "points": [],
-        "sourceMultiplicity": "*",
-        "targetMultiplicity": "1"
-      }
-    },
-    {
       "id": "cc61e6a2-1d4b-4129-b6c6-15a38c7346cf",
       "source": "42f63270-ee62-4f02-85fc-d248ddcfa8a4",
       "target": "0338d0c8-5d46-4534-af89-0cd658ae9eb8",
@@ -760,20 +706,12 @@
       "data": {
         "points": [
           {
-            "x": -755,
-            "y": 111
+            "x": -1090,
+            "y": 96
           },
           {
-            "x": -755,
-            "y": 256
-          },
-          {
-            "x": -590,
-            "y": 256
-          },
-          {
-            "x": -590,
-            "y": 379
+            "x": -1090,
+            "y": 369
           }
         ],
         "sourceMultiplicity": "1",
@@ -818,20 +756,20 @@
       "data": {
         "points": [
           {
-            "x": -389,
-            "y": 405
+            "x": -889,
+            "y": 395
           },
           {
-            "x": -70,
-            "y": 405
+            "x": -415,
+            "y": 395
           },
           {
-            "x": -70,
-            "y": -15
+            "x": -415,
+            "y": -30
           },
           {
-            "x": -420,
-            "y": -15
+            "x": -755,
+            "y": -30
           }
         ],
         "targetAnchor": {
