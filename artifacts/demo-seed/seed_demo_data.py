@@ -503,6 +503,30 @@ def seed_communication(conn, data: dict[str, Any], ids: dict[str, str]) -> None:
                 )
 
     with conn.cursor() as cur:
+        # Delete any conversation with the same participant pair but a different id
+        # (e.g. created by the app) — the ON CONFLICT (id) clause won't cover it and
+        # the conversations_participants_unique constraint would raise UniqueViolation.
+        cur.execute(
+            """
+            DELETE FROM communication.messages
+            WHERE conversation_id IN (
+                SELECT id FROM communication.conversations
+                WHERE LEAST(participant_a_id, participant_b_id) = LEAST(%s::uuid, %s::uuid)
+                  AND GREATEST(participant_a_id, participant_b_id) = GREATEST(%s::uuid, %s::uuid)
+                  AND id <> %s::uuid
+            )
+            """,
+            (participant_a, participant_b, participant_a, participant_b, conversation["id"]),
+        )
+        cur.execute(
+            """
+            DELETE FROM communication.conversations
+            WHERE LEAST(participant_a_id, participant_b_id) = LEAST(%s::uuid, %s::uuid)
+              AND GREATEST(participant_a_id, participant_b_id) = GREATEST(%s::uuid, %s::uuid)
+              AND id <> %s::uuid
+            """,
+            (participant_a, participant_b, participant_a, participant_b, conversation["id"]),
+        )
         cur.execute(
             """
             INSERT INTO communication.conversations (
