@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: quay.io/keycloak/keycloak:26.6.1
+          image: quay.io/keycloak/keycloak:26.6.1@sha256:dea26401d06341095cc4ea9d66896200b55de5ca1daa1d2fcbe58493afa6e0ad
           args: ["start-dev"]
           ports:
             - containerPort: 8080
@@ -106,7 +106,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: keycloak-config-cli
-          image: adorsys/keycloak-config-cli:latest
+          image: adorsys/keycloak-config-cli:6.5.1-26.5.5@sha256:0955d98c8a341898b7aa177477edf8a1e90569ae50bbe7598141c1270b773274
           args:
             - "--import.var-substitution.enabled=true"
             - "--import.var-substitution.script-evaluation-enabled=true"

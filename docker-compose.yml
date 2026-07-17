@@ -113,7 +113,10 @@ services:
     restart: "no"
 
   demo-seed:
-    <<: *hardening
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     image: python:3.12-alpine
     entrypoint: ["/bin/sh", "-c"]
     command:
