@@ -146,6 +146,10 @@ For the local demo, you need to [enable it explicitely](#observability). For dem
 - In local development it is normal that on first startup a useContext error is present. This is a know React Router issue, which is not specific to this project.
 - Due to Rancher limitations, we could not have rolling updates on deployment as having multiple instances up of the services will break the deployment because of ressource limits.
 
+### Rancher Redeployment
+
+The app can be deployed manually for demo purposes via the GH Actions panel. Therefore select the job `Build and Push Images` and select the main branch for deployment.
+
 ## Domains
 
 |  | local | k8 |
