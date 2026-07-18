@@ -75,7 +75,7 @@ _Note: This is just an initial version of the backlog. Later on we plan to creat
 
 ---
 
-# EPIC 4: Trust and Module Context (skipped and most important anspects were moved to other EPICs)
+# EPIC 4: Trust and Module Context (skipped and most important aspects were moved to other EPICs)
 
 - Implement `Rating` model with tutor ID, student ID, score, and comment.
 - Add rating submission and tutor rating summary endpoints.
