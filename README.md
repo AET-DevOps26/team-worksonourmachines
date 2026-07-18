@@ -48,6 +48,7 @@ See [problem-statement.md](./docs/problem-statement.md) for the full responsibil
 - The initial project backlog has been drafted in [initial-backlog.md](./docs/initial-backlog.md) file.
 - The OpenAPI specs are found in the [api folder](./api/specs/). They are defined using [TypeSpec](https://typespec.io/). As api-driven development is used, they are used to generate the network code for all self-written subsystems (e.g. not Keycloak). They can be viewed by prepending the url with the `api` subdomain.
 - Further Documentation for the subsystems is found in the [docs folder](./docs/technical/): [client](./docs/technical/client-web.md), [server](./docs/technical/server.md), [AI](./docs/technical/ai.md), [storage schema](./docs/technical/storage.md), [observability](./docs/technical/observability.md), [Kubernetes deployment](./docs/technical/k8s-deployment.md).
+- The security scanns were executed on the project, but we have many false positives in regards to our compose setup, as we have multiple compose files and the scanner checks them individually. E.g. healthchecks are present on the services but only defined in the main compose file and not again in the other ones.
 
 ## Local development
 
