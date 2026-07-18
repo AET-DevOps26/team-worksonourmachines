@@ -8,7 +8,7 @@ At the core are three **server** Spring Boot Microservices. They are each respon
 
 Each of them communicates with a logical DB from our single Postgres **DB** instance. Only the responsible service can write to the logical DB, and cross-service access to any other logical DB is not allowed.
 
-The **GenAI** Service is written in Python and consists of a LangChain component and a FastAPI HTTP component. It will communicate with (a subset of) the three Server Microservices. Communication to AI models will include an external online model (most likely from OpenAI) and a self deployed local model.
+The **GenAI** Service is written in Python and consists of a LangChain component and a FastAPI HTTP component. It will communicate with (a subset of) the three Server Microservices. Communication to AI models will include an external online model (Logos) and a self deployed local model (Ollama).
 
 The **web client** uses React Router. The service consists of the in-browser Frontend (FE) and a Backend-for-frontend (BFF). The FE communicates with the BFF via actions and loaders (React Router concepts). The BFF will communicate directly with the Server Microservices via the provided REST APIs.
 

@@ -14,6 +14,8 @@ The system consists of five self-contained components:
 | **GenAI** | Python — FastAPI + LangChain | Independent AI service; generates study plans; supports cloud (OpenAI/Logos) and local (Ollama/LM Studio) LLMs |
 | **Gateway** | Caddy | Public-facing reverse proxy; the client app, Keycloak (auth), Grafana, and the API UI (Scalar + backend REST routes) are all publicly accessible |
 
+Clients reach the system only through the **public gateway** (Caddy locally/Azure; Ingress in Kubernetes). By design, the BFF hides the backends from the browser, except for the WebSocket (STOMP) endpoint, which the gateway proxies directly. There is no API gateway between BFF and backends as it is not necessary: each microservice is a single service instance locally and on Azure, while Kubernetes Services provide discovery in the cluster.
+
 For a prose description see [system-overview.md](./docs/system-overview.md). UML diagrams (Component, Use Case, Class) are in [docs/uml/](./docs/uml/).
 
 ## API Documentation
@@ -72,6 +74,10 @@ To start the project without initializing the full development environment, run 
 ### Cleaning up
 
 Use `make clean` to remove local dependencies and build artifacts, or `make deep-clean` to also reset containers, images, and pnpm stores.
+
+### Kubernetes
+
+A local Kubernetes cluster can be started to serve the application locally and make it available at https://tutormatch.127.0.0.1.nip.io. Refer to the dedicated [documentation](./docs/technical/k8s-deployment.md#local-cluster-k3d) for details.
 
 ## Testing
 
