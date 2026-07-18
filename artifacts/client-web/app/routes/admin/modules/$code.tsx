@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { getModule, updateAdminModule } from '~/.server/service/marketplace';
 import { roleProtectedAction, roleProtectedLoader } from '~/.server/service/routeProtection';
 import { ModuleTopicEditor, parseTopicsFromFormData, topicToDraft } from '~/components/module';
@@ -17,7 +18,7 @@ export const loader = roleProtectedLoader('admin', async ({ params }) => {
     const code = params.code ?? '';
     const result = await getModule(code);
     if (isErr(result)) {
-        throw result.error;
+        throwRouteError(result.error);
     }
     return { module: result.value };
 });

@@ -53,13 +53,13 @@ class MarketplaceQueryParameterConversionTest {
     @Test
     void bindsLowercaseTutorQueryEnums() throws Exception {
         when(tutorProfileService.listTutors(
-                        any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                        any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(new TutorPage(List.of(), 1, 20, 0));
 
         mockMvc.perform(get(MarketplaceApiV1.PATH_LIST_TUTORS)
                         .queryParam("locations", "online")
                         .queryParam("weekdays", "monday")
-                        .queryParam("sort", "rating"))
+                        .queryParam("sort", "rate_asc"))
                 .andExpect(status().isOk());
 
         verify(tutorProfileService).listTutors(
@@ -72,9 +72,8 @@ class MarketplaceQueryParameterConversionTest {
                 List.of(SharedMarketplaceLocation.ONLINE),
                 null,
                 null,
-                null,
                 List.of(SharedMarketplaceWeekday.MONDAY),
-                SharedMarketplaceTutorSort.RATING);
+                SharedMarketplaceTutorSort.RATE_ASC);
     }
 
     @Test

@@ -8,6 +8,7 @@ import {
     type SharedMarketplaceWeekday,
 } from '~/.server/api/server-marketplace/generated';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { getModule, listModules, listTutors } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
 import { contentMaxWidth } from '~/components/shell';
@@ -71,7 +72,6 @@ export const loader = protectedLoader(async ({ request }) => {
             : undefined;
     const minRate = parseOptionalNonNegativeNumber(params.get('minRate'));
     const maxRate = parseOptionalNonNegativeNumber(params.get('maxRate'));
-    const minRating = parseOptionalNonNegativeNumber(params.get('minRating'));
 
     const tutorParams: Parameters<typeof listTutors>[0] = { page, pageSize: 12 };
     if (q) tutorParams.q = q;
@@ -83,12 +83,11 @@ export const loader = protectedLoader(async ({ request }) => {
     if (location) tutorParams.locations = [location];
     if (minRate !== undefined) tutorParams.minRate = minRate;
     if (maxRate !== undefined) tutorParams.maxRate = maxRate;
-    if (minRating !== undefined) tutorParams.minRating = minRating;
 
     const [tutorsResult, modulesResult] = await Promise.all([listTutors(tutorParams), listModules({ pageSize: 100 })]);
 
-    if (isErr(tutorsResult)) throw tutorsResult.error;
-    if (isErr(modulesResult)) throw modulesResult.error;
+    if (isErr(tutorsResult)) throwRouteError(tutorsResult.error);
+    if (isErr(modulesResult)) throwRouteError(modulesResult.error);
 
     const selectedModule = moduleId ? modulesResult.value.items.find((m) => m.id === moduleId) : undefined;
     let moduleTopics: { id: string; name: string }[] = [];
@@ -119,7 +118,6 @@ export default function DiscoverRoute() {
     const locationId = useId();
     const minRateId = useId();
     const maxRateId = useId();
-    const minRatingId = useId();
 
     return (
         <div className="flex flex-col">
@@ -151,8 +149,7 @@ export default function DiscoverRoute() {
                             <Label className="sr-only" htmlFor={sortId}>
                                 Sort by
                             </Label>
-                            <Select defaultValue={searchParams.get('sort') ?? 'rating'} id={sortId} name="sort">
-                                <option value="rating">Top rated</option>
+                            <Select defaultValue={searchParams.get('sort') ?? 'rate_asc'} id={sortId} name="sort">
                                 <option value="rate_asc">Rate (low to high)</option>
                                 <option value="rate_desc">Rate (high to low)</option>
                                 <option value="name">Name</option>
@@ -260,20 +257,6 @@ export default function DiscoverRoute() {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <Label htmlFor={minRatingId}>Min rating</Label>
-                                    <Input
-                                        className="mt-1.5"
-                                        defaultValue={searchParams.get('minRating') ?? ''}
-                                        id={minRatingId}
-                                        max={5}
-                                        min={0}
-                                        name="minRating"
-                                        step={0.1}
-                                        type="number"
-                                    />
-                                </div>
-
                                 <Button className="w-full" type="submit">
                                     Apply filters
                                 </Button>
@@ -298,7 +281,7 @@ export default function DiscoverRoute() {
                                             <Card className="h-full transition-colors hover:border-primary/40">
                                                 <CardTitle className="text-base">{tutor.displayName}</CardTitle>
                                                 <CardDescription className="mt-1">
-                                                    €{tutor.hourlyRate}/h · ★ {tutor.ratingSummary.average.toFixed(1)}
+                                                    €{tutor.hourlyRate}/h
                                                 </CardDescription>
                                                 <div className="mt-3 flex flex-wrap gap-1">
                                                     {tutor.coverages.map((c) => (

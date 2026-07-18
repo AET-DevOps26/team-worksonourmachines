@@ -231,7 +231,6 @@ public interface MarketplaceApiV1 {
      * @param locations  (optional)
      * @param minRate  (optional)
      * @param maxRate  (optional)
-     * @param minRating  (optional)
      * @param weekdays  (optional)
      * @param sort  (optional)
      * @return The request has succeeded. (status code 200)
@@ -250,9 +249,8 @@ public interface MarketplaceApiV1 {
          @Valid @RequestParam(value = "topicId", required = false) @Nullable String topicId,
          @Valid @RequestParam(value = "languages", required = false) @Nullable List<String> languages,
          @Valid @RequestParam(value = "locations", required = false) @Nullable List<SharedMarketplaceLocation> locations,
-         @Valid @RequestParam(value = "minRate", required = false) @Nullable Float minRate,
-         @Valid @RequestParam(value = "maxRate", required = false) @Nullable Float maxRate,
-         @Valid @RequestParam(value = "minRating", required = false) @Nullable Float minRating,
+         @Valid @RequestParam(value = "minRate", required = false) @Nullable Integer minRate,
+         @Valid @RequestParam(value = "maxRate", required = false) @Nullable Integer maxRate,
          @Valid @RequestParam(value = "weekdays", required = false) @Nullable List<SharedMarketplaceWeekday> weekdays,
          @Valid @RequestParam(value = "sort", required = false) @Nullable SharedMarketplaceTutorSort sort
     );

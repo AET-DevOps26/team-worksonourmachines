@@ -30,7 +30,6 @@ export async function listTutors(params?: {
     locations?: SharedMarketplaceLocation[];
     minRate?: number;
     maxRate?: number;
-    minRating?: number;
     weekdays?: SharedMarketplaceWeekday[];
     sort?: SharedMarketplaceTutorSort;
 }) {

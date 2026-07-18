@@ -8,7 +8,6 @@ src/main/java/org/openapitools/model/SharedMarketplaceApproveApplicationResponse
 src/main/java/org/openapitools/model/SharedMarketplaceLocation.java
 src/main/java/org/openapitools/model/SharedMarketplaceModuleDetail.java
 src/main/java/org/openapitools/model/SharedMarketplaceModuleListItem.java
-src/main/java/org/openapitools/model/SharedMarketplaceRatingSummary.java
 src/main/java/org/openapitools/model/SharedMarketplaceRejectApplicationRequest.java
 src/main/java/org/openapitools/model/SharedMarketplaceSubmitTutorApplicationRequest.java
 src/main/java/org/openapitools/model/SharedMarketplaceTopic.java

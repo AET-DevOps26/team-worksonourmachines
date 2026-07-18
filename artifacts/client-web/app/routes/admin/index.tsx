@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { listAdminModules, listAdminTutorApplications } from '~/.server/service/marketplace';
 import { roleProtectedLoader } from '~/.server/service/routeProtection';
 import { PageContainer } from '~/components/shell';
@@ -9,8 +10,8 @@ import { cn } from '~/lib/ui/utils';
 
 export const loader = roleProtectedLoader('admin', async () => {
     const [appsResult, modulesResult] = await Promise.all([listAdminTutorApplications('pending'), listAdminModules()]);
-    if (isErr(appsResult)) throw appsResult.error;
-    if (isErr(modulesResult)) throw modulesResult.error;
+    if (isErr(appsResult)) throwRouteError(appsResult.error);
+    if (isErr(modulesResult)) throwRouteError(modulesResult.error);
     return {
         moduleCount: modulesResult.value.length,
         pendingCount: appsResult.value.length,

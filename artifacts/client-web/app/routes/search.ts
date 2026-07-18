@@ -1,4 +1,5 @@
 import { isErr } from '~/.server/lib/result';
+import { routeErrorJson } from '~/.server/lib/routeError';
 import { listModules, listTutors } from '~/.server/service/marketplace';
 import { protectedLoader } from '~/.server/service/routeProtection';
 
@@ -14,8 +15,8 @@ export const loader = protectedLoader(async ({ request }) => {
         listTutors({ pageSize: 5, q }),
     ]);
 
-    if (isErr(modulesResult)) throw modulesResult.error;
-    if (isErr(tutorsResult)) throw tutorsResult.error;
+    if (isErr(modulesResult)) return routeErrorJson(modulesResult.error);
+    if (isErr(tutorsResult)) return routeErrorJson(tutorsResult.error);
 
     return {
         modules: modulesResult.value.items,

@@ -19,7 +19,6 @@
  * @export
  */
 export const SharedMarketplaceTutorSort = {
-    Rating: 'rating',
     RateAsc: 'rate_asc',
     RateDesc: 'rate_desc',
     Name: 'name'

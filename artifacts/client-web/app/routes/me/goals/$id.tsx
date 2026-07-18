@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 import { isErr } from '~/.server/lib/result';
+import { throwRouteError } from '~/.server/lib/routeError';
 import { listModules } from '~/.server/service/marketplace';
 import { protectedAction, protectedLoader } from '~/.server/service/routeProtection';
 import { deleteGoal, getGoal, updateGoal } from '~/.server/service/student';
@@ -18,8 +19,8 @@ const LOCATIONS = ['online', 'garching', 'munich', 'weihenstephan', 'straubing',
 export const loader = protectedLoader(async ({ params }) => {
     const id = params.id ?? '';
     const [goalResult, modulesResult] = await Promise.all([getGoal(id), listModules({ pageSize: 100 })]);
-    if (isErr(goalResult)) throw goalResult.error;
-    if (isErr(modulesResult)) throw modulesResult.error;
+    if (isErr(goalResult)) throwRouteError(goalResult.error);
+    if (isErr(modulesResult)) throwRouteError(modulesResult.error);
     return { goal: goalResult.value, modules: modulesResult.value.items };
 });
 

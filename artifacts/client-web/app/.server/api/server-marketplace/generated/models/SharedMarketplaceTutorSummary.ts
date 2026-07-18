@@ -21,13 +21,6 @@ import {
     SharedMarketplaceLocationToJSON,
     SharedMarketplaceLocationToJSONTyped,
 } from './SharedMarketplaceLocation';
-import type { SharedMarketplaceRatingSummary } from './SharedMarketplaceRatingSummary';
-import {
-    SharedMarketplaceRatingSummaryFromJSON,
-    SharedMarketplaceRatingSummaryFromJSONTyped,
-    SharedMarketplaceRatingSummaryToJSON,
-    SharedMarketplaceRatingSummaryToJSONTyped,
-} from './SharedMarketplaceRatingSummary';
 import type { SharedMarketplaceTutorCoverage } from './SharedMarketplaceTutorCoverage';
 import {
     SharedMarketplaceTutorCoverageFromJSON,
@@ -80,12 +73,6 @@ export interface SharedMarketplaceTutorSummary {
     locations: Array<SharedMarketplaceLocation>;
     /**
      * 
-     * @type {SharedMarketplaceRatingSummary}
-     * @memberof SharedMarketplaceTutorSummary
-     */
-    ratingSummary: SharedMarketplaceRatingSummary;
-    /**
-     * 
      * @type {Array<SharedMarketplaceTutorCoverage>}
      * @memberof SharedMarketplaceTutorSummary
      */
@@ -102,7 +89,6 @@ export function instanceOfSharedMarketplaceTutorSummary(value: object): value is
     if (!('hourlyRate' in value) || value['hourlyRate'] === undefined) return false;
     if (!('languages' in value) || value['languages'] === undefined) return false;
     if (!('locations' in value) || value['locations'] === undefined) return false;
-    if (!('ratingSummary' in value) || value['ratingSummary'] === undefined) return false;
     if (!('coverages' in value) || value['coverages'] === undefined) return false;
     return true;
 }
@@ -123,7 +109,6 @@ export function SharedMarketplaceTutorSummaryFromJSONTyped(json: any, ignoreDisc
         'hourlyRate': json['hourlyRate'],
         'languages': json['languages'],
         'locations': ((json['locations'] as Array<any>).map(SharedMarketplaceLocationFromJSON)),
-        'ratingSummary': SharedMarketplaceRatingSummaryFromJSON(json['ratingSummary']),
         'coverages': ((json['coverages'] as Array<any>).map(SharedMarketplaceTutorCoverageFromJSON)),
     };
 }
@@ -145,7 +130,6 @@ export function SharedMarketplaceTutorSummaryToJSONTyped(value?: SharedMarketpla
         'hourlyRate': value['hourlyRate'],
         'languages': value['languages'],
         'locations': ((value['locations'] as Array<any>).map(SharedMarketplaceLocationToJSON)),
-        'ratingSummary': SharedMarketplaceRatingSummaryToJSON(value['ratingSummary']),
         'coverages': ((value['coverages'] as Array<any>).map(SharedMarketplaceTutorCoverageToJSON)),
     };
 }

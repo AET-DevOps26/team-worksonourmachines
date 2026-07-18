@@ -28,13 +28,6 @@ import {
     SharedMarketplaceLocationToJSON,
     SharedMarketplaceLocationToJSONTyped,
 } from './SharedMarketplaceLocation';
-import type { SharedMarketplaceRatingSummary } from './SharedMarketplaceRatingSummary';
-import {
-    SharedMarketplaceRatingSummaryFromJSON,
-    SharedMarketplaceRatingSummaryFromJSONTyped,
-    SharedMarketplaceRatingSummaryToJSON,
-    SharedMarketplaceRatingSummaryToJSONTyped,
-} from './SharedMarketplaceRatingSummary';
 import type { SharedMarketplaceTutorCoverage } from './SharedMarketplaceTutorCoverage';
 import {
     SharedMarketplaceTutorCoverageFromJSON,
@@ -87,12 +80,6 @@ export interface SharedMarketplaceTutorDetail {
     locations: Array<SharedMarketplaceLocation>;
     /**
      * 
-     * @type {SharedMarketplaceRatingSummary}
-     * @memberof SharedMarketplaceTutorDetail
-     */
-    ratingSummary: SharedMarketplaceRatingSummary;
-    /**
-     * 
      * @type {Array<SharedMarketplaceTutorCoverage>}
      * @memberof SharedMarketplaceTutorDetail
      */
@@ -127,7 +114,6 @@ export function instanceOfSharedMarketplaceTutorDetail(value: object): value is 
     if (!('hourlyRate' in value) || value['hourlyRate'] === undefined) return false;
     if (!('languages' in value) || value['languages'] === undefined) return false;
     if (!('locations' in value) || value['locations'] === undefined) return false;
-    if (!('ratingSummary' in value) || value['ratingSummary'] === undefined) return false;
     if (!('coverages' in value) || value['coverages'] === undefined) return false;
     if (!('bio' in value) || value['bio'] === undefined) return false;
     if (!('availability' in value) || value['availability'] === undefined) return false;
@@ -151,7 +137,6 @@ export function SharedMarketplaceTutorDetailFromJSONTyped(json: any, ignoreDiscr
         'hourlyRate': json['hourlyRate'],
         'languages': json['languages'],
         'locations': ((json['locations'] as Array<any>).map(SharedMarketplaceLocationFromJSON)),
-        'ratingSummary': SharedMarketplaceRatingSummaryFromJSON(json['ratingSummary']),
         'coverages': ((json['coverages'] as Array<any>).map(SharedMarketplaceTutorCoverageFromJSON)),
         'bio': json['bio'],
         'availability': ((json['availability'] as Array<any>).map(SharedMarketplaceTutorAvailabilityFromJSON)),
@@ -176,7 +161,6 @@ export function SharedMarketplaceTutorDetailToJSONTyped(value?: SharedMarketplac
         'hourlyRate': value['hourlyRate'],
         'languages': value['languages'],
         'locations': ((value['locations'] as Array<any>).map(SharedMarketplaceLocationToJSON)),
-        'ratingSummary': SharedMarketplaceRatingSummaryToJSON(value['ratingSummary']),
         'coverages': ((value['coverages'] as Array<any>).map(SharedMarketplaceTutorCoverageToJSON)),
         'bio': value['bio'],
         'availability': ((value['availability'] as Array<any>).map(SharedMarketplaceTutorAvailabilityToJSON)),

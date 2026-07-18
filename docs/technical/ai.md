@@ -1,6 +1,97 @@
+# AI Service
+
+The AI service is an independent Python microservice (FastAPI + LangChain) that generates personalised study plans. It is the only component that calls an LLM; all other services interact with it over a defined REST interface.
+
+## Module layout
+
+```text
+app/
+  main.py           — FastAPI app, router registration, health endpoint
+  ai_impl.py        — DefaultApiImpl: plan generation logic, LLM invocation, response mapping
+  clients.py        — Async HTTP clients for student and marketplace services
+  llm.py            — LLM factory: builds a LangChain ChatModel from env vars
+  auth.py           — Inbound JWT validation (verifies caller is server-student)
+  token_exchange.py — Client-credentials token fetch (AI calls upstream services as server-ai)
+  prompt.py         — Prompt builder: assembles the full LLM prompt from structured data
+generated/          — OpenAPI-generated FastAPI router, models, and base class (do not edit)
+tests/
+  test_plan.py      — Unit tests for plan generation, prompt building, filtering
+  test_main.py      — Health endpoint smoke test
+  test_llm.py       — LLM factory unit tests
+```
+
+## API
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/v1/plan` | Generate a study plan for a learning goal |
+| `GET` | `/health` | Liveness check |
+
+The `/v1/plan` endpoint is defined in the shared TypeSpec contract (`api/ai.tsp`) and compiled to `api/specs/openapi.Ai.v1.yaml`. The generated FastAPI router and models live in `generated/`.
+
+## Plan generation flow
+
+`POST /v1/plan` accepts `{ learningGoalId, studentId }` and returns three plan suggestions (cheapest, within_budget, best_quality).
+
+1. **Auth**: inbound JWT is validated — must be issued by Keycloak, `azp` must be `server-student`, and the token must carry the `service` realm role.
+2. **Token exchange**: the service fetches its own client-credentials token (`server-ai` client) to call upstream services.
+3. **Data fetch** (parallel): learning goal and student profile are fetched from `server-student`'s internal API; module details and matching tutors are fetched from `server-marketplace`.
+4. **Filtering**: tutors are filtered by the student's preferred languages and the goal's preferred locations. A `422` is returned if no tutors remain after filtering.
+5. **Prompt assembly**: `build_prompt()` constructs a detailed prompt including student profile, learning goal, all module topics with study-focus weights, and the filtered tutor list with exact hourly rates.
+6. **LLM invocation**:
+   - For `openai` provider: uses LangChain `with_structured_output()` — the schema is enforced at the API level, no parsing needed.
+   - For all other providers (Logos, Ollama, LM Studio): plain text generation, then JSON fence stripping. On parse failure the prompt is retried once with an explicit correction instruction. A second failure returns HTTP 500.
+7. **Response mapping**: `_map_response()` / `_fix_rates()` validates that all tutor IDs in the LLM output exist in the fetched tutor list, replaces any hallucinated IDs with the first valid tutor (`valid_tutors[0]`), and recomputes `totalEstimatedCost` from milestone sums.
+
+## Security
+
+The service enforces a two-way trust boundary:
+
+- **Inbound** (`auth.py`): every request to `/v1/plan` must carry a valid Keycloak JWT signed with `RS256`. The JWKS are fetched from Keycloak and cached. The token's `azp` claim must equal `server-student` and must include the `service` realm role — other callers are rejected with 403.
+- **Outbound** (`token_exchange.py`): when calling `server-student` and `server-marketplace`, the AI service obtains its own client-credentials token (`server-ai` Keycloak client) and attaches it as `Authorization: Bearer ...`. The server services accept this because the `server-ai` account also carries the `service` role.
+
+## Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `LLM_PROVIDER` | `lmstudio` | LLM backend: `lmstudio`, `ollama`, `logos`, `openai` |
+| `LLM_BASE_URL` | — | LLM API base URL (required for all except Ollama default) |
+| `LLM_MODEL` | provider-specific | Model name passed to the LLM |
+| `LLM_API_KEY` | — | API key (required for Logos and OpenAI) |
+| `STUDENT_API_URL` | `http://server-student:8081` | Student service base URL |
+| `MARKETPLACE_API_URL` | `http://server-marketplace:8082` | Marketplace service base URL |
+| `KEYCLOAK_ISSUER` | `https://auth.tutormatch.localhost/realms/tutormatch` | JWT issuer for inbound token validation |
+| `KEYCLOAK_JWKS_URI` | `http://keycloak:8080/realms/tutormatch/...` | JWKS endpoint (internal URL) |
+| `EXPECTED_CALLER_CLIENT_ID` | `server-student` | Expected `azp` claim in inbound tokens |
+| `KEYCLOAK_TOKEN_URL` | `http://keycloak:8080/realms/tutormatch/...` | Token endpoint for outbound client-credentials |
+| `AI_CLIENT_ID` | `server-ai` | Keycloak client ID for outbound token |
+| `AI_CLIENT_SECRET` | — | Keycloak client secret for outbound token |
+| `LOG_LEVEL` | `INFO` | Python logging level |
+
+## Testing
+
+Tests use `pytest` with `pytest-asyncio`. All external calls (LLM, upstream services, Keycloak) are mocked — no running services are needed.
+
+```bash
+make test-ai
+```
+
+Key test coverage in `tests/test_plan.py`:
+
+| Area | What is tested |
+|---|---|
+| `_extract_json` | Plain JSON, fenced JSON, preamble + fence, invalid input |
+| `_map_response` | Basic mapping, empty suggestions, tutor ID correction |
+| `build_prompt` | All required sections present, student/goal/tutor/topic data injected |
+| `generate_plan` | Success path, markdown fence stripping, JSON retry on bad response, 500 after two failures, 502 on token failure, 502 on LLM connection error |
+| Language filter | Correct tutors passed to LLM, case-insensitive match, 422 on no match, skipped when student has no languages |
+| Location filter | Correct tutors passed to LLM, 422 on no match, skipped when goal has no locations, both filters applied sequentially |
+
+---
+
 ## Checking the deployed AI service
 
-The AI service is not exposed through an Ingress — it is internal to the cluster. To hit it directly:
+The AI service is not directly reachable via the main app ingress, but `POST /v1/plan` is publicly accessible through the `api-ui` ingress at `api.<host>/v1/plan` (see [Service networking](./server.md#service-networking)). To hit the service directly for debugging, use port-forward:
 
 ```bash
 kubectl --context stud -n team-worksonourmachines port-forward svc/ai 8000:8000
@@ -9,9 +100,10 @@ kubectl --context stud -n team-worksonourmachines port-forward svc/ai 8000:8000
 Then in another terminal:
 
 ```bash
-curl -X POST http://localhost:8000/v1/chat \
+curl -X POST http://localhost:8000/v1/plan \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "Hello"}'
+  -H "Authorization: Bearer <server-student-token>" \
+  -d '{"learningGoalId":"<goal-id>","studentId":"<student-id>"}'
 ```
 
 The `/health` endpoint is also available:

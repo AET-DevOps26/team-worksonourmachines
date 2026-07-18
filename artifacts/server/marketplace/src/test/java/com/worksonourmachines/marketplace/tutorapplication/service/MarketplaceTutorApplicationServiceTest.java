@@ -186,7 +186,7 @@ class MarketplaceTutorApplicationServiceTest {
                 application.getUserId(),
                 "Ada Lovelace",
                 "Tutor bio.",
-                25.0f,
+                25,
                 false);
         when(profileRepository.findByUserId(application.getUserId())).thenReturn(Optional.of(profile));
         when(repository.save(application)).thenReturn(application);
@@ -326,7 +326,7 @@ class MarketplaceTutorApplicationServiceTest {
                 userId,
                 "Ada Lovelace",
                 "Tutor bio.",
-                25.0f,
+                25,
                 false);
     }
 
@@ -336,7 +336,7 @@ class MarketplaceTutorApplicationServiceTest {
                 "Tutor bio.",
                 List.of("English"),
                 List.of(SharedMarketplaceLocation.ONLINE),
-                25.0f,
+                25,
                 List.of(new SharedMarketplaceTutorAvailability(SharedMarketplaceWeekday.MONDAY, true)));
     }
 }

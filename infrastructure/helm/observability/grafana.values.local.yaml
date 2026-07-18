@@ -1,0 +1,9 @@
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "null"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+  hosts:
+    - grafana.tutormatch.127.0.0.1.nip.io
+  tls:
+    - hosts:
+        - grafana.tutormatch.127.0.0.1.nip.io
