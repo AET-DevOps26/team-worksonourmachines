@@ -13,6 +13,9 @@ x-server-base: &server-base
 
 services:
   gateway:
+    ports:
+      - 127.0.0.1:80:80
+      - 127.0.0.1:443:443
     environment:
       APP_HOSTNAME: tutormatch.localhost
     volumes:
@@ -99,7 +102,7 @@ services:
       KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://keycloak:8080}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-tutormatch}
       KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-server-marketplace-admin}
-      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-server-marketplace-admin-secret}
+      KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET: ${KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET:-server-marketplace-admin-secret}
     command: ["mvn", "-pl", "marketplace", "-am", "spring-boot:run"]
     ports:
       - 127.0.0.1:8082:8082

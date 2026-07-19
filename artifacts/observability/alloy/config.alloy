@@ -25,7 +25,7 @@ discovery.relabel "tutormatch_logs" {
 loki.source.docker "tutormatch" {
   host          = "unix:///var/run/docker.sock"
   targets       = discovery.docker.tutormatch.targets
-  labels        = { environment = "local" }
+  labels        = { environment = "production" }
   relabel_rules = discovery.relabel.tutormatch_logs.rules
   forward_to    = [loki.write.local.receiver]
 }
