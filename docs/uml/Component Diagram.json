@@ -1,7 +1,7 @@
 {
-  "id": "dffed0f5-9051-4a90-b595-7d53b8bf063f",
-  "version": "4.0.0",
-  "title": "Tutor Matcher Component Diagram",
+  "id": "rw8MWC0LiSGI6mfnyy4KNg",
+  "version": "4.1.0",
+  "title": "TUtorMatch Component Diagram",
   "type": "ComponentDiagram",
   "nodes": [
     {
@@ -33,7 +33,7 @@
       },
       "parentId": "20ede45a-7a15-4a9c-b830-994a51e3577f",
       "data": {
-        "name": "BFF + SSR of Frontend:3000",
+        "name": "BFF + SSR of Frontend:5173",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -88,7 +88,7 @@
       },
       "parentId": "8a033d98-371e-4fba-b589-ea952f821d3c",
       "data": {
-        "name": "Communication Service :8081",
+        "name": "Communication Service:8083",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -107,7 +107,7 @@
       },
       "parentId": "8a033d98-371e-4fba-b589-ea952f821d3c",
       "data": {
-        "name": "Marketplace Service :8082",
+        "name": "Marketplace Service:8082",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -126,7 +126,7 @@
       },
       "parentId": "8a033d98-371e-4fba-b589-ea952f821d3c",
       "data": {
-        "name": "Student Service :8083",
+        "name": "Student Service:8081",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -165,7 +165,7 @@
       },
       "parentId": "714f9f3a-c6ee-4184-a757-45bfff0237fa",
       "data": {
-        "name": "Keycloak :8080",
+        "name": "Keycloak:8080",
         "isComponentHeaderShown": true,
         "strokeColor": "#45aaf2"
       },
@@ -199,11 +199,11 @@
       "type": "component",
       "position": {
         "x": 60,
-        "y": 70
+        "y": 95
       },
       "parentId": "e11389a6-9d1e-4fd4-839a-7732429fb50f",
       "data": {
-        "name": "Communication DBPostgreSQL :5432",
+        "name": "Communication DB PostgreSQL:5432",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -222,7 +222,7 @@
       },
       "parentId": "e11389a6-9d1e-4fd4-839a-7732429fb50f",
       "data": {
-        "name": "Marketplace DBPostgreSQL :5432",
+        "name": "Marketplace DB PostgreSQL:5432",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -237,11 +237,11 @@
       "type": "component",
       "position": {
         "x": 60,
-        "y": 340
+        "y": 345
       },
       "parentId": "e11389a6-9d1e-4fd4-839a-7732429fb50f",
       "data": {
-        "name": "Student DB\nPostgreSQL :5432",
+        "name": "Student DB\nPostgreSQL:5432",
         "isComponentHeaderShown": true
       },
       "measured": {
@@ -279,7 +279,7 @@
       },
       "parentId": "775f5c59-ef90-41e0-99d2-1a2ae64920f9",
       "data": {
-        "name": "GenAI Orchestrator Service :8085",
+        "name": "GenAI Orchestrator Service:8000",
         "isComponentHeaderShown": true,
         "strokeColor": "#26de81"
       },
@@ -294,8 +294,8 @@
       "height": 30,
       "type": "componentInterface",
       "position": {
-        "x": -120,
-        "y": 50
+        "x": -115,
+        "y": 30
       },
       "data": {
         "name": "OIDC / JWT",
@@ -316,7 +316,7 @@
         "y": 230
       },
       "data": {
-        "name": "/communication/v1"
+        "name": "HTTP"
       },
       "measured": {
         "width": 30,
@@ -333,7 +333,7 @@
         "y": 340
       },
       "data": {
-        "name": "/marketplace/v1"
+        "name": "HTTP"
       },
       "measured": {
         "width": 30,
@@ -350,7 +350,7 @@
         "y": 450
       },
       "data": {
-        "name": "/student/v1"
+        "name": "HTTP"
       },
       "measured": {
         "width": 30,
@@ -363,7 +363,7 @@
       "height": 220,
       "type": "componentSubsystem",
       "position": {
-        "x": 1430,
+        "x": 1385,
         "y": 810
       },
       "data": {
@@ -387,7 +387,7 @@
       },
       "parentId": "c5e34214-4579-4341-a910-1688237eceb5",
       "data": {
-        "name": "OpenAI API :443",
+        "name": "Logos API",
         "isComponentHeaderShown": true,
         "strokeColor": "#26de81"
       },
@@ -421,11 +421,11 @@
       "height": 30,
       "type": "componentInterface",
       "position": {
-        "x": 620,
+        "x": 500,
         "y": -30
       },
       "data": {
-        "name": "OIDC/JWT",
+        "name": "OIDC / JWT",
         "strokeColor": "#45aaf2"
       },
       "measured": {
@@ -439,11 +439,11 @@
       "height": 30,
       "type": "componentInterface",
       "position": {
-        "x": 620,
-        "y": 40
+        "x": 500,
+        "y": 35
       },
       "data": {
-        "name": "OIDC/JWT",
+        "name": "OIDC / JWT",
         "strokeColor": "#45aaf2"
       },
       "measured": {
@@ -457,11 +457,11 @@
       "height": 30,
       "type": "componentInterface",
       "position": {
-        "x": 620,
-        "y": 100
+        "x": 500,
+        "y": 95
       },
       "data": {
-        "name": "OIDC/JWT",
+        "name": "OIDC / JWT",
         "strokeColor": "#45aaf2"
       },
       "measured": {
@@ -479,7 +479,137 @@
         "y": 310
       },
       "data": {
-        "name": "tutormatch.de:443"
+        "name": "HTTP"
+      },
+      "measured": {
+        "width": 30,
+        "height": 30
+      }
+    },
+    {
+      "id": "c683b91b-d5d3-443f-952a-07e9221d17dd",
+      "width": 30,
+      "height": 30,
+      "type": "componentInterface",
+      "position": {
+        "x": -625,
+        "y": 45
+      },
+      "data": {
+        "name": "auth.<domain> | OIDC / JWT",
+        "strokeColor": "#45aaf2"
+      },
+      "measured": {
+        "width": 30,
+        "height": 30
+      }
+    },
+    {
+      "id": "86af388f-4913-4499-9017-18d9f9a075ba",
+      "width": 30,
+      "height": 30,
+      "type": "componentInterface",
+      "position": {
+        "x": -405,
+        "y": 145
+      },
+      "data": {
+        "name": "/stomp | HTTP WebSocket"
+      },
+      "measured": {
+        "width": 30,
+        "height": 30
+      }
+    },
+    {
+      "id": "00cfeab1-0f08-455b-94c2-2f90bb3cf4b5",
+      "width": 360,
+      "height": 220,
+      "type": "componentSubsystem",
+      "position": {
+        "x": 245,
+        "y": 815
+      },
+      "data": {
+        "name": "Local AI",
+        "isComponentSubsystemHeaderShown": true,
+        "strokeColor": "#26de81"
+      },
+      "measured": {
+        "width": 360,
+        "height": 220
+      }
+    },
+    {
+      "id": "5dc0a375-6348-44de-bc3e-634902f10f3a",
+      "width": 280,
+      "height": 110,
+      "type": "component",
+      "position": {
+        "x": 40,
+        "y": 75
+      },
+      "parentId": "00cfeab1-0f08-455b-94c2-2f90bb3cf4b5",
+      "data": {
+        "name": "Ollama API",
+        "isComponentHeaderShown": true,
+        "strokeColor": "#26de81"
+      },
+      "measured": {
+        "width": 280,
+        "height": 110
+      }
+    },
+    {
+      "id": "48240a8f-fb98-47d8-9bda-86d1b103c550",
+      "width": 30,
+      "height": 30,
+      "type": "componentInterface",
+      "position": {
+        "x": 390,
+        "y": 670
+      },
+      "data": {
+        "name": "OIDC/JWT",
+        "strokeColor": "#45aaf2"
+      },
+      "measured": {
+        "width": 30,
+        "height": 30
+      }
+    },
+    {
+      "id": "02b8e216-4909-4646-9688-ce5dd20434c4",
+      "width": 30,
+      "height": 30,
+      "type": "componentInterface",
+      "position": {
+        "x": 1145,
+        "y": 655
+      },
+      "data": {
+        "name": "HTTP",
+        "fillColor": "",
+        "strokeColor": "#26de81"
+      },
+      "measured": {
+        "width": 30,
+        "height": 30
+      }
+    },
+    {
+      "id": "b086c9a3-f38e-4f4b-9609-6f6fe44092fa",
+      "width": 30,
+      "height": 30,
+      "type": "componentInterface",
+      "position": {
+        "x": 885,
+        "y": 650
+      },
+      "data": {
+        "name": "HTTP",
+        "fillColor": "",
+        "strokeColor": "#26de81"
       },
       "measured": {
         "width": 30,
@@ -555,17 +685,6 @@
       }
     },
     {
-      "id": "84a2fc1d-bcd2-414b-bb7c-99f3df86de2a",
-      "source": "30dad2ea-a6b7-4bb6-b3e5-3f59108b02ec",
-      "target": "b4d697e8-3bf6-4c05-9413-806c13c6adc8",
-      "type": "ComponentDependency",
-      "sourceHandle": "right-top",
-      "targetHandle": "left",
-      "data": {
-        "points": []
-      }
-    },
-    {
       "id": "d684a4f2-23af-4a48-a23c-eadceac8581c",
       "source": "7937ad73-78a8-4a50-ad2e-e38a075fb000",
       "target": "13ffa5c5-3510-4496-b4fd-c65741a9b31c",
@@ -577,27 +696,32 @@
       }
     },
     {
-      "id": "b4976441-2128-402a-83bb-50b896e4031e",
-      "source": "67429b57-ac37-47d8-915d-69cbda474dcf",
-      "target": "325d0f77-85dc-49e0-a5c1-2d980faf9178",
-      "type": "ComponentRequiredInterface",
-      "sourceHandle": "top",
-      "targetHandle": "bottom",
-      "data": {
-        "points": [],
-        "strokeColor": "#45aaf2"
-      }
-    },
-    {
       "id": "8d2e0256-2f35-4305-a420-4818de3c96b1",
       "source": "322c933d-c024-4f57-95a4-6a6c13be1620",
       "target": "325d0f77-85dc-49e0-a5c1-2d980faf9178",
       "type": "ComponentProvidedInterface",
       "sourceHandle": "bottom-left",
-      "targetHandle": "top",
+      "targetHandle": "right",
       "data": {
-        "points": [],
-        "strokeColor": "#45aaf2"
+        "points": [
+          {
+            "x": 220,
+            "y": -109
+          },
+          {
+            "x": 220,
+            "y": 45
+          },
+          {
+            "x": -85,
+            "y": 45
+          }
+        ],
+        "strokeColor": "#45aaf2",
+        "targetAnchor": {
+          "side": "right",
+          "ratio": 0.5
+        }
       }
     },
     {
@@ -618,18 +742,6 @@
       "type": "ComponentDependency",
       "sourceHandle": "right",
       "targetHandle": "left",
-      "data": {
-        "strokeColor": "#26de81",
-        "points": []
-      }
-    },
-    {
-      "id": "604fe1da-0b72-489a-8a1e-5c7b0eee0840",
-      "source": "afcd5e5a-eb44-44bb-8619-86bfbd918283",
-      "target": "2a0f7431-9bb3-4fd4-a079-d30a47632407",
-      "type": "ComponentDependency",
-      "sourceHandle": "bottom",
-      "targetHandle": "top",
       "data": {
         "strokeColor": "#26de81",
         "points": []
@@ -737,6 +849,215 @@
       "sourceHandle": "right",
       "targetHandle": "left",
       "data": {
+        "points": []
+      }
+    },
+    {
+      "id": "655cba2c-c081-4b41-a4e7-a167220dd268",
+      "source": "ad5c6bbb-aaa3-416f-82b2-c7a353ec83db",
+      "target": "c683b91b-d5d3-443f-952a-07e9221d17dd",
+      "type": "ComponentRequiredInterface",
+      "sourceHandle": "top-between-mid-left-center",
+      "targetHandle": "bottom",
+      "data": {
+        "textColor": "#45aaf2",
+        "strokeColor": "#45aaf2",
+        "points": []
+      }
+    },
+    {
+      "id": "fdf0ecf8-852e-4742-87cc-1ce0068349e6",
+      "source": "c683b91b-d5d3-443f-952a-07e9221d17dd",
+      "target": "322c933d-c024-4f57-95a4-6a6c13be1620",
+      "type": "ComponentProvidedInterface",
+      "sourceHandle": "top",
+      "targetHandle": "left-bottom",
+      "data": {
+        "strokeColor": "#45aaf2",
+        "points": [],
+        "textColor": "#45aaf2"
+      }
+    },
+    {
+      "id": "c2d0ae6f-cfa4-4335-94ee-ccbf26acc6b8",
+      "source": "ad5c6bbb-aaa3-416f-82b2-c7a353ec83db",
+      "target": "86af388f-4913-4499-9017-18d9f9a075ba",
+      "type": "ComponentRequiredInterface",
+      "sourceHandle": "top-right",
+      "targetHandle": "left",
+      "data": {
+        "points": []
+      }
+    },
+    {
+      "id": "a5a84336-9625-46e4-9cf1-d9ec108050e1",
+      "source": "86af388f-4913-4499-9017-18d9f9a075ba",
+      "target": "30dad2ea-a6b7-4bb6-b3e5-3f59108b02ec",
+      "type": "ComponentProvidedInterface",
+      "sourceHandle": "right",
+      "targetHandle": "top-left",
+      "data": {
+        "points": []
+      }
+    },
+    {
+      "id": "6ebd772a-233d-478d-9235-54327c81bc92",
+      "source": "30dad2ea-a6b7-4bb6-b3e5-3f59108b02ec",
+      "target": "b4d697e8-3bf6-4c05-9413-806c13c6adc8",
+      "type": "ComponentDependency",
+      "sourceHandle": "right",
+      "targetHandle": "left",
+      "data": {
+        "points": []
+      }
+    },
+    {
+      "id": "2b113e03-d183-4679-ad9c-271623dbac2c",
+      "source": "2a0f7431-9bb3-4fd4-a079-d30a47632407",
+      "target": "5dc0a375-6348-44de-bc3e-634902f10f3a",
+      "type": "ComponentDependency",
+      "sourceHandle": "left",
+      "targetHandle": "right-between-mid-top-center",
+      "data": {
+        "strokeColor": "#26de81",
+        "points": []
+      }
+    },
+    {
+      "id": "e84ae671-a52a-4f9e-980e-17c14688461d",
+      "source": "0f072d7c-0f62-495f-9db6-eac70e766bf4",
+      "target": "00cfeab1-0f08-455b-94c2-2f90bb3cf4b5",
+      "type": "ComponentDependency",
+      "sourceHandle": "top",
+      "targetHandle": "top-mid-right",
+      "data": {
+        "points": []
+      }
+    },
+    {
+      "id": "0a7b0bdb-2bab-4009-b1a8-8c142eca92a9",
+      "source": "322c933d-c024-4f57-95a4-6a6c13be1620",
+      "target": "48240a8f-fb98-47d8-9bda-86d1b103c550",
+      "type": "ComponentProvidedInterface",
+      "sourceHandle": "bottom",
+      "targetHandle": "left",
+      "data": {
+        "strokeColor": "#45aaf2",
+        "points": [],
+        "sourceAnchor": {
+          "side": "bottom",
+          "ratio": 0.34375
+        }
+      }
+    },
+    {
+      "id": "35316f72-c5f4-4731-9074-953f4514b109",
+      "source": "2a0f7431-9bb3-4fd4-a079-d30a47632407",
+      "target": "48240a8f-fb98-47d8-9bda-86d1b103c550",
+      "type": "ComponentRequiredInterface",
+      "sourceHandle": "top-left",
+      "targetHandle": "right",
+      "data": {
+        "strokeColor": "#45aaf2",
+        "points": []
+      }
+    },
+    {
+      "id": "a84d40cc-ee22-4e4d-9e8d-11780c65b3ed",
+      "source": "7937ad73-78a8-4a50-ad2e-e38a075fb000",
+      "target": "02b8e216-4909-4646-9688-ce5dd20434c4",
+      "type": "ComponentProvidedInterface",
+      "sourceHandle": "right",
+      "targetHandle": "top",
+      "data": {
+        "strokeColor": "#26de81",
+        "points": []
+      }
+    },
+    {
+      "id": "a546b9e4-0570-4471-b0b3-5144eb86f12a",
+      "source": "2a0f7431-9bb3-4fd4-a079-d30a47632407",
+      "target": "02b8e216-4909-4646-9688-ce5dd20434c4",
+      "type": "ComponentRequiredInterface",
+      "sourceHandle": "top-between-mid-right-right",
+      "targetHandle": "bottom",
+      "data": {
+        "textColor": "#26de81",
+        "strokeColor": "#26de81",
+        "points": [
+          {
+            "x": 965,
+            "y": 889
+          },
+          {
+            "x": 965,
+            "y": 740
+          },
+          {
+            "x": 1160,
+            "y": 740
+          },
+          {
+            "x": 1160,
+            "y": 690
+          }
+        ]
+      }
+    },
+    {
+      "id": "e3d0e52b-612e-4537-aedf-18f97c192ed8",
+      "source": "afcd5e5a-eb44-44bb-8619-86bfbd918283",
+      "target": "b086c9a3-f38e-4f4b-9609-6f6fe44092fa",
+      "type": "ComponentRequiredInterface",
+      "sourceHandle": "bottom",
+      "targetHandle": "top",
+      "data": {
+        "strokeColor": "#26de81",
+        "points": []
+      }
+    },
+    {
+      "id": "77b4c9c0-fc69-4797-a8f8-1276a6a658ec",
+      "source": "2a0f7431-9bb3-4fd4-a079-d30a47632407",
+      "target": "b086c9a3-f38e-4f4b-9609-6f6fe44092fa",
+      "type": "ComponentRequiredInterface",
+      "sourceHandle": "top",
+      "targetHandle": "bottom",
+      "data": {
+        "strokeColor": "#26de81",
+        "points": [
+          {
+            "x": 955,
+            "y": 890
+          },
+          {
+            "x": 955,
+            "y": 740
+          },
+          {
+            "x": 900,
+            "y": 740
+          },
+          {
+            "x": 900,
+            "y": 685
+          }
+        ],
+        "sourceAnchor": {
+          "side": "top",
+          "ratio": 0.6964285714285714
+        }
+      }
+    },
+    {
+      "id": "ced7130c-b87e-4449-8be6-501e52197e32",
+      "source": "67429b57-ac37-47d8-915d-69cbda474dcf",
+      "target": "325d0f77-85dc-49e0-a5c1-2d980faf9178",
+      "type": "ComponentRequiredInterface",
+      "sourceHandle": "top-left",
+      "targetHandle": "left",
+      "data": {
+        "strokeColor": "#45aaf2",
         "points": []
       }
     }
