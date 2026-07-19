@@ -75,7 +75,7 @@ spec:
               value: "tutormatch"
             - name: KEYCLOAK_ADMIN_CLIENT_ID
               value: "server-marketplace-admin"
-            - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+            - name: KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET
               valueFrom:
                 secretKeyRef:
                   name: keycloak-secrets

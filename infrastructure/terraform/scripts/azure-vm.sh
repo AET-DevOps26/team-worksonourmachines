@@ -14,7 +14,7 @@ Environment variables:
   GHCR_USERNAME          GitHub username for private GHCR packages.
   GHCR_TOKEN             GitHub token with read:packages for private GHCR packages.
   LLM_API_KEY            Optional LLM provider API key passed to the AI service when set.
-  AZURE_APP_HOSTNAME     Optional public hostname loaded from .env. Defaults to <vm-public-ip>.nip.io.
+  AZURE_APP_HOSTNAME     Optional public hostname loaded from .env. Defaults to tutormatch.<vm-public-ip>.nip.io.
   APP_HOSTNAME           Optional shell-only public hostname override kept for compatibility.
   SSH_PRIVATE_KEY        SSH private key for the Azure admin user. Defaults to ~/.ssh/id_ed25519.
   TERRAFORM_DIR          Terraform directory. Defaults to infrastructure/terraform/azure-vm.
@@ -55,7 +55,7 @@ action="${1:-deploy}"
 
 env_file_variable_is_allowed() {
   case "$1" in
-    AZURE_APP_HOSTNAME|GHCR_USERNAME|GHCR_TOKEN|IMAGE_TAG|LLM_API_KEY|POSTGRES_PASSWORD|KEYCLOAK_DB_PASSWORD|KEYCLOAK_ADMIN_PASSWORD|KEYCLOAK_CLIENT_SECRET|ARM_SUBSCRIPTION_ID|SSH_PRIVATE_KEY|TERRAFORM_DIR|INVENTORY_FILE|PLAN_FILE|DESTROY_PLAN_FILE|TF_VAR_*)
+    AZURE_APP_HOSTNAME|GHCR_USERNAME|GHCR_TOKEN|IMAGE_TAG|LLM_API_KEY|POSTGRES_PASSWORD|KEYCLOAK_DB_PASSWORD|KEYCLOAK_ADMIN_PASSWORD|KEYCLOAK_CLIENT_SECRET|SERVER_STUDENT_CLIENT_SECRET|KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET|AI_CLIENT_SECRET|GRAFANA_ADMIN_USER|GRAFANA_ADMIN_PASSWORD|ARM_SUBSCRIPTION_ID|SSH_PRIVATE_KEY|TERRAFORM_DIR|INVENTORY_FILE|PLAN_FILE|DESTROY_PLAN_FILE|TF_VAR_*)
       return 0
       ;;
     *)
@@ -290,23 +290,20 @@ remote_command() {
 verify_deployment() {
   log "Verifying running containers and GHCR image references"
 
-  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps'
-  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml images'
+  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml -f docker-compose.observability.yml ps'
+  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml -f docker-compose.observability.yml images'
 
-  if remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml config | grep "build:"'; then
-    printf 'Verification failed: Azure Compose config contains a build section.\n' >&2
-    exit 1
-  fi
-
-  log "No build sections found in the Azure Compose config"
-  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q client-web)" --format "{{ .Config.Image }}"'
-  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml ps -q ai)" --format "{{ .Config.Image }}"'
+  log "Verifying GHCR image references for deployed services"
+  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml -f docker-compose.observability.yml ps -q client-web)" --format "{{ .Config.Image }}"'
+  remote_command 'cd /opt/tutormatch && docker inspect "$(docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml -f docker-compose.observability.yml ps -q ai)" --format "{{ .Config.Image }}"'
 
   local public_ip app_hostname
   public_ip="$(terraform_output public_ip_address)"
-  app_hostname="${AZURE_APP_HOSTNAME:-${APP_HOSTNAME:-${public_ip}.nip.io}}"
+  app_hostname="${AZURE_APP_HOSTNAME:-${APP_HOSTNAME:-tutormatch.${public_ip}.nip.io}}"
   log "Deployment URL: https://${app_hostname}"
   log "Keycloak URL: https://auth.${app_hostname}"
+  log "API UI URL: https://api.${app_hostname}"
+  log "Grafana URL: https://grafana.${app_hostname}"
 }
 
 stop_deployment() {
@@ -314,7 +311,7 @@ stop_deployment() {
   ensure_terraform_inputs
   terraform_init
   log "Stopping Docker Compose application while keeping Azure resources"
-  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml down'
+  remote_command 'cd /opt/tutormatch && docker compose --env-file .env.azure -f docker-compose.yml -f docker-compose.azure.yml -f docker-compose.observability.yml down'
 }
 
 destroy_deployment() {

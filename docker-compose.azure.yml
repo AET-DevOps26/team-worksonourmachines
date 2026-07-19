@@ -1,6 +1,9 @@
 services:
   gateway:
     restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
     environment:
       APP_HOSTNAME: ${APP_HOSTNAME:?Set APP_HOSTNAME for Azure deployment}
     volumes:
@@ -44,11 +47,12 @@ services:
       KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD for Azure deployment}
       KEYCLOAK_USER: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_CLIENT_WEB_SECRET: ${KEYCLOAK_CLIENT_SECRET:?Set KEYCLOAK_CLIENT_SECRET for Azure deployment}
-      KEYCLOAK_SERVER_STUDENT_SECRET: ${SERVER_STUDENT_CLIENT_SECRET:-server-student-dev-secret}
-      KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET: ${KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET:-server-marketplace-admin-secret}
-      AI_CLIENT_SECRET: ${AI_CLIENT_SECRET:-server-ai-dev-secret}
+      KEYCLOAK_SERVER_STUDENT_SECRET: ${SERVER_STUDENT_CLIENT_SECRET:?Set SERVER_STUDENT_CLIENT_SECRET for Azure deployment}
+      KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET: ${KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET:?Set KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET for Azure deployment}
+      AI_CLIENT_SECRET: ${AI_CLIENT_SECRET:?Set AI_CLIENT_SECRET for Azure deployment}
 
   demo-seed:
+    restart: on-failure
     environment:
       KEYCLOAK_USER: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD for Azure deployment}
@@ -62,6 +66,39 @@ services:
       COMMUNICATION_USER: ${COMMUNICATION_DB_USER:-communication}
       COMMUNICATION_PASSWORD: ${COMMUNICATION_DB_PASSWORD:-communication}
 
+  server-student:
+    image: ${SERVER_STUDENT_IMAGE:?Set SERVER_STUDENT_IMAGE to the GHCR image tag}
+    restart: unless-stopped
+    environment:
+      PORT: "8081"
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:?Set KEYCLOAK_ISSUER for Azure deployment}
+      KEYCLOAK_CLIENT_SECRET: ${SERVER_STUDENT_CLIENT_SECRET:?Set SERVER_STUDENT_CLIENT_SECRET for Azure deployment}
+      STUDENT_DB_URL: jdbc:postgresql://postgres:5432/student
+      STUDENT_DB_USER: ${STUDENT_DB_USER:-student}
+      STUDENT_DB_PASSWORD: ${STUDENT_DB_PASSWORD:-student}
+
+  server-marketplace:
+    image: ${SERVER_MARKETPLACE_IMAGE:?Set SERVER_MARKETPLACE_IMAGE to the GHCR image tag}
+    restart: unless-stopped
+    environment:
+      PORT: "8082"
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:?Set KEYCLOAK_ISSUER for Azure deployment}
+      KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET: ${KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET:?Set KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET for Azure deployment}
+      MARKETPLACE_DB_URL: jdbc:postgresql://postgres:5432/marketplace
+      MARKETPLACE_DB_USER: ${MARKETPLACE_DB_USER:-marketplace}
+      MARKETPLACE_DB_PASSWORD: ${MARKETPLACE_DB_PASSWORD:-marketplace}
+
+  server-communication:
+    image: ${SERVER_COMMUNICATION_IMAGE:?Set SERVER_COMMUNICATION_IMAGE to the GHCR image tag}
+    restart: unless-stopped
+    environment:
+      PORT: "8083"
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:?Set KEYCLOAK_ISSUER for Azure deployment}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD for Azure deployment}
+      COMMUNICATION_DB_URL: jdbc:postgresql://postgres:5432/communication
+      COMMUNICATION_DB_USER: ${COMMUNICATION_DB_USER:-communication}
+      COMMUNICATION_DB_PASSWORD: ${COMMUNICATION_DB_PASSWORD:-communication}
+
   client-web:
     image: ${CLIENT_WEB_IMAGE:?Set CLIENT_WEB_IMAGE to the GHCR image tag}
     restart: unless-stopped
@@ -73,18 +110,26 @@ services:
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:?Set KEYCLOAK_ISSUER for Azure deployment}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-client-web}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:?Set KEYCLOAK_CLIENT_SECRET for Azure deployment}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
-      SERVER_AI_API_URL: ${SERVER_AI_API_URL:-tbd}
-      SERVER_COMMUNICATION_API_URL: ${SERVER_COMMUNICATION_API_URL:-tbd}
-      SERVER_MARKETPLACE_API_URL: ${SERVER_MARKETPLACE_API_URL:-tbd}
-      SERVER_STUDENT_API_URL: ${SERVER_STUDENT_API_URL:-tbd}
+      REDIS_URL: redis://redis:6379
+      SERVER_AI_API_URL: http://ai:8000
+      SERVER_COMMUNICATION_API_URL: http://server-communication:8083
+      SERVER_MARKETPLACE_API_URL: http://server-marketplace:8082
+      SERVER_STUDENT_API_URL: http://server-student:8081
 
   ai:
     image: ${AI_IMAGE:?Set AI_IMAGE to the GHCR image tag}
     restart: unless-stopped
     environment:
-      - LOG_LEVEL=${AI_LOG_LEVEL:-INFO}
-      - LLM_PROVIDER=${LLM_PROVIDER:-logos}
-      - LLM_BASE_URL=${LLM_BASE_URL:-https://logos.aet.cit.tum.de}
-      - LLM_MODEL=${LLM_MODEL:-openai/gpt-oss-120b}
-      - LLM_API_KEY
+      LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
+      LLM_PROVIDER: ${LLM_PROVIDER:-logos}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://logos.aet.cit.tum.de/v1}
+      LLM_MODEL: ${LLM_MODEL:-openai/gpt-oss-120b}
+      LLM_API_KEY: ${LLM_API_KEY:?Set LLM_API_KEY for Azure deployment}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:?Set KEYCLOAK_ISSUER for Azure deployment}
+      KEYCLOAK_JWKS_URI: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/certs
+      KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/tutormatch/protocol/openid-connect/token
+      AI_CLIENT_ID: server-ai
+      AI_CLIENT_SECRET: ${AI_CLIENT_SECRET:?Set AI_CLIENT_SECRET for Azure deployment}
+      EXPECTED_CALLER_CLIENT_ID: server-student
+      STUDENT_API_URL: http://server-student:8081
+      MARKETPLACE_API_URL: http://server-marketplace:8082
