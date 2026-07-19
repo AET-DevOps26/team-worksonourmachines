@@ -163,7 +163,7 @@ make -C infrastructure k3d-local-deploy
 
 The dynamic ingress ClusterIP is passed directly to Helm; `values.local.yaml` no longer needs to be edited whenever the cluster is recreated.
 
-Each phase is also independently invokable:
+Each phase is also independently invocable:
 
 ```bash
 make -C infrastructure k3d-cluster-create
