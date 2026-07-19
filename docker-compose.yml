@@ -216,6 +216,45 @@ services:
       retries: 5
       start_period: 30s
 
+  server-student:
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    image: ${SERVER_STUDENT_IMAGE}
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8081; printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  server-marketplace:
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    image: ${SERVER_MARKETPLACE_IMAGE}
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8082; printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  server-communication:
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    image: ${SERVER_COMMUNICATION_IMAGE}
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8083; printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
 volumes:
   postgres_data:
   caddy_data:
