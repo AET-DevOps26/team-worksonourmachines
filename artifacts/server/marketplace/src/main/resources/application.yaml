@@ -29,7 +29,7 @@ keycloak:
     base-url: ${KEYCLOAK_BASE_URL:http://keycloak:8080}
     realm: ${KEYCLOAK_REALM:tutormatch}
     client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:server-marketplace-admin}
-    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:server-marketplace-admin-secret}
+    client-secret: ${KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET:server-marketplace-admin-secret}
 
 server:
   port: ${PORT:8082}

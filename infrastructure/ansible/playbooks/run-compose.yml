@@ -8,10 +8,11 @@
     application_dir: /opt/tutormatch
     compose_base_file: docker-compose.yml
     compose_azure_file: docker-compose.azure.yml
+    compose_observability_file: docker-compose.observability.yml
     repo_root: "{{ playbook_dir }}/../../.."
     image_prefix: ghcr.io/aet-devops26/team-worksonourmachines
     image_tag: ""
-    app_hostname: "{{ (ansible_host | default(inventory_hostname)) ~ '.nip.io' }}"
+    app_hostname: "tutormatch.{{ (ansible_host | default(inventory_hostname)) ~ '.nip.io' }}"
     app_base_url: "https://{{ app_hostname }}"
     keycloak_hostname: "https://auth.{{ app_hostname }}"
     keycloak_issuer: "{{ keycloak_hostname }}/realms/tutormatch"
@@ -25,16 +26,15 @@
     keycloak_admin_password: "{{ lookup('env', 'KEYCLOAK_ADMIN_PASSWORD') | default('', true) }}"
     keycloak_client_id: client-web
     keycloak_client_secret: "{{ lookup('env', 'KEYCLOAK_CLIENT_SECRET') | default('', true) }}"
+    server_student_client_secret: "{{ lookup('env', 'SERVER_STUDENT_CLIENT_SECRET') | default('', true) }}"
+    keycloak_server_marketplace_admin_secret: "{{ lookup('env', 'KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET') | default('', true) }}"
+    ai_client_secret: "{{ lookup('env', 'AI_CLIENT_SECRET') | default('', true) }}"
     llm_provider: logos
-    llm_base_url: https://logos.aet.cit.tum.de
+    llm_base_url: https://logos.aet.cit.tum.de/v1
     llm_model: openai/gpt-oss-120b
     llm_api_key: "{{ lookup('env', 'LLM_API_KEY') | default('', true) }}"
-    server_communication_api_url: http://server-communication:8083
-    server_marketplace_api_url: http://server-marketplace:8082
-    server_student_api_url: http://server-student:8081
-    server_student_client_secret: "{{ lookup('env', 'SERVER_STUDENT_CLIENT_SECRET') | default('server-student-dev-secret', true) }}"
-    ghcr_username: "{{ lookup('env', 'GHCR_USERNAME') | default('', true) }}"
-    ghcr_token: "{{ lookup('env', 'GHCR_TOKEN') | default('', true) }}"
+    grafana_admin_user: "{{ lookup('env', 'GRAFANA_ADMIN_USER') | default('', true) }}"
+    grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') | default('', true) }}"
 
   pre_tasks:
     - name: Validate required production secrets
@@ -45,7 +45,13 @@
           - keycloak_db_password | length > 0
           - keycloak_admin_password | length > 0
           - keycloak_client_secret | length > 0
-        fail_msg: "Set image_tag to a Git commit SHA and provide the production secrets via environment variables or Ansible Vault."
+          - server_student_client_secret | length > 0
+          - keycloak_server_marketplace_admin_secret | length > 0
+          - ai_client_secret | length > 0
+          - llm_api_key | length > 0
+          - grafana_admin_user | length > 0
+          - grafana_admin_password | length > 0
+        fail_msg: "Provide all required production secrets via environment variables."
 
   tasks:
     - name: Ensure application directories exist
@@ -60,6 +66,14 @@
         - "{{ application_dir }}/artifacts/gateway"
         - "{{ application_dir }}/artifacts/keycloak/import"
         - "{{ application_dir }}/artifacts/postgres/init"
+        - "{{ application_dir }}/artifacts/demo-seed"
+        - "{{ application_dir }}/artifacts/api-ui"
+        - "{{ application_dir }}/artifacts/api-ui/docker"
+        - "{{ application_dir }}/api/specs"
+        - "{{ application_dir }}/artifacts/observability/alloy"
+        - "{{ application_dir }}/artifacts/observability/grafana/provisioning/datasources"
+        - "{{ application_dir }}/artifacts/observability/grafana/provisioning/dashboards"
+        - "{{ application_dir }}/artifacts/observability/grafana/dashboards"
 
     - name: Copy base Docker Compose file
       ansible.builtin.copy:
@@ -73,6 +87,14 @@
       ansible.builtin.copy:
         src: "{{ repo_root }}/docker-compose.azure.yml"
         dest: "{{ application_dir }}/{{ compose_azure_file }}"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy observability Docker Compose file
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/docker-compose.observability.yml"
+        dest: "{{ application_dir }}/{{ compose_observability_file }}"
         owner: "{{ application_user }}"
         group: "{{ application_group }}"
         mode: "0644"
@@ -101,6 +123,78 @@
         group: "{{ application_group }}"
         mode: "0755"
 
+    - name: Copy demo seed scripts
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/demo-seed/"
+        dest: "{{ application_dir }}/artifacts/demo-seed/"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy API UI config
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/api-ui/scalar.config.json"
+        dest: "{{ application_dir }}/artifacts/api-ui/scalar.config.json"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy API UI entrypoint
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/api-ui/docker/entrypoint.sh"
+        dest: "{{ application_dir }}/artifacts/api-ui/docker/entrypoint.sh"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0755"
+
+    - name: Copy API specs
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/api/specs/"
+        dest: "{{ application_dir }}/api/specs/"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Prometheus configuration
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/observability/prometheus.yml"
+        dest: "{{ application_dir }}/artifacts/observability/prometheus.yml"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Alloy configuration
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/observability/alloy/config.alloy"
+        dest: "{{ application_dir }}/artifacts/observability/alloy/config.alloy"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Grafana datasources provisioning
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/observability/grafana/provisioning/datasources/observability.yml"
+        dest: "{{ application_dir }}/artifacts/observability/grafana/provisioning/datasources/observability.yml"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Grafana dashboards provisioning
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/observability/grafana/provisioning/dashboards/tutormatch.yml"
+        dest: "{{ application_dir }}/artifacts/observability/grafana/provisioning/dashboards/tutormatch.yml"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
+    - name: Copy Grafana dashboards
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/artifacts/observability/grafana/dashboards/"
+        dest: "{{ application_dir }}/artifacts/observability/grafana/dashboards/"
+        owner: "{{ application_user }}"
+        group: "{{ application_group }}"
+        mode: "0644"
+
     - name: Write deployment environment file
       ansible.builtin.copy:
         dest: "{{ application_dir }}/.env.azure"
@@ -110,7 +204,6 @@
         content: |
           APP_HOSTNAME={{ app_hostname }}
           APP_BASE_URL={{ app_base_url }}
-          GATEWAY_CADDYFILE=./artifacts/gateway/Caddyfile.prod
           KEYCLOAK_HOSTNAME={{ keycloak_hostname }}
           KEYCLOAK_ISSUER={{ keycloak_issuer }}
           CLIENT_WEB_IMAGE={{ image_prefix }}/client-web:{{ image_tag }}
@@ -129,35 +222,24 @@
           KEYCLOAK_CLIENT_ID={{ keycloak_client_id }}
           KEYCLOAK_CLIENT_SECRET={{ keycloak_client_secret }}
           SERVER_STUDENT_CLIENT_SECRET={{ server_student_client_secret }}
+          KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET={{ keycloak_server_marketplace_admin_secret }}
+          AI_CLIENT_SECRET={{ ai_client_secret }}
           LLM_PROVIDER={{ llm_provider }}
           LLM_BASE_URL={{ llm_base_url }}
           LLM_MODEL={{ llm_model }}
-          {% if llm_api_key | length > 0 %}
           LLM_API_KEY={{ llm_api_key }}
-          {% endif %}
-          SERVER_COMMUNICATION_API_URL={{ server_communication_api_url }}
-          SERVER_MARKETPLACE_API_URL={{ server_marketplace_api_url }}
-          SERVER_STUDENT_API_URL={{ server_student_api_url }}
+          GRAFANA_ADMIN_USER={{ grafana_admin_user }}
+          GRAFANA_ADMIN_PASSWORD={{ grafana_admin_password }}
       no_log: true
-
-    - name: Log in to GHCR for private images
-      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker login ghcr.io --username "{{ ghcr_username }}" --password-stdin
-      args:
-        stdin: "{{ ghcr_token }}"
-      no_log: true
-      changed_when: true
-      when:
-        - ghcr_username | length > 0
-        - ghcr_token | length > 0
 
     - name: Pull deployment images
-      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure -f {{ compose_base_file }} -f {{ compose_azure_file }} pull
+      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure -f {{ compose_base_file }} -f {{ compose_azure_file }} -f {{ compose_observability_file }} pull
       args:
         chdir: "{{ application_dir }}"
       changed_when: true
 
     - name: Start Docker Compose project
-      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure -f {{ compose_base_file }} -f {{ compose_azure_file }} up -d --remove-orphans
+      ansible.builtin.command: runuser --user "{{ application_user }}" -- docker compose --env-file .env.azure -f {{ compose_base_file }} -f {{ compose_azure_file }} -f {{ compose_observability_file }} up -d --remove-orphans
       args:
         chdir: "{{ application_dir }}"
       changed_when: true
