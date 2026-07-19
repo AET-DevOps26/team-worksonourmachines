@@ -16,3 +16,8 @@ scrape_configs:
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: [server-communication:8083]
+
+  - job_name: ai
+    metrics_path: /metrics
+    static_configs:
+      - targets: [ai:8000]
