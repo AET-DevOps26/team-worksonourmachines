@@ -6,6 +6,7 @@ KEYCLOAK_REALM_SRC := $(KUBERNETES_REPO_ROOT)/artifacts/keycloak/import/tutormat
 KEYCLOAK_REALM_CHART_FILE := $(KUBERNETES_CHART)/files/tutormatch-realm.json
 OBSERVABILITY_DIR := $(KUBERNETES_DIR)helm/observability/
 OBSERVABILITY_DASHBOARD := $(KUBERNETES_REPO_ROOT)/artifacts/observability/grafana/dashboards/spring-boot-observability.json
+OBSERVABILITY_DASHBOARD_OVERVIEW := $(KUBERNETES_REPO_ROOT)/artifacts/observability/grafana/dashboards/tutormatch-overview.json
 OBSERVABILITY_ENV ?= $(KUBERNETES_REPO_ROOT)/.env
 
 IMAGE_PREFIX ?= ghcr.io/aet-devops26/team-worksonourmachines
@@ -425,8 +426,11 @@ k3d-observability-install: ## Deploy observability stack (Prometheus, Grafana, L
 		--values "$(OBSERVABILITY_DIR)grafana.values.yaml" \
 		--values "$(OBSERVABILITY_DIR)grafana.values.local.yaml" \
 		--set-file 'dashboards.default.spring-boot-observability.json=$(OBSERVABILITY_DASHBOARD)' \
+		--set-file 'dashboards.default.tutormatch-overview.json=$(OBSERVABILITY_DASHBOARD_OVERVIEW)' \
 		--wait \
-		--timeout "$(K3D_TIMEOUT)"
+		--timeout "$(K3D_TIMEOUT)" && \
+	kubectl --context "$(K3D_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		apply -f "$(OBSERVABILITY_DIR)kube-state-metrics.yaml"
 
 .PHONY: k3d-observability-uninstall
 k3d-observability-uninstall: ## Remove observability stack from local k3d
@@ -493,5 +497,8 @@ rancher-observability-install: ## Deploy observability stack (Prometheus, Grafan
 		--namespace "$(NAMESPACE)" \
 		--values "$(OBSERVABILITY_DIR)grafana.values.yaml" \
 		--set-file 'dashboards.default.spring-boot-observability.json=$(OBSERVABILITY_DASHBOARD)' \
+		--set-file 'dashboards.default.tutormatch-overview.json=$(OBSERVABILITY_DASHBOARD_OVERVIEW)' \
 		--wait \
 		--timeout "$(RANCHER_TIMEOUT)"
+	@kubectl --context "$(RANCHER_KUBE_CONTEXT)" --namespace "$(NAMESPACE)" \
+		apply -f "$(OBSERVABILITY_DIR)kube-state-metrics.yaml"
