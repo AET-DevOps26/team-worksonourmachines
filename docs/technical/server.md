@@ -146,7 +146,7 @@ api/               — MarketplaceController, MarketplaceWebConfiguration
 | `KEYCLOAK_BASE_URL` | `http://keycloak:8080` | Keycloak Admin API base |
 | `KEYCLOAK_REALM` | `tutormatch` | Realm name |
 | `KEYCLOAK_ADMIN_CLIENT_ID` | `server-marketplace-admin` | Admin client ID |
-| `KEYCLOAK_ADMIN_CLIENT_SECRET` | `server-marketplace-admin-secret` | Admin client secret |
+| `KEYCLOAK_SERVER_MARKETPLACE_ADMIN_SECRET` | `server-marketplace-admin-secret` | Admin client secret |
 
 ## Communication service
 
